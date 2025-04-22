@@ -1,0 +1,4 @@
+.vscode
+node_modules
+./packages/mainconfig.js
+/.vscode

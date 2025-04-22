@@ -1,0 +1,21 @@
+{
+  "name": "zenclaim-seedtool",
+  "version": "0.0.1",
+  "description": "command line tools for deriving addresses and keys from 12 or 24 word seed phrases",
+  "main": "seedtool.js",
+  "type": "module",
+  "bin": {
+    "zenclaim-seedtool": "packages/zenclaim-seedtool/seedtool.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "allan@zensytems.io",
+  "license": "MIT",
+  "dependencies": {
+    "bip32": "4.0.0",
+    "bip39": "^3.1.0",
+    "colors": "^1.4.0",
+    "tiny-secp256k1": "^2.2.3",
+    "zencashjs": "^2.1.0"  }
+}
