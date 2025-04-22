@@ -13,10 +13,10 @@
   "author": "allan@zensystems.io",
   "license": "MIT",
   "dependencies": {
-    "@polkadot/rpc-provider": "^15.3.1",
-    "bs58check": "^4.0.0",
-    "ethers": "^6.13.5",
-    "sha3": "^2.1.4",
-    "web3": "^4.16.0"
+    "bs58check": "4.0.0",
+    "eip55": "2.1.1",
+    "ethers": "6.13.5",
+    "sha3": "2.1.4",
+    "web3": "4.16.0"
   }
 }

@@ -13,7 +13,7 @@
   "author": "allan@zensystems.io",
   "license": "MIT",
   "dependencies": {
-    "colors": "^1.4.0",
-    "zencashjs": "^2.1.0"
+    "colors": "1.4.0",
+    "zencashjs": "2.2.0"
   }
 }
