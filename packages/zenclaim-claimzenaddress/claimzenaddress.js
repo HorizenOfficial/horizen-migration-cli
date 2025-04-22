@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as zen from "./claimzenutils.js";
-import { verify } from "zenclaim-verifymessage/verifyutils.js";
+import { verify } from "../zenclaim-verifymessage/verifyutils.js";
 import 'colors';
 
 // HELP
@@ -71,7 +71,7 @@ async function claimZen(options) {
   const testnet = network === 'testnet' ? 1 : 0;
 
   // Validate inputs
-  if (!zen.isZenAddress(zenAddress, testnet, verbose)) {
+  if (!zen.isZenAddress(zenAddress, testnet, false, verbose)) {
     throw new Error("Not a valid zenAddress");
   }
   if (!zen.isH2Address(destinationAddress)) {
@@ -84,7 +84,7 @@ async function claimZen(options) {
   if (!verify(message, zenAddress, signature)) {
     throw new Error("Not a valid signature for signed message");
   }
-
+  
   const addressCheck = await zen.checkClaimAddress(zenAddress, testnet, verbose);
   if (addressCheck.error) {
     throw new Error(addressCheck.error);

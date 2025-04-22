@@ -1,23 +1,13 @@
 // import zencashjs from "zencashjs"
 import bs58check from "bs58check";
+import eip55 from "eip55";
 // import { writeZenClaimContract } from './zenClaim/useZenClaimContract'
 
-import { Keccak  } from 'sha3';
+import { Keccak } from 'sha3';
 import { Buffer } from 'buffer';
 import { checkClaimAddressBalance, sendDataToSmartContract } from './zenClaim/rpc.js'
 
-const regexZenAddr = /^[z][a-km-zA-HJ-NP-Z1-9]{26,36}$/;
-const regexEth = /^0x[a-fA-F0-9]{40}$/;
 const regexEthPrivKey = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/
-
-/**
- *
- * @param {string} addr  zen address
- * @returns boolean
- */
-const isZen = (addr) => {
-  return regexZenAddr.test(addr);
-};
 
 /**
  *
@@ -25,9 +15,8 @@ const isZen = (addr) => {
  * @param {number} testnet 0 or 1
  * @returns boolean
  */
-const isZenAddress = (address, testnet, verbose) => {
+const isZenAddress = (address, testnet, isMulti, verbose) => {
   if (verbose) console.log("ZEN isZenAddress check", address);
-  if (!isZen(address)) return false;
 
   let prefix;
   try {
@@ -45,6 +34,15 @@ const isZenAddress = (address, testnet, verbose) => {
     if (verbose) console.log("ZEN isZenAddress rejecting non testnet address");
     return false;
   }
+  if (isMulti && prefix !== "2096" && prefix !== "2092") {
+    if (verbose) console.log("ZEN isZenAddress rejecting non multisig address");
+    return false;
+  }
+  if (!isMulti && prefix == "2096" && prefix == "2092") {
+    if (verbose) console.log("ZEN isZenAddress rejecting multisig address");
+    return false;
+  }
+
   if (verbose) console.log("ZEN zenAddress ok");
   return true;
 };
@@ -55,7 +53,8 @@ const isZenAddress = (address, testnet, verbose) => {
 * @returns boolean
 */
 const isH2Address = (destinationAddress) => {
-  return regexEth.test(destinationAddress);
+  //this can throw an error if the address is not valid.
+  return eip55.verify(destinationAddress, false);
 }
 /**
 *
@@ -105,20 +104,29 @@ const zendAddrToLowercaseHorizen2Addr = (mc_address) => {
 }
 const checkClaimAddress = async (mc_address, network, verbose) => {
   const eth_address = zendAddrToLowercaseHorizen2Addr(mc_address);
-  if (!isH2Address(eth_address)) {
-    console.error("Not a valid H2 address.");
+  let checksummedAddress;
+  try {
+    checksummedAddress = eip55.encode(eth_address);
+    if (!isH2Address(checksummedAddress)) {
+      if (verbose) console.error("Not a valid H2 address.");
+      return { error: "Not a valid H2 adress." }
+    }
+  } catch (error) {
+    if (verbose) console.error("Error deriving the Horizen 2 claim address from the Zen address provided.");
     // process.exit();
     return { error: "Error deriving the Horizen 2 claim address from the Zen address provided." }
   }
 
-  const balance = await checkClaimAddressBalance(eth_address, network, verbose);
+
+
+  const balance = await checkClaimAddressBalance(checksummedAddress, network, verbose);
   if (!balance || Number(balance) === 0) {
-    console.error("No balance in Horizen 2 claim address");
+    if (verbose) console.error("No balance in Horizen 2 claim address");
     // process.exit();
-    return { error: `No balance found in Horizen 2 claim address ${eth_address} for zen main chain address ${mc_address}` }
+    return { error: `No balance found in Horizen 2 claim address ${checksummedAddress} for zen main chain address ${mc_address} (for gas)` }
   }
 
-  return { eth_address, balance };
+  return { checksummedAddress, balance };
 }
 
 const claimZen = (zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose) => {
