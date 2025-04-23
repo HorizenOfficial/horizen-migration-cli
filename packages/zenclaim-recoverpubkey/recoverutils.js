@@ -66,7 +66,20 @@ function verify(message, zenAddress, signature) {
     const pubkeyRecoveredConvertedUncompressed = secp256k1.publicKeyConvert(Buffer.from(pubkeyRecovered , "hex"), false).toString("hex")
     
     const addr = zencashjs.address.pubKeyToAddr(pubkeyRecovered);
-    const validKey = zenAddress === addr;
-    return { validMessage, validKey, pubkeyRecovered, pubkeyRecoveredConvertedUncompressed };
+    const matches = zenAddress === addr;
+    const pubkeyXcoordinate = pubkeyRecoveredConvertedUncompressed.slice(0, 66).slice(2);
+    const pubkeyYcoordinate = pubkeyRecoveredConvertedUncompressed.slice(66);
+    if (verbose) {
+        console.log("zenAddress=", zenAddress);
+        console.log("message=", message);
+        console.log("addrsMatch=", matches);
+        console.log("validMessage=", validMessage);
+        console.log("pubkeyRecoveredUncompressed=", pubkeyRecoveredConvertedUncompressed);
+        console.log("pubkeyXcoordinate=", pubkeyXcoordinate);
+        console.log("pubkeyYcoordinate=", pubkeyYcoordinate);
+        return { validMessage, addrsMatch: matches, pubkeyRecovered, pubkeyXcoordinate, pubkeyYcoordinate};
+    }
+    return { pubkeyXcoordinate, pubkeyYcoordinate};
   }
+
   export {verifyAndRecoverPubKey}
