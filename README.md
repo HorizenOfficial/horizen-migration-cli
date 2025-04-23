@@ -56,7 +56,7 @@ deriveAddresses(options).then(result => {
 Arguments/Options:    
 Only the mnemonicPhrase is required. Defaults are for ZEN mainnet. 
 ```
-  --mnemonicPhrase="" (${'mandatory'.magenta} 12 or 24 words. 13th or 25th treated as password, if present)
+  --mnemonicPhrase="" (mandatory, usually 12 or 24 words)
   --mnemonicPassword="" (optional, default "", seed password)
   --numAddresses=int (optional, default 5)
   --derivationPath="" (optional, default "m/44'/121'/0'/0/")
@@ -66,7 +66,7 @@ Only the mnemonicPhrase is required. Defaults are for ZEN mainnet.
   --help  display this help
   --verbose display additional values to help debug
   ${'Short forms of arguments'.cyan} 
-  -ph="" -pw="" -na="" -dp="" -do="" -nt="" -s -h -v
+  -ph="" -pw="" -na= -dp="" -do="" -nt="" -s -h -v
 `;
 ```
 Notes: help is only available in the CLI.    
