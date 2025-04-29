@@ -2,7 +2,7 @@ import varuint from 'varuint-bitcoin';
 import zencashjs from 'zencashjs';
 import secp256k1 from 'secp256k1';
 import bs58check from 'bs58check';
-import { isZenAddress } from 'zenclaim-claimzenaddress/claimzenutils.js';
+import { isZenAddress } from '../zenclaim-claimzenaddress/zenClaim/claimzenutils.js';
 
 // see zencashjs/src/message.js for the origin of the next 3 functions
 function _magicHash(message) {
@@ -53,20 +53,27 @@ function verify(message, zenAddress, signature) {
     return [ (expected.equals(actual)), publicKey.toString("hex") ];
   };
 
+
   function verifyAndRecoverPubKey(message, zenAddress, signature, network, verbose) {
     const testnet = Number(network) || 0;
     if (verbose) console.log(`testnet= ${testnet}`)
     if (!zenAddress || !message || !signature) {
         return { error: "zenAddress, message, and signature are all required" };
     }
-    if (!isZenAddress(zenAddress, testnet)) {
+    if (!isZenAddress(zenAddress, testnet, false, verbose)) {
         return { error: "Not a valid zenAddress" };
     }
-    const [ validMessage, pubkeyRecovered ] = verify(message, zenAddress, Buffer.from(signature, "base64"));
+    const [ validMessage, pubkeyRecovered ] = verify(message, zenAddress, signature);
     const pubkeyRecoveredConvertedUncompressed = secp256k1.publicKeyConvert(Buffer.from(pubkeyRecovered , "hex"), false).toString("hex")
     
-    const addr = zencashjs.address.pubKeyToAddr(pubkeyRecovered);
+    const addr = zencashjs.address.pubKeyToAddr(
+      pubkeyRecovered,
+      testnet ? zencashjs.config.testnet.pubKeyHash : zencashjs.config.mainnet.pubKeyHash,
+    );
     const matches = zenAddress === addr;
+    if (!matches) {
+        return { error: "zen address does not match the public key derived from signature" };
+    }
     const pubkeyXcoordinate = pubkeyRecoveredConvertedUncompressed.slice(0, 66).slice(2);
     const pubkeyYcoordinate = pubkeyRecoveredConvertedUncompressed.slice(66);
     if (verbose) {
@@ -77,7 +84,6 @@ function verify(message, zenAddress, signature) {
         console.log("pubkeyRecoveredUncompressed=", pubkeyRecoveredConvertedUncompressed);
         console.log("pubkeyXcoordinate=", pubkeyXcoordinate);
         console.log("pubkeyYcoordinate=", pubkeyYcoordinate);
-        return { validMessage, addrsMatch: matches, pubkeyRecovered, pubkeyXcoordinate, pubkeyYcoordinate};
     }
     return { pubkeyXcoordinate, pubkeyYcoordinate};
   }
