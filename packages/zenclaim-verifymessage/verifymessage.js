@@ -39,13 +39,13 @@ function parseArguments(args) {
       console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
       process.exit(1);
     }
-    if (val[0] === '-ms' || val[0] === '--message') options.message = val[1];
-    if (val[0] === '-za' || val[0] === '--zenAddress') options.zenAddress = val[1];
-    if (val[0] === '-sg' || val[0] === '--signature') options.signature = val[1];
-    if (val[0] === '-v' || val[0] === '--verbose') options.verbose = true;
+    if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
+    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
+    if (val[0] === '-sg' || val[0] === '--signature') { options.signature = val[1]; continue; }
+    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
-  if(options.verbose) console.log('zenclaim-verifymessage CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+  if (options.verbose) console.log('zenclaim-verifymessage CLI'.green, version.yellow, 'by Horizen Labs'.grey);
 
   if (!options.message || !options.zenAddress || !options.signature) {
     console.error('message, zenAddress, and signature are all required'.red);

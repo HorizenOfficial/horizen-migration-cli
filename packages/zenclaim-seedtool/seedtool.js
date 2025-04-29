@@ -39,16 +39,17 @@ function parseArguments(args) {
             console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
             process.exit(1);
         }
-        if (val[0] === '-ph' || val[0] === '--mnemonicPhrase') options.mnemonicPhrase = val[1];
-        if (val[0] === '-pw' || val[0] === '--mnemonicPassword') options.mnemonicPassword = val[1];
-        if (val[0] === '-na' || val[0] === '--numAddresses') options.numAddresses = Number(val[1]);
-        if (val[0] === '-dp' || val[0] === '--derivationPath') options.derivationPath = val[1];
-        if (val[0] === '-do' || val[0] === '--derivationAddressIndexOffset') options.derivationAddressIndexOffset = Number(val[1]);
-        if (val[0] === '-nt' || val[0] === '--network') options.network = val[1];
-        if (val[0] === '-s' || val[0] === '--stringify') options.stringify = true;
-        if (val[0] === '-v' || val[0] === '--verbose') options.verbose = true;
+        if (val[0] === '-ph' || val[0] === '--mnemonicPhrase') { options.mnemonicPhrase = val[1]; continue; }
+        if (val[0] === '-na' || val[0] === '--numAddresses') { options.numAddresses = Number(val[1]); continue; }
+        if (val[0] === '-pw' || val[0] === '--mnemonicPassword') { options.mnemonicPassword = val[1]; continue; }
+        if (val[0] === '-na' || val[0] === '--numAddresses') { options.numAddresses = Number(val[1]); continue; }
+        if (val[0] === '-dp' || val[0] === '--derivationPath') { options.derivationPath = val[1];; continue; }
+        if (val[0] === '-do' || val[0] === '--derivationAddressIndexOffset') { options.derivationAddressIndexOffset = Number(val[1]); continue; }
+        if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
+        if (val[0] === '-s' || val[0] === '--stringify') { options.stringify = true; continue; }
+        if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
     }
-    if(options.verbose) console.log('zenclaim-seedtool CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+    if (options.verbose) console.log('zenclaim-seedtool CLI'.green, version.yellow, 'by Horizen Labs'.grey);
 
 
     if (!options.mnemonicPhrase) {
@@ -74,7 +75,7 @@ async function deriveAddresses(options) {
             network,
             options.verbose || options.v || false,
         );
-        
+
         if (addrs.error) {
             console.error(addrs.error.red);
             process.exit(1);
@@ -109,5 +110,5 @@ export { deriveAddresses };
 const argv = process.argv
 const isCLI = argv[0].includes('node') && argv[1].endsWith('seedtool.js')
 if (isCLI) {
-        main(argv.slice(2));
+    main(argv.slice(2));
 }

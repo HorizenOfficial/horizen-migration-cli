@@ -26,7 +26,6 @@ The message to sign should consist of the word ZENCLAIM and the destination addr
 const long = ['--privKey', '--message', '--compressed', '--network', '--stringify', '--help', '--verbose'];
 const short = ['-pk', '-ms', '-cp', '-nt', '-s', '-h', '-v'];
 const allowed = long.concat(short);
-// const flags = long.splice(-3).concat(short.splice(-3));
 
 // Function to parse arguments
 function parseArguments(args) {
@@ -45,15 +44,15 @@ function parseArguments(args) {
       console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
       process.exit(1);
     }
-    if (val[0] === '-pk' || val[0] === '--privKey') options.privKey = val[1];
-    if (val[0] === '-ms' || val[0] === '--message') options.message = val[1];
-    if (val[0] === '-cp' || val[0] === '--compressed') options.compressed = val[1] === 'true';
-    if (val[0] === '-nt' || val[0] === '--network') options.network = val[1];
-    if (val[0] === '-s' || val[0] === '--stringify') options.stringify = true;
-    if (val[0] === '-v' || val[0] === '--verbose') options.verbose = true;
+    if (val[0] === '-pk' || val[0] === '--privKey') { options.privKey = val[1]; continue; }
+    if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
+    if (val[0] === '-cp' || val[0] === '--compressed') { options.compressed = val[1] === 'true'; continue; }
+    if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
+    if (val[0] === '-s' || val[0] === '--stringify') { options.stringify = true; continue; }
+    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
-  if(options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+  if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by Horizen Labs'.grey);
 
   if (!options.privKey || !options.message) {
     console.error('message and private key are required'.red);

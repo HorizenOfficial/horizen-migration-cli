@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import * as zen from "./claimzenutils.js";
-import { verify } from "../zenclaim-verifymessage/verifyutils.js";
+import * as zen from "./zenClaim/claimzenutils.js";
+import { findSenderBalance, submitClaim } from './zenClaim/rpc.js'
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "./zenClaim/contractConsts.js";
 import 'colors';
 
 // HELP
@@ -47,14 +48,14 @@ function parseArguments(args) {
       console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
       process.exit(1);
     }
-    if (val[0] === '-za' || val[0] === '--zenAddress') options.zenAddress = val[1];
-    if (val[0] === '-da' || val[0] === '--destinationAddress') options.destinationAddress = val[1];
-    if (val[0] === '-sg' || val[0] === '--signature') options.signature = val[1];
-    if (val[0] === '-pk' || val[0] === '--senderAddressPrivKey') options.senderAddressPrivKey = val[1];
-    if (val[0] === '-gf' || val[0] === '--maxFeePerGas') options.maxFeePerGas = Number(val[1]);
-    if (val[0] === '-pf' || val[0] === '--maxPriorityFeePerGas') options.maxPriorityFeePerGas = Number(val[1]);
-    if (val[0] === '-nt' || val[0] === '--network') options.network = val[1];
-    if (val[0] === '-v' || val[0] === '--verbose') options.verbose = true;
+    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue;}
+    if (val[0] === '-da' || val[0] === '--destinationAddress') { options.destinationAddress = val[1]; continue; }
+    if (val[0] === '-sg' || val[0] === '--signature') { options.signature = args[i].slice(args[i].indexOf('=') + 1); continue; }
+    if (val[0] === '-pk' || val[0] === '--senderAddressPrivKey') { options.senderAddressPrivKey = val[1]; continue; }
+    if (val[0] === '-gf' || val[0] === '--maxFeePerGas') { options.maxFeePerGas = Number(val[1]); continue; }
+    if (val[0] === '-pf' || val[0] === '--maxPriorityFeePerGas') { options.maxPriorityFeePerGas = Number(val[1]); continue; }
+    if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
+    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
   if (!options.zenAddress || !options.destinationAddress || !options.signature || !options.senderAddressPrivKey) {
@@ -69,30 +70,43 @@ function parseArguments(args) {
 async function claimZen(options) {
   const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
   const testnet = network === 'testnet' ? 1 : 0;
-
-  // Validate inputs
-  if (!zen.isZenAddress(zenAddress, testnet, false, verbose)) {
-    throw new Error("Not a valid zenAddress");
-  }
-  if (!zen.isH2Address(destinationAddress)) {
-    throw new Error("Not a valid destinationAddress");
-  }
-  if (!zen.isH2PrivKey(senderAddressPrivKey)) {
-    throw new Error("Not a valid senderAddressPrivKey");
-  }
-  const message = `ZENCLAIM${destinationAddress}`;
-  if (!verify(message, zenAddress, signature)) {
-    throw new Error("Not a valid signature for signed message");
-  }
-  
-  const addressCheck = await zen.checkClaimAddress(zenAddress, testnet, verbose);
-  if (addressCheck.error) {
-    throw new Error(addressCheck.error);
-  }
-
-  // Claim ZEN
   try {
-    const txHash = await zen.claimZen(zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
+    // Validate inputs
+    if (!zen.isZenAddress(zenAddress, testnet, false, verbose)) {
+      throw new Error("Not a valid zenAddress");
+    }
+    if (!zen.isH2Address(destinationAddress)) {
+      throw new Error("Not a valid destinationAddress");
+    }
+    if (!zen.isH2PrivKey(senderAddressPrivKey)) {
+      throw new Error("Not a valid senderAddressPrivKey");
+    }
+    const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
+    const message = `${prefix}${destinationAddress}`;
+    if (!zen.verifyMessage(message, zenAddress, signature)) {
+      throw new Error("Not a valid signature for signed message");
+    }
+    const pubKeyCoords = zen.getPubKeyInfo(message, zenAddress, signature, testnet, verbose);
+    if (pubKeyCoords.error) {
+      throw new Error(pubKeyCoords.error);
+    }
+
+    const vaultAddress = await zen.checkClaimAddress(zenAddress, testnet, verbose);
+    if (vaultAddress.error) {
+      throw new Error(vaultAddress.error);
+    }
+
+    const senderEthBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
+    if (senderEthBalance.error) {
+      throw new Error(senderEthBalance.error);
+    }
+    if (senderEthBalance.balance < maxFeePerGas) {
+      throw new Error(`Not enough funds in sender address to pay gas. Sender balance: ${senderEthBalance.balance}, required(gwei): ${maxFeePerGas}`);
+    }
+    if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
+
+    // Claim ZEN
+    const txHash = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
     return txHash;
   } catch (error) {
     throw new Error(error.message);

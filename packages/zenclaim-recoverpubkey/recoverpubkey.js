@@ -41,14 +41,14 @@ function parseArguments(args) {
       console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
       process.exit(1);
     }
-    if (val[0] === '-ms' || val[0] === '--message') options.message = val[1];
-    if (val[0] === '-za' || val[0] === '--zenAddress') options.zenAddress = val[1];
-    if (val[0] === '-sg' || val[0] === '--signature') options.signature = val[1];
-    if (val[0] === '-nt' || val[0] === '--network') options.network = val[1];
-    if (val[0] === '-v' || val[0] === '--verbose') options.verbose = true;
+    if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
+    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
+    if (val[0] === '-sg' || val[0] === '--signature') { options.signature = val[1]; continue; }
+    if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
+    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
-  if(options.verbose) console.log('zenclaim-recoverpubkey CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+  if (options.verbose) console.log('zenclaim-recoverpubkey CLI'.green, version.yellow, 'by Horizen Labs'.grey);
 
   if (!options.message || !options.zenAddress || !options.signature) {
     console.error('message, zenAddress, and signature are all required'.red);
@@ -60,11 +60,11 @@ function parseArguments(args) {
 
 // Function to verify the message and recover the public key
 function recoverPubkey(options) {
-    const network = (options.network === 'testnet' || options.nt == 'testnet') ? 1 : 0;
+  const network = (options.network === 'testnet' || options.nt == 'testnet') ? 1 : 0;
 
   try {
-    const result = zen.verifyAndRecoverPubKey(options.message, options.zenAddress, options.signature, network, options.verbose);
-    return result;
+    const valid = zen.verifyAndRecoverPubKey(options.message, options.zenAddress, options.signature, network, options.verbose);
+    return valid;
   } catch (error) {
     return { error: error.message || 'Unable to verify the signature'.red };
   }
@@ -91,7 +91,7 @@ async function main(args) {
   console.log(result);
 }
 
-// Export the verifyMessage function for use as a module
+// Export the function for use as a module
 export { recoverPubkey };
 
 // If the script is run directly, execute the main function
