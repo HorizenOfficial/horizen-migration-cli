@@ -12,22 +12,20 @@
     "zenclaim-signtool": "packages/zenclaim-signtool/signtool.js",
     "zenclaim-verifymessage": "packages/zenclaim-verifymessage/verifymessage.js",
     "zenclaim-claimzenaddress": "packages/zenclaim-claimzenaddress/claimzenaddress.js",
-    "zenclaim-recoverpubkey": "packages/zenclaim-recoverpubkey/recoverpubkey.js"
+    "zenclaim-recoverpubkey": "packages/zenclaim-recoverpubkey/recoverpubkey.js",
+    "zenclaim-claimmultisigaddress": "packages/zenclaim-claimmultisigaddress/claimmultisigaddress.js"
   },
   "exports": {
     "zenclaim-seedtool": "./packages/zenclaim-seedtool/seedtool.js",
     "zenlaim-signtool": "./packages/zenclaim-signtool/signtool.js",
     "zenclaim-verifymessage": "./packages/zenclaim-verifymessage/verifymessage.js",
     "zenclaim-claimzenaddress": "./packages/zenclaim-claimzenaddress/claimzenaddress.js",
-    "zenclaim-recoverpubkey": "./packages/zenclaim-recoverpubkey/recoverpubkey.js"
+    "zenclaim-recoverpubkey": "./packages/zenclaim-recoverpubkey/recoverpubkey.js",
+    "zenclaim-claimmultisigaddress": "./packages/zenclaim-claimmultisigaddress/claimmultisigaddress.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "allan@zensystems.io",
-  "license": "MIT",
-  "dependencies": {
-    "@wagmi/core": "^2.16.3",
-    "viem": "^2.22.1"
-  }
+  "license": "MIT"
 }

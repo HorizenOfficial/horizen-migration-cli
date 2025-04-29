@@ -2,7 +2,7 @@
 
 const config = {
     rpcURLs: {
-        testnet: "https://testnet-rpc.horizen.io",
+        testnet: "https://base-sepolia.drpc.org",
         mainnet: "https://rpc.horizen.io"
     },
 }

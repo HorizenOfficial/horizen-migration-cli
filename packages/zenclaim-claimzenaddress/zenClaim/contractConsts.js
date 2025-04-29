@@ -1,14 +1,139 @@
-export const PRECOMPILE_ADDRESS_ZEND_CLAIM = 
-"0x0000000000000000000000000000000000000409"; 
-// NEED NEW ADDRESS
-
+// production:
+export const PRECOMPILE_ADDRESS_ZEND_CLAIM = "0x0000000000000000000000000000000000000409";
+/* NEED ADDRESS for ZENBackupVault when deployed on base mainnet */
 export const ZENCLAIM_MESSAGE_PREFIX = "ZENCLAIM";
 
+// testnet: base sepolia. (explorer - sepolia.basescan.org) chain id 84532
+export const PRECOMPILE_ADDRESS_ZEND_CLAIM_TESTNET = '0x37fC33500Ea52D1AC745B55cb1E4de3bb6A19428';
+export const ZENCLAIM_MESSAGE_PREFIX_TESTNET = "ZT1CLAIM";
+
+// regular address and multisig address
 export const FUNCTION_NAME_CLAIM_P2PKH = "claimP2PKH";
+export const FUNCTION_NAME_CLAIM_P2SH = "claimP2SH";
 
-// multisig claim
-export const FUNCTION_NAME_CLAIM_P2PSH = "claimP2SH";
+export const ABI_ZEND_CLAIM = [
+  {
+      inputs: [
+        {
+          internalType: "bytes20",
+          name: "",
+          type: "bytes20",
+        },
+      ],
+      name: "balances",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "destAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bytes20",
+        name: "zenAddress",
+        type: "bytes20",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Claimed",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "destAddress",
+        type: "address",
+      },
+      {
+        internalType: "bytes",
+        name: "hexSignature",
+        type: "bytes",
+      },
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "x",
+            type: "bytes32",
+          },
+          {
+            internalType: "bytes32",
+            name: "y",
+            type: "bytes32",
+          },
+        ],
+        internalType: "struct ZendBackupVault.PubKey",
+        name: "pubKey",
+        type: "tuple",
+      },
+    ],
+    name: "claimP2PKH",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "destAddress",
+        type: "address",
+      },
+      {
+        internalType: "bytes[]",
+        name: "hexSignatures",
+        type: "bytes[]",
+      },
+      {
+        internalType: "bytes",
+        name: "script",
+        type: "bytes",
+      },
+      {
+        components: [
+          {
+            internalType: "bytes32",
+            name: "x",
+            type: "bytes32",
+          },
+          {
+            internalType: "bytes32",
+            name: "y",
+            type: "bytes32",
+          },
+        ],
+        internalType: "struct ZendBackupVault.PubKey[]",
+        name: "pubKeys",
+        type: "tuple[]",
+      },
+    ],
+    name: "claimP2SH",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+];
 
+/*  FULL ABI
 export const ABI_ZEND_CLAIM = [
   {
     inputs: [
@@ -491,3 +616,4 @@ export const ABI_ZEND_CLAIM = [
     type: "function",
   },
 ];
+*/

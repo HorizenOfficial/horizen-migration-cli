@@ -1,0 +1,18 @@
+{
+  "name": "zenclaim-claimmultisigaddress",
+  "version": "0.1.0",
+  "description": "CLI tool to claim a zen multisig address",
+  "main": "claimmultisigaddress.js",
+  "type": "module",
+  "bin": {
+    "zenclaim-claimmultisigaddress": "packages/zenclaim-claimmultisigaddress/claimmultisigaddress.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "allan@zensystems.io",
+  "license": "MIT",
+  "dependencies": {
+    "bitcoinjs-lib": "6.1.7"
+  }
+}

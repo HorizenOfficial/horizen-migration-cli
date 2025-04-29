@@ -1,11 +1,10 @@
-// import zencashjs from "zencashjs"
 import bs58check from "bs58check";
 import eip55 from "eip55";
-// import { writeZenClaimContract } from './zenClaim/useZenClaimContract'
 
 import { Keccak } from 'sha3';
 import { Buffer } from 'buffer';
-import { checkClaimAddressBalance, sendDataToSmartContract } from './zenClaim/rpc.js'
+import { verify as verifyMsg } from "../../zenclaim-verifymessage/verifyutils.js";
+import { verifyAndRecoverPubKey } from '../../zenclaim-recoverpubkey/recoverutils.js';
 
 const regexEthPrivKey = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/
 
@@ -15,7 +14,7 @@ const regexEthPrivKey = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/
  * @param {number} testnet 0 or 1
  * @returns boolean
  */
-const isZenAddress = (address, testnet, isMulti, verbose) => {
+const isZenAddress = (address, testnet, isMulti = false, verbose) => {
   if (verbose) console.log("ZEN isZenAddress check", address);
 
   let prefix;
@@ -65,28 +64,6 @@ const isH2PrivKey = (senderAddressPrivKey) => {
   return regexEthPrivKey.test(senderAddressPrivKey);
 }
 
-
-// const zendAddrToLowercaseHorizen2Addr = (mc_address) => {
-//   // Step 1: compute Keccak-256 hash of the address
-//   // const hash = keccak256(mc_address);
-//   const hash = new Keccak(256);
-//   hash.update(mc_address);
-
-//   // Convert the hash to a Buffer
-//   // const hashBuffer = Buffer.from(hash, 'hex');
-//   const hashBuffer = hash.digest('hex');
-
-//   // Step 2: take the last 20 bytes
-//   const trimmedResult = hashBuffer.slice(-20);
-
-//   // Convert the trimmed result to a hex string
-//   const addr = trimmedResult.toString('hex');
-
-//   // Return the formatted address
-//   return `0x${addr}`;
-// }
-
-
 const zendAddrToLowercaseHorizen2Addr = (mc_address) => {
   // Step 1: compute Keccak-256 hash of the address
   const hasher = new Keccak(256);
@@ -102,6 +79,7 @@ const zendAddrToLowercaseHorizen2Addr = (mc_address) => {
   // Return the formatted address
   return `0x${addr}`;
 }
+
 const checkClaimAddress = async (mc_address, network, verbose) => {
   const eth_address = zendAddrToLowercaseHorizen2Addr(mc_address);
   let checksummedAddress;
@@ -111,54 +89,41 @@ const checkClaimAddress = async (mc_address, network, verbose) => {
       if (verbose) console.error("Not a valid H2 address.");
       return { error: "Not a valid H2 adress." }
     }
+    return { claimAddress: checksummedAddress };
   } catch (error) {
     if (verbose) console.error("Error deriving the Horizen 2 claim address from the Zen address provided.");
-    // process.exit();
     return { error: "Error deriving the Horizen 2 claim address from the Zen address provided." }
   }
-
-
-
-  const balance = await checkClaimAddressBalance(checksummedAddress, network, verbose);
-  if (!balance || Number(balance) === 0) {
-    if (verbose) console.error("No balance in Horizen 2 claim address");
-    // process.exit();
-    return { error: `No balance found in Horizen 2 claim address ${checksummedAddress} for zen main chain address ${mc_address} (for gas)` }
-  }
-
-  return { checksummedAddress, balance };
 }
 
-const claimZen = (zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose) => {
-  return sendDataToSmartContract(zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose)
+// check sender address balance for funds to pay gas
+const senderBal = async (senderPrivateKey) => {
+  const bal = await findSenderBalance(senderPrivateKey);
+  return bal
+
+}
+const verifyMessage = (message, zenAddress, signature) => {
+  return verifyMsg(message, zenAddress, signature)
 }
 
+const getPubKeyInfo = (message, zenAddress, signature, network, verbose) => {
+  const result = verifyAndRecoverPubKey(message, zenAddress, signature, network, verbose);
+  return result;
+}
 
-// validate
-
-
-// // Construct
-// const wsProvider = new WsProvider('wss://rpc.polkadot.io');
-// const api = await ApiPromise.create({ provider: wsProvider });
-
-// // Do something
-// console.log(api.genesisHash.toHex());
-
-//validate any amounts
-
-//select testnet
-
-// const result = await writeZenClaimContract(zenAddress, destinationAddress, signature)
-// const zend_address = "ztTmj8oJzBo2s8fcewUA3GexNUeWA24Qe8T";
-// const zend_address = "ztWAzdzHEJ5dGgyy6McEqQiDcHz1tGpRiYk";
-// const network = 1
-// checkClaimAddress(zend_address, network)
-
+const decodeZenAddress = (zenAddress) => {
+  const decodedFull = bs58check.decode(zenAddress);
+  const decodedAddr = decodedFull.slice(2)
+  return { decodedFull, decodedAddr };
+}
 
 export {
   isZenAddress,
   isH2Address,
   isH2PrivKey,
   checkClaimAddress,
-  claimZen
+  senderBal,
+  verifyMessage,
+  getPubKeyInfo,
+  decodeZenAddress,
 }
