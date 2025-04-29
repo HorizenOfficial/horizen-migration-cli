@@ -84,7 +84,7 @@ async function checkClaimBalance(zenAddress, testnet, verbose) {
     throw new Error("Error checking claim balance.");
   }
 }
-async function checkFeeData(maxFeePerGas, maxPriorityFeePerGas) {
+async function checkFeeData(maxFeePerGas, maxPriorityFeePerGas, verbose) {
   const feeData = await provider.getFeeData();
   const gasPrice = feeData.gasPrice;
   // add a small buffer to the gas limit
