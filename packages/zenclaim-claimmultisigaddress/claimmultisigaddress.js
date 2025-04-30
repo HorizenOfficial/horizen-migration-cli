@@ -82,7 +82,7 @@ async function claimMultisig(options) {
             throw new Error("Not a valid zen multisig address");
         }
         if (!zen.isH2Address(destinationAddress)) {
-            throw new Error("Not a valid destinationAddress");
+            throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
         if (!ms.checkRedeemScript(redeemScript)) {
             throw new Error("Not a valid redeemScript");
@@ -96,6 +96,10 @@ async function claimMultisig(options) {
         }
         multisig.redeemScript = redeemScript;
 
+        if (multisigAddress !== multisig.address) {
+            throw new Error(`zenMultisigAddress ${multisigAddress} does not match redeemScript address ${multisig.address}`);
+        }
+
         let signaturesArray = JSON.parse(signatures);
         const isSigArrayValid = ms.validateSignatures(signaturesArray, multisig);
         if (isSigArrayValid?.error)
@@ -103,10 +107,10 @@ async function claimMultisig(options) {
 
 
         const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
-        const message = `${prefix}${destinationAddress}`;
+        const message = `${prefix}0x${ms.decodeZenAddress(multisigAddress).toString('hex')}${destinationAddress}`;
 
         const [orderedPubKeyCoords, orderedSignatures] = ms.verifySigsAndGetCoords(signaturesArray, multisig, message, testnet, verbose);
-        let count = orderedPubKeyCoords.filter((a) => a !== 0).length;
+        let count = orderedPubKeyCoords.filter((a) => Number(a[0]) !== 0).length;
         if (count < multisig.requiredSigs) {
             throw new Error(`Not enough valid signatures found. Required: ${multisig.requiredSigs}, found: ${count}`);
         }
@@ -126,8 +130,8 @@ async function claimMultisig(options) {
         if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
 
         // Claim ZEN
-        const txHash = await submitMultisigClaim(multisig, destinationAddress, orderedSignatures, orderedPubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
-        return txHash;
+        const txResult = await submitMultisigClaim(multisig, destinationAddress, orderedSignatures, orderedPubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
+        return txResult;
     } catch (error) {
         throw new Error(error.message);
     }
@@ -149,7 +153,6 @@ async function main(args) {
     try {
         const result = await claimMultisig(options);
         console.log(result);
-        if (options.verbose) console.log('no errors');
     } catch (error) {
         console.error(error.message.red);
         process.exit(1);

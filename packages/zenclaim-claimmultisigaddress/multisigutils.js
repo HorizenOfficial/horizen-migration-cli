@@ -1,7 +1,7 @@
 import zencashjs from "zencashjs"
 import bscript from "bitcoinjs-lib/src/script.js"
 import OPCODES from "bitcoinjs-lib/src/ops.js"
-import { verifyAndRecoverPubKey } from '../zenclaim-recoverpubkey/recoverutils.js';
+import { getPublicKeyFromSignature, verifyAndRecoverPubKey, base58DecodeZenAddress } from '../zenclaim-recoverpubkey/recoverutils.js';
 
 const OP_INT_BASE = OPCODES.OPS.OP_RESERVED;
 const checkRedeemScript = (rscript) => {
@@ -17,6 +17,9 @@ const checkRedeemScript = (rscript) => {
     return true
 }
 
+const decodeZenAddress = (address) => {
+    return base58DecodeZenAddress(address);
+}
 /**
  *
  * @param {string} pubKey  public key
@@ -64,7 +67,7 @@ function decodeMulti(rscript, testnet, verbose) {
             rscript,
             testnet ? zencashjs.config.testnet.scriptHash : zencashjs.config.mainnet.scriptHash,
         );
-        ms.multisig = addr;
+        ms.address = addr;
         if (verbose) console.log("ZEN decode multisig addr", addr);
         ms.addresses = ms.pubkeys.map((a) => pubKeyToAddr(a, testnet));
         return ms;
@@ -79,7 +82,7 @@ function validateSignatures(signatures, multisig) {
         return { error: `Signatures must be a non-empty array of ${multisig.requiredSigs} base64 strings` };
     }
     if (signatures.length !== multisig.requiredSigs) {
-        return { error: `Invalid number of signatures. Expected ${multisig.requiredSigs}, got ${signatures.length}` };
+        return { error: `Incorrect number of signatures. Expected ${multisig.requiredSigs}, got ${signatures.length}` };
     }
     return null;
 }
@@ -90,10 +93,11 @@ function verifySigsAndGetCoords(signatures, multisig, message, testnet, verbose)
     const addrs = [...multisig.addresses];
     const pkFill = "0x" + "0".repeat(64);
     const orderedPubKeyCoords = new Array(addrs.length).fill([pkFill, pkFill]);
-    const orderedSignatures = new Array(addrs.length).fill(Buffer.alloc(65));
+    const orderedSignatures = new Array(addrs.length).fill(Buffer.from("", "base64"));
     for (let i = 0; i < signatures.length; i++) {
+        const sigPubKey = getPublicKeyFromSignature (message, signatures[i])
         for (let x = 0; x < addrs.length; x++) {
-            const result = verifyAndRecoverPubKey(message, addrs[x], signatures[i], testnet, verbose);
+            const result = verifyAndRecoverPubKey(addrs[x], sigPubKey, testnet, verbose);
             if (result.pubkeyXcoordinate) {
                 orderedPubKeyCoords[x] = [`0x${result.pubkeyXcoordinate}`, `0x${result.pubkeyYcoordinate}`];
                 orderedSignatures[x] = Buffer.from(signatures[i], "base64");
@@ -108,6 +112,7 @@ export {
     checkRedeemScript,
     decodeMulti,
     validateSignatures,
-    verifySigsAndGetCoords
+    verifySigsAndGetCoords,
+    decodeZenAddress
 }
 

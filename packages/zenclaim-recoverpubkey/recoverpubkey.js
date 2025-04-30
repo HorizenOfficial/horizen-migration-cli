@@ -63,7 +63,8 @@ function recoverPubkey(options) {
   const network = (options.network === 'testnet' || options.nt == 'testnet') ? 1 : 0;
 
   try {
-    const valid = zen.verifyAndRecoverPubKey(options.message, options.zenAddress, options.signature, network, options.verbose);
+    const sigPubKey = zen.getPublicKeyFromSignature(options.message, options.signature);
+    const valid = zen.verifyAndRecoverPubKey(options.zenAddress, sigPubKey, network, options.verbose);
     return valid;
   } catch (error) {
     return { error: error.message || 'Unable to verify the signature'.red };

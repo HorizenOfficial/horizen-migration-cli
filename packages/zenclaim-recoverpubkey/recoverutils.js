@@ -13,7 +13,8 @@ function _magicHash(message) {
   var buf = Buffer.concat([prefix1, MAGIC_BYTES, prefix2, messageBuffer]);
   return zencashjs.crypto.hash256Buf(buf)
 };
-function decodeSignature (buffer) {
+
+function decodeSignature(buffer) {
   if (buffer.length !== 65) throw new Error('Invalid signature length')
   const flagByte = buffer.readUInt8(0) - 27
   if (flagByte > 15 || flagByte < 0) {
@@ -26,66 +27,71 @@ function decodeSignature (buffer) {
   }
 };
 
-// modified to also return recovered publicKey
+function base58DecodeZenAddress(address) {
+  // prefix is 2 bytes in zencash instead of 1
+  const decoded = bs58check.decode(address).subarray(2)
+  if (decoded.length !== 20) throw new Error('Invalid address length')
+  return decoded
+}
+
+function getPublicKeyFromSignature(message, signature) {
+  if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
+  const parsed = decodeSignature(signature)
+  const hash = _magicHash(message)
+  const publicKey = secp256k1.recover(
+    hash,
+    parsed.signature,
+    parsed.recovery,
+    parsed.compressed
+  )
+  return publicKey
+}
+
 /**
  * Validate a signature against a given zend address.
  *
- * @param {String} message - the message to verify
  * @param {String} zenAddress - A zen address
- * @param {String|Buffer} signature - A base64 encoded compact signature
+ * @param {String|Buffer} signPubKey - A base64 encoded compact signature
  * @returns [ {Boolean} true if the signature is valid, (string) publicKey ]
  */
-function verify(message, zenAddress, signature) {
-    if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
-    const parsed = decodeSignature(signature)
-    const hash = _magicHash(message)
-    const publicKey = secp256k1.recover(
-      hash,
-      parsed.signature,
-      parsed.recovery,
-      parsed.compressed
-    )
-    const publicKeyHash = zencashjs.crypto.hash160Buf(publicKey)
-    let actual, expected
-    actual = publicKeyHash
-    // prefix is 2 bytes in zencash instead of 1
-    expected = bs58check.decode(zenAddress).slice(2)
-    return [ (expected.equals(actual)), publicKey.toString("hex") ];
-  };
+function verifyMatch(zenAddress, sigPubKey) {
+  const publicKeyHash = zencashjs.crypto.hash160Buf(sigPubKey)
+  const expected = base58DecodeZenAddress(zenAddress)
+  return [(expected.equals(publicKeyHash)), sigPubKey.toString("hex")];
+};
 
 
-  function verifyAndRecoverPubKey(message, zenAddress, signature, network, verbose) {
-    const testnet = Number(network) || 0;
-    if (verbose) console.log(`testnet= ${testnet}`)
-    if (!zenAddress || !message || !signature) {
-        return { error: "zenAddress, message, and signature are all required" };
-    }
-    if (!isZenAddress(zenAddress, testnet, false, verbose)) {
-        return { error: "Not a valid zenAddress" };
-    }
-    const [ validMessage, pubkeyRecovered ] = verify(message, zenAddress, signature);
-    const pubkeyRecoveredConvertedUncompressed = secp256k1.publicKeyConvert(Buffer.from(pubkeyRecovered , "hex"), false).toString("hex")
-    
-    const addr = zencashjs.address.pubKeyToAddr(
-      pubkeyRecovered,
-      testnet ? zencashjs.config.testnet.pubKeyHash : zencashjs.config.mainnet.pubKeyHash,
-    );
-    const matches = zenAddress === addr;
-    if (!matches) {
-        return { error: "zen address does not match the public key derived from signature" };
-    }
-    const pubkeyXcoordinate = pubkeyRecoveredConvertedUncompressed.slice(0, 66).slice(2);
-    const pubkeyYcoordinate = pubkeyRecoveredConvertedUncompressed.slice(66);
-    if (verbose) {
-        console.log("zenAddress=", zenAddress);
-        console.log("message=", message);
-        console.log("addrsMatch=", matches);
-        console.log("validMessage=", validMessage);
-        console.log("pubkeyRecoveredUncompressed=", pubkeyRecoveredConvertedUncompressed);
-        console.log("pubkeyXcoordinate=", pubkeyXcoordinate);
-        console.log("pubkeyYcoordinate=", pubkeyYcoordinate);
-    }
-    return { pubkeyXcoordinate, pubkeyYcoordinate};
+function verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose) {
+  const testnet = Number(network) || 0;
+  if (verbose) console.log(`testnet= ${testnet}`)
+  if (!zenAddress || !sigPubKey) {
+    return { error: "zenAddress and signature public key are both required" };
   }
+  if (!isZenAddress(zenAddress, testnet, false, verbose)) {
+    return { error: "Not a valid zenAddress" };
+  }
+  const [validMessage, pubkeyRecovered] = verifyMatch(zenAddress, sigPubKey);
+  const pubkeyRecoveredConvertedUncompressed = secp256k1.publicKeyConvert(Buffer.from(pubkeyRecovered, "hex"), false).toString("hex")
 
-  export {verifyAndRecoverPubKey}
+  const addr = zencashjs.address.pubKeyToAddr(
+    pubkeyRecovered,
+    testnet ? zencashjs.config.testnet.pubKeyHash : zencashjs.config.mainnet.pubKeyHash,
+  );
+  const matches = zenAddress === addr;
+  if (!matches) {
+    return { error: "zen address does not match the public key derived from signature" };
+  }
+  const pubkeyXcoordinate = pubkeyRecoveredConvertedUncompressed.slice(2, 66);
+  const pubkeyYcoordinate = pubkeyRecoveredConvertedUncompressed.slice(66);
+  if (verbose) {
+    console.log("zenAddress=", zenAddress);
+    console.log("addrsMatch=", matches);
+    console.log("validMessage=", validMessage);
+    console.log("pubkeyRecoveredUncompressed=", pubkeyRecoveredConvertedUncompressed);
+    console.log("pubkeyXcoordinate=", pubkeyXcoordinate);
+    console.log("pubkeyYcoordinate=", pubkeyYcoordinate);
+  }
+  return { pubkeyXcoordinate, pubkeyYcoordinate };
+}
+
+export { getPublicKeyFromSignature, verifyAndRecoverPubKey, base58DecodeZenAddress }

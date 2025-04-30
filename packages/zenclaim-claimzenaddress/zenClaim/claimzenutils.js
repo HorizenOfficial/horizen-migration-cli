@@ -4,7 +4,7 @@ import eip55 from "eip55";
 import { Keccak } from 'sha3';
 import { Buffer } from 'buffer';
 import { verify as verifyMsg } from "../../zenclaim-verifymessage/verifyutils.js";
-import { verifyAndRecoverPubKey } from '../../zenclaim-recoverpubkey/recoverutils.js';
+import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from '../../zenclaim-recoverpubkey/recoverutils.js';
 
 const regexEthPrivKey = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/
 
@@ -71,7 +71,8 @@ const zendAddrToLowercaseHorizen2Addr = (mc_address) => {
   const result = hasher.digest();
 
   // Step 2: take the last 20 bytes
-  const trimmedResult = result.slice(-20);
+  const trimmedResult = result.subarray(-20);
+   
 
   // Convert the trimmed result to a hex string
   const addr = Buffer.from(trimmedResult).toString('hex');
@@ -107,7 +108,8 @@ const verifyMessage = (message, zenAddress, signature) => {
 }
 
 const getPubKeyInfo = (message, zenAddress, signature, network, verbose) => {
-  const result = verifyAndRecoverPubKey(message, zenAddress, signature, network, verbose);
+  const sigPubKey = getPublicKeyFromSignature (message, signature)
+  const result = verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose);
   return result;
 }
 

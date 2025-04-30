@@ -162,7 +162,7 @@ async function submitMultisigClaim(
 ) {
   try {
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const balance = await checkClaimBalance(multisig.multisig, testnet, verbose);
+    const balance = await checkClaimBalance(multisig.address, testnet, verbose);
     if (balance == 0n) {
       return `No balance found in claim address ${multisig.address}`;
     }
