@@ -11,10 +11,10 @@ import 'colors';
 const usage = `${'npx zenclaim-claimmultisigaddress  --argument="" --argument="" ... '.cyan}
 arguments:
  --zenMultisigAddress="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address) 
- --destinationAddress="0x.." (mandatory, Horizen 2 claim destination address) 
+ --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2) 
  --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
  --signatures='["",""]' (mandatory, n signatures of a n-of-m multisig address) 
- --senderAddressPrivKey="0x.." (mandatory, private key of Horizen 2 address sending the transaction and paying the fee. must have enough funds for gas)  
+ --senderAddressPrivKey="0x.." (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
  --maxFeePerGas=int (optional, wei, default 20000000000) 
  --maxPriorityFeePerGas=int (optional, wei, default 20000000000) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -23,8 +23,9 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM and the destination address on Horizen 2 
-Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
+The message to sign should consist of the word ZENCLAIM the base58checked decode of the multisig address and the destination Ethereum address on Base L2 
+The addresses must be in the format 0x{hex}.
+Example "ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"
 Signatures must be created with the public key of each zenAddress the multisig address is composed of. 
 `;
 
@@ -81,13 +82,13 @@ async function claimMultisig(options) {
         if (!zen.isZenAddress(multisigAddress, testnet, true, verbose)) {
             throw new Error("Not a valid zen multisig address");
         }
-        if (!zen.isH2Address(destinationAddress)) {
+        if (!zen.isEthAddress(destinationAddress)) {
             throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
         if (!ms.checkRedeemScript(redeemScript)) {
             throw new Error("Not a valid redeemScript");
         }
-        if (!zen.isH2PrivKey(senderAddressPrivKey)) {
+        if (!zen.isEthPrivKey(senderAddressPrivKey)) {
             throw new Error("Not a valid senderAddressPrivKey");
         }
         const multisig = ms.decodeMulti(redeemScript, testnet, verbose);
@@ -113,11 +114,6 @@ async function claimMultisig(options) {
         let count = orderedPubKeyCoords.filter((a) => Number(a[0]) !== 0).length;
         if (count < multisig.requiredSigs) {
             throw new Error(`Not enough valid signatures found. Required: ${multisig.requiredSigs}, found: ${count}`);
-        }
-
-        const vaultAddress = await zen.checkClaimAddress(multisigAddress, testnet, verbose);
-        if (vaultAddress.error) {
-            throw new Error(vaultAddress.error);
         }
 
         const senderEthBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);

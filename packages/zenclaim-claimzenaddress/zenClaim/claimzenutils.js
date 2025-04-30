@@ -1,12 +1,10 @@
 import bs58check from "bs58check";
 import eip55 from "eip55";
-
+import { ethers } from "ethers";
 import { Keccak } from 'sha3';
 import { Buffer } from 'buffer';
 import { verify as verifyMsg } from "../../zenclaim-verifymessage/verifyutils.js";
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from '../../zenclaim-recoverpubkey/recoverutils.js';
-
-const regexEthPrivKey = /(^|\b)(0x)?[0-9a-fA-F]{64}(\b|$)/
 
 /**
  *
@@ -48,53 +46,28 @@ const isZenAddress = (address, testnet, isMulti = false, verbose) => {
 
 /**
 *
-* @param {string} addr  EON/H2 (eth) address. expects 0x prefix
+* @param {string} destinationAddress (eth) address. expects 0x prefix
 * @returns boolean
 */
-const isH2Address = (destinationAddress) => {
+const isEthAddress = (destinationAddress) => {
   //this can throw an error if the address is not valid.
   return eip55.verify(destinationAddress, false);
 }
 /**
 *
-* @param {string} addr  EON/H2 (eth) private key
+* @param {string} value  (eth) private key
 * @returns boolean
 */
-const isH2PrivKey = (senderAddressPrivKey) => {
-  return regexEthPrivKey.test(senderAddressPrivKey);
-}
-
-const zendAddrToLowercaseHorizen2Addr = (mc_address) => {
-  // Step 1: compute Keccak-256 hash of the address
-  const hasher = new Keccak(256);
-  hasher.update(mc_address);
-  const result = hasher.digest();
-
-  // Step 2: take the last 20 bytes
-  const trimmedResult = result.subarray(-20);
-   
-
-  // Convert the trimmed result to a hex string
-  const addr = Buffer.from(trimmedResult).toString('hex');
-
-  // Return the formatted address
-  return `0x${addr}`;
-}
-
-const checkClaimAddress = async (mc_address, network, verbose) => {
-  const eth_address = zendAddrToLowercaseHorizen2Addr(mc_address);
-  let checksummedAddress;
-  try {
-    checksummedAddress = eip55.encode(eth_address);
-    if (!isH2Address(checksummedAddress)) {
-      if (verbose) console.error("Not a valid H2 address.");
-      return { error: "Not a valid H2 adress." }
+const isEthPrivKey = (value) => {
+  if (ethers.isHexString(value)) {
+    return true;
+  } else {
+    if (value.length === 64) {
+      return ethers.isHexString(`0x${value}`);
     }
-    return { claimAddress: checksummedAddress };
-  } catch (error) {
-    if (verbose) console.error("Error deriving the Horizen 2 claim address from the Zen address provided.");
-    return { error: "Error deriving the Horizen 2 claim address from the Zen address provided." }
+    return false;
   }
+
 }
 
 // check sender address balance for funds to pay gas
@@ -121,9 +94,8 @@ const decodeZenAddress = (zenAddress) => {
 
 export {
   isZenAddress,
-  isH2Address,
-  isH2PrivKey,
-  checkClaimAddress,
+  isEthAddress,
+  isEthPrivKey,
   senderBal,
   verifyMessage,
   getPubKeyInfo,

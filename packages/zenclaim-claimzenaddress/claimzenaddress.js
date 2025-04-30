@@ -9,9 +9,9 @@ import 'colors';
 const usage = `${'npx zenclaim-claimzenaddress --argument="" --argument="" ... '.cyan}
 arguments:
  --zenAddress="" (mandatory, Horizen 1 Mainchain address) 
- --destinationAddress="0x.." (mandatory, Horizen 2 claim destination address starting with 0x) 
+ --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2 starting with 0x) 
  --signature="" (mandatory signed message signature from zenAddress) 
- --senderAddressPrivKey="0x.." (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)  
+ --senderAddressPrivKey="0x.." (mandatory, private key of Ethereum address sending the transaction and paying the fee)  
  --maxFeePerGas=int (optional, wei, default 20000000000) 
  --maxPriorityFeePerGas=int (optional, wei, default 20000000000) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -20,7 +20,7 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -za="" -da="" -sg="" -pk="" -gf= -pf= -nt="" -h -v
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM and the destination address on Horizen 2 and should be signed with the public key of zenAddress
+The message to sign should consist of the word ZENCLAIM and the destination address (starting with 0x) on Base  and should be signed with the public key of the zenAddress
   Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
 `;
 
@@ -75,10 +75,10 @@ async function claimZen(options) {
     if (!zen.isZenAddress(zenAddress, testnet, false, verbose)) {
       throw new Error("Not a valid zenAddress");
     }
-    if (!zen.isH2Address(destinationAddress)) {
+    if (!zen.isEthAddress(destinationAddress)) {
       throw new Error("Not a valid destinationAddress");
     }
-    if (!zen.isH2PrivKey(senderAddressPrivKey)) {
+    if (!zen.isEthPrivKey(senderAddressPrivKey)) {
       throw new Error("Not a valid senderAddressPrivKey");
     }
     const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
@@ -90,12 +90,7 @@ async function claimZen(options) {
     if (pubKeyCoords.error) {
       throw new Error(pubKeyCoords.error);
     }
-
-    const vaultAddress = await zen.checkClaimAddress(zenAddress, testnet, verbose);
-    if (vaultAddress.error) {
-      throw new Error(vaultAddress.error);
-    }
-
+    
     const senderEthBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
     if (senderEthBalance.error) {
       throw new Error(senderEthBalance.error);
@@ -106,8 +101,8 @@ async function claimZen(options) {
     if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
 
     // Claim ZEN
-    const txHash = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
-    return txHash;
+    const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
+    return txResult;
   } catch (error) {
     throw new Error(error.message);
   }
@@ -128,8 +123,8 @@ async function main(args) {
 
   try {
     const result = await claimZen(options);
-    console.log(result);
     if (options.verbose) console.log('no errors');
+    console.log(result);
   } catch (error) {
     console.error(error.message.red);
     process.exit(1);
