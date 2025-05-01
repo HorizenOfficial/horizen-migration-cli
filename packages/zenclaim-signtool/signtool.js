@@ -53,7 +53,7 @@ function parseArguments(args) {
     if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
-  if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+  if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
   if (!options.privKey || !options.message) {
     console.error('message and private key are required'.red);

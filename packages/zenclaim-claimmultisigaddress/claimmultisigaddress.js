@@ -5,6 +5,9 @@ import * as ms from "./multisigutils.js";
 import { findSenderBalance, submitMultisigClaim } from '../zenclaim-claimzenaddress/zenClaim/rpc.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
 import 'colors';
+import { readFileSync } from 'fs';
+const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const version = packageJson.version;
 
 
 // HELP
@@ -76,6 +79,7 @@ function parseArguments(args) {
         process.exit(0);
     }
 
+    if (options.verbose) console.log('zenclaim-claimultisigaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
     if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
         console.error('zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required. For help: use --help or -h'.red);

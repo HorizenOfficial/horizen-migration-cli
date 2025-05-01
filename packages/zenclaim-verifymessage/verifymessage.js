@@ -45,7 +45,7 @@ function parseArguments(args) {
     if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
-  if (options.verbose) console.log('zenclaim-verifymessage CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+  if (options.verbose) console.log('zenclaim-verifymessage CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
   if (!options.message || !options.zenAddress || !options.signature) {
     console.error('message, zenAddress, and signature are all required'.red);

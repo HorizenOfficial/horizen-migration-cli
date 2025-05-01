@@ -49,7 +49,7 @@ function parseArguments(args) {
         if (val[0] === '-s' || val[0] === '--stringify') { options.stringify = true; continue; }
         if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
     }
-    if (options.verbose) console.log('zenclaim-seedtool CLI'.green, version.yellow, 'by Horizen Labs'.grey);
+    if (options.verbose) console.log('zenclaim-seedtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
 
     if (!options.mnemonicPhrase) {

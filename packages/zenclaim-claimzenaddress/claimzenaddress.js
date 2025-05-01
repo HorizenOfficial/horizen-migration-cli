@@ -4,6 +4,9 @@ import * as zen from "./zenClaim/claimzenutils.js";
 import { findSenderBalance, submitClaim } from './zenClaim/rpc.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "./zenClaim/contractConsts.js";
 import 'colors';
+import { readFileSync } from 'fs';
+const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const version = packageJson.version;
 
 // HELP
 const usage = `${'npx zenclaim-claimzenaddress --argument="" --argument="" ... '.cyan}
@@ -57,6 +60,8 @@ function parseArguments(args) {
     if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
     if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
+
+  if (options.verbose) console.log('zenclaim-claimsenaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
   if (!options.zenAddress || !options.destinationAddress || !options.signature || !options.senderAddressPrivKey) {
     console.error('zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required. For help: use --help or -h'.red);
