@@ -20,8 +20,9 @@ arguments:
  --network="mainnet||testnet" (optional, default "mainnet")
  --help  display this help
  --verbose  display additional values to help check for errors
+ --buildmessage  build the message to sign. If present zenMultisigAddress, destinationAddress are required (include testnet if needed). Only the message is returned, no transaction is sent.
 ${'Short forms of arguments'.cyan} 
-  -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v
+  -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v -b
 ${'Claiming ZEN:'.cyan}
 The message to sign should consist of the word ZENCLAIM the base58checked decode of the multisig address and the destination Ethereum address on Base L2 
 The addresses must be in the format 0x{hex}.
@@ -30,8 +31,8 @@ Signatures must be created with the public key of each zenAddress the multisig a
 `;
 
 // Allowed arguments
-const long = ['--zenMultisigAddress', '--destinationAddress', '--redeemscript', '--signatures', '--senderAddressPrivKey', '--maxFeePerGas', '--maxPriorityFeePerGas', '--network', '--help', '--verbose'];
-const short = ['-ma', '-da', '-rs', '-sg', '-pk', '-gf', '-pf', '-nt', '-s', '-h', '-v'];
+const long = ['--zenMultisigAddress', '--destinationAddress', '--redeemscript', '--signatures', '--senderAddressPrivKey', '--maxFeePerGas', '--maxPriorityFeePerGas', '--network', '--help', '--verbose', '--buildmessage'];
+const short = ['-ma', '-da', '-rs', '-sg', '-pk', '-gf', '-pf', '-nt', '-s', '-h', '-v', '-b'];
 const allowed = long.concat(short);
 
 // Function to parse arguments
@@ -63,7 +64,18 @@ function parseArguments(args) {
         if (val[0] === '-pf' || val[0] === '--maxPriorityFeePerGas') { options.maxPriorityFeePerGas = Number(val[1]); continue; }
         if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
         if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
+        if (val[0] === '-b' || val[0] === '--buildmessage') { options.buildmessage = true; continue; }
     }
+    if (options.buildmessage) {
+        if (!options.multisigAddress || !options.destinationAddress) {
+            console.error('zenMultisigAddress and destinationAddress are required. For help: use --help or -h'.red);
+            process.exit(1);
+        }
+        const message = buildMessage(options);
+        console.log(message);
+        process.exit(0);
+    }
+
 
     if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
         console.error('zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required. For help: use --help or -h'.red);
@@ -71,6 +83,12 @@ function parseArguments(args) {
     }
 
     return options;
+}
+
+function buildMessage(options) {
+    const prefix = options.network === 'testnet' ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
+    const message = `${prefix}0x${ms.decodeZenAddress(options.multisigAddress).toString('hex')}${options.destinationAddress}`;
+    return message;
 }
 
 // Function to claim ZEN
@@ -106,9 +124,7 @@ async function claimMultisig(options) {
         if (isSigArrayValid?.error)
             throw new Error(isSigArrayValid.error);
 
-
-        const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
-        const message = `${prefix}0x${ms.decodeZenAddress(multisigAddress).toString('hex')}${destinationAddress}`;
+        const message = buildMessage({ multisigAddress, destinationAddress, network });
 
         const [orderedPubKeyCoords, orderedSignatures] = ms.verifySigsAndGetCoords(signaturesArray, multisig, message, testnet, verbose);
         let count = orderedPubKeyCoords.filter((a) => Number(a[0]) !== 0).length;
