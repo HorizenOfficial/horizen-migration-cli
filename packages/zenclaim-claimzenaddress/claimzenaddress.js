@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as zen from "./zenClaim/claimzenutils.js";
-import { findSenderBalance, submitClaim } from './zenClaim/rpc.js'
+import { findSenderBalance, submitClaim } from './zenClaim/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "./zenClaim/contractConsts.js";
 import 'colors';
 import { readFileSync } from 'fs';

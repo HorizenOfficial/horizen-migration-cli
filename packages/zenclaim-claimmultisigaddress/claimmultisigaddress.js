@@ -2,7 +2,7 @@
 
 import * as zen from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
 import * as ms from "./multisigutils.js";
-import { findSenderBalance, submitMultisigClaim } from '../zenclaim-claimzenaddress/zenClaim/rpc.js'
+import { findSenderBalance, submitMultisigClaim } from '../zenclaim-claimzenaddress/zenClaim/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
 import 'colors';
 import { readFileSync } from 'fs';
