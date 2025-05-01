@@ -2,7 +2,7 @@ import {
   ABI_ZEND_CLAIM,
   FUNCTION_NAME_CLAIM_P2PKH,
   FUNCTION_NAME_CLAIM_P2SH,
-  PRECOMPILE_ADDRESS_ZEND_CLAIM, PRECOMPILE_ADDRESS_ZEND_CLAIM_TESTNET
+  ZEND_BACKUP_VAULT_CONTRACT_ADDRESS, ZEND_BACKUP_VAULT_CONTRACT_ADDRESS_TESTNET
 } from "./contractConsts.js";
 import { ethers } from "ethers";
 import { rpcURLs } from "../../mainconfig.js";
@@ -25,8 +25,8 @@ const setProvider = async (testnet, verbose) => {
     console.log("RPC Block number is ", num);
   }
   contractAddress = testnet
-    ? PRECOMPILE_ADDRESS_ZEND_CLAIM_TESTNET
-    : PRECOMPILE_ADDRESS_ZEND_CLAIM;
+    ? ZEND_BACKUP_VAULT_CONTRACT_ADDRESS_TESTNET
+    : ZEND_BACKUP_VAULT_CONTRACT_ADDRESS;
 };
 
 async function setWallet(privateKey, testnet, verbose) {
