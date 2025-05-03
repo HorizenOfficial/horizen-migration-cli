@@ -12,9 +12,6 @@ describe('claimzenaddress.js', () => {
     isTest: true,
     verbose: false,
   }
- 
-  // const maxFeePerGas = 20000000000;
-  // const maxPriorityFeePerGas = 20000000000;
 
   // funds can only be claimed once.  If funds, short circuit with Test completed instead of sending tx
   const successes = ["Test completed", "No balance found"]

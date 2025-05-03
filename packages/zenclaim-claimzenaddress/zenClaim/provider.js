@@ -47,15 +47,12 @@ async function setWallet(privateKey, testnet, verbose) {
 
 //check sender funds to pay gas
 async function findSenderBalance(privateKey, testnet, verbose) {
-  if (verbose)
-    console.log("RPC Checking sender balance by private key");
   try {
     if (!provider) await setProvider(testnet, verbose);
     if (!wallet) setWallet(privateKey, testnet, verbose);
-    if (verbose) console.log("RPC checking eth balance for address ", wallet.address);
-
     const balance = await provider.getBalance(wallet.address);
-    return { balance };
+    if (verbose) console.log(`Senders eth balance ${ethers.formatEther(balance)}`);
+    return balance;
   } catch (error) {
     console.error("Error checking sender balance: ", error);
     return { error: "Error checking sender balance." };
@@ -72,32 +69,17 @@ async function getContractAndSigner(senderAddressPrivKey, testnet, verbose) {
   return { contract, signer }
 }
 
-async function checkClaimBalance(zenAddress, testnet, verbose) {
+async function checkClaimBalance(zenAddress, claim, verbose) {
   try {
     const addrDecoded = decodeZenAddress(zenAddress);
-    const claim = await getContractAndSigner(addrDecoded.decodedAddr, testnet, verbose);
     const balance = await claim.contract.balances(addrDecoded.decodedAddr);
     if (verbose) console.log("Claim balance: ", ethers.formatEther(balance.toString()));
     return balance;
   } catch (error) {
-    console.log("Error checking claim balance: ", error?.info?.error || error?.shortMessage || error );
+    console.log("Error checking claim balance: ", error?.info?.error || error?.shortMessage || error);
     throw new Error("Error checking claim balance.");
   }
 }
-async function checkFeeData(maxFeePerGas, maxPriorityFeePerGas, verbose) {
-  const feeData = await provider.getFeeData();
-  const gasPrice = feeData.gasPrice;
-  // add a small buffer to the gas limit
-  const gasLimit = gasPrice + ethers.toBigInt('100000');
-  const maxFPG = feeData.maxFeePerGas < maxFeePerGas ? feeData.maxFeePerGas : maxFeePerGas;
-  const maxPFPG = feeData.maxPriorityFeePerGas < maxPriorityFeePerGas ? feeData.maxPriorityFeePerGas : maxPriorityFeePerGas;
-  if (verbose) {
-    console.log(`gasPrice:${gasPrice.toString()}, gasLimit:${gasLimit.toString()}`);
-    console.log(`Using maxFeePerGas=${maxFPG}, maxPriorityFeePerGas=${maxPFPG}`);
-  }
-  return [gasPrice, gasLimit, maxFPG, maxPFPG];
-}
-
 
 async function submitClaim(
   zenAddress,
@@ -112,16 +94,31 @@ async function submitClaim(
   isTest,
 ) {
   try {
+    // check balances
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const balance = await checkClaimBalance(zenAddress, testnet, verbose);
-    if (balance == 0n) {
+    const claimBalance = await checkClaimBalance(zenAddress, claim, verbose);
+    if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;
     }
-    const [gasLimit, maxFPG, maxPFPG] = await checkFeeData(maxFeePerGas, maxPriorityFeePerGas, verbose)
+    const senderBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
+    if (senderBalance === 0n) {
+      throw new Error(`No balance in sender address to pay gas.`);
+    }
 
-    // build the transaction
+    // prep the transaction data
     const pubKey = [`0x${pubKeyCoords.pubkeyXcoordinate}`, `0x${pubKeyCoords.pubkeyYcoordinate}`];
     const signatureBuffer = Buffer.from(signature, "base64");
+
+    // check fees
+    const feeData = await provider.getFeeData();
+    const maxFPG = maxFeePerGas ? ethers.toBigInt(maxFeePerGas) : feeData.maxFeePerGas;
+    const maxPFPG = maxPriorityFeePerGas || maxPriorityFeePerGas === 0 ? ethers.toBigInt(maxPriorityFeePerGas) : feeData.maxPriorityFeePerGas;
+    const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_P2PKH].estimateGas(destAddress, signatureBuffer, pubKey)
+    const maxGasCost = gasEstimate * (maxFPG + maxPFPG);
+    if (senderBalance < maxGasCost) {
+      throw new Error(`Insufficient sender balance. Need up to ${ethers.formatEther(maxGasCost)} Found ${ethers.formatEther(senderBalance)}`)
+    }
+    if (verbose) console.log('Max eth transaction fee', ethers.formatEther(maxGasCost))
 
     const tx = await claim.contract[
       FUNCTION_NAME_CLAIM_P2PKH
@@ -132,12 +129,11 @@ async function submitClaim(
     if (verbose) console.log("RPC Nonce: ", nonce);
 
     // don't send if test
-    if(isTest) return "Test completed"
+    if (isTest) return "Test completed"
 
     const txResponse = await claim.signer.sendTransaction({
       to: contractAddress,
       data: tx.data,
-      gasLimit,
       nonce,
       maxFPG,
       maxPFPG,
@@ -147,7 +143,6 @@ async function submitClaim(
     // return the transaction hash
     return txResponse.hash;
   } catch (error) {
-    console.error("Error processing claim: ", error);
     if (error.revert) console.log(Object.keys(error.revert));
     throw error;
   }
@@ -156,25 +151,43 @@ async function submitClaim(
 async function submitMultisigClaim(
   multisig,
   destAddress,
-  orderedSignatures, 
+  orderedSignatures,
   orderedPubKeyCoords,
   senderAddressPrivKey,
   maxFeePerGas,
   maxPriorityFeePerGas,
   testnet,
-  verbose,  
+  verbose,
   isTest,
 ) {
   try {
+    //check balances
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const balance = await checkClaimBalance(multisig.address, testnet, verbose);
-    if (balance == 0n) {
+    const claimBalance = await checkClaimBalance(multisig.address, claim, verbose);
+    if (claimBalance == 0n) {
       return `No balance found in claim address ${multisig.address}`;
     }
+    const senderBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
+    if (senderBalance === 0n) {
+      throw new Error(`No balance in sender address to pay gas.`);
+    }
 
-    const [gasLimit, maxFPG, maxPFPG] = await checkFeeData(maxFeePerGas, maxPriorityFeePerGas, verbose)
+    // prep the transaction data
+    const pubKey = [`0x${pubKeyCoords.pubkeyXcoordinate}`, `0x${pubKeyCoords.pubkeyYcoordinate}`];
+    const signatureBuffer = Buffer.from(signature, "base64");
 
-    const rscript = `0x${multisig.redeemScript}`;
+    // check fees
+    const feeData = await provider.getFeeData();
+    const maxFPG = maxFeePerGas ? ethers.toBigInt(maxFeePerGas) : feeData.maxFeePerGas;
+    const maxPFPG = maxPriorityFeePerGas || maxPriorityFeePerGas === 0 ? ethers.toBigInt(maxPriorityFeePerGas) : feeData.maxPriorityFeePerGas;
+    const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_P2PKH].estimateGas(destAddress, signatureBuffer, pubKey)
+    const maxGasCost = gasEstimate * (maxFPG + maxPFPG);
+    // check if sender balance is sufficient
+    if (senderBalance < maxGasCost) {
+      throw new Error(`Insufficient sender balance. Need up to ${ethers.formatEther(maxGasCost)} Found ${ethers.formatEther(senderBalance)}`)
+    }
+    if (verbose) console.log('Max eth transaction fee', ethers.formatEther(maxGasCost))
+
     const tx = await claim.contract[
       FUNCTION_NAME_CLAIM_P2SH
     ].populateTransaction(destAddress, orderedSignatures, rscript, orderedPubKeyCoords,);
@@ -182,14 +195,13 @@ async function submitMultisigClaim(
     // get the nonce last
     const nonce = await claim.signer.getNonce();
     if (verbose) console.log("RPC Nonce: ", nonce);
-    
+
     // don't send if test
-    if(isTest) return "Test completed"
-    
+    if (isTest) return "Test completed"
+
     const txResponse = await claim.signer.sendTransaction({
       to: contractAddress,
       data: tx.data,
-      gasLimit,
       nonce,
       maxFeePerGas: maxFPG,
       maxPriorityFeePerGas: maxPFPG,

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as zen from "./zenClaim/claimzenutils.js";
-import { findSenderBalance, submitClaim } from './zenClaim/provider.js'
+import { submitClaim } from './zenClaim/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "./zenClaim/contractConsts.js";
 import 'colors';
 import { readFileSync } from 'fs';
@@ -15,8 +15,8 @@ arguments:
  --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2 starting with 0x) 
  --signature="" (mandatory signed message signature from zenAddress) 
  --senderAddressPrivKey="0x.." (mandatory, private key of Ethereum address sending the transaction and paying the fee)  
- --maxFeePerGas=int (optional, wei, default 20000000000) 
- --maxPriorityFeePerGas=int (optional, wei, default 20000000000) 
+ --maxFeePerGas=int (optional, wei, overrides provider estimate) 
+ --maxPriorityFeePerGas=int (optional, wei, overrides provider estimate) 
  --network="mainnet||testnet" (optional, default "mainnet")
  --help  display this help
  --verbose  display additional values to help check for errors
@@ -87,15 +87,6 @@ async function claimZen(options) {
       throw new Error(pubKeyCoords.error);
     }
     
-    const senderEthBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
-    if (senderEthBalance.error) {
-      throw new Error(senderEthBalance.error);
-    }
-    if (senderEthBalance.balance < maxFeePerGas) {
-      throw new Error(`Not enough funds in sender address to pay gas. Sender balance: ${senderEthBalance.balance}, required(gwei): ${maxFeePerGas}`);
-    }
-    if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
-
     const isTest = options?.isTest
     // Claim ZEN
     const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose, isTest);

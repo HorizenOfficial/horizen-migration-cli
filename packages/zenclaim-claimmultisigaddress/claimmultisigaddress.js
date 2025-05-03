@@ -2,7 +2,7 @@
 
 import * as zen from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
 import * as ms from "./multisigutils.js";
-import { findSenderBalance, submitMultisigClaim } from '../zenclaim-claimzenaddress/zenClaim/provider.js'
+import { submitMultisigClaim } from '../zenclaim-claimzenaddress/zenClaim/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
 import 'colors';
 import { readFileSync } from 'fs';
@@ -18,8 +18,8 @@ arguments:
  --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
  --signatures='["",""]' (mandatory, n signatures of a n-of-m multisig address) 
  --senderAddressPrivKey="0x.." (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
- --maxFeePerGas=int (optional, wei, default 20000000000) 
- --maxPriorityFeePerGas=int (optional, wei, default 20000000000) 
+ --maxFeePerGas=int (optional, wei, overrides provider estimate) 
+ --maxPriorityFeePerGas=int (optional, wei, overrides provider estimate) 
  --network="mainnet||testnet" (optional, default "mainnet")
  --help  display this help
  --verbose  display additional values to help check for errors
@@ -40,7 +40,7 @@ const allowed = long.concat(short);
 
 // Function to parse arguments
 function parseArguments(args) {
-    const options = {isCLI: true}
+    const options = { isCLI: true }
 
     for (let i = 0; i < args.length; i++) {
         const val = args[i].split('=');
@@ -135,15 +135,6 @@ async function claimMultisig(options) {
         if (count < multisig.requiredSigs) {
             throw new Error(`Not enough valid signatures found. Required: ${multisig.requiredSigs}, found: ${count}`);
         }
-
-        const senderEthBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
-        if (senderEthBalance.error) {
-            throw new Error(senderEthBalance.error);
-        }
-        if (senderEthBalance.balance < maxFeePerGas) {
-            throw new Error(`Not enough funds in sender address to pay gas. Sender balance: ${senderEthBalance.balance}, required(gwei): ${maxFeePerGas}`);
-        }
-        if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
 
         // Claim ZEN
         const isTest = options?.isTest
