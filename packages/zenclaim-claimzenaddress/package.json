@@ -15,7 +15,7 @@
   "dependencies": {
     "bs58check": "4.0.0",
     "eip55": "2.1.1",
-    "ethers": "6.13.5",
+    "ethers": "6.13.7",
     "sha3": "2.1.4"
   }
 }
