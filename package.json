@@ -25,7 +25,7 @@
   },
   "scripts": {
     "test": "env NODE_OPTIONS='--experimental-vm-modules' jest",
-    "testcoverage:win": "env NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
+    "testcoverage:win": "env NODE_OPTIONS='--experimental-vm-modules' jest --coverage"
   },
   "author": "allan@zensystems.io",
   "license": "MIT",
