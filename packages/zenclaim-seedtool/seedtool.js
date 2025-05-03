@@ -62,30 +62,24 @@ function parseArguments(args) {
 
 // Function to derive addresses
 async function deriveAddresses(options) {
-    const network = (options.network === 'testnet' || options.nt == 'testnet') ? 1 : 0;
-    if (!options.mnemonicPhrase && !options.ph) throw new Error('Seed phrase is required.');
-
     try {
+        const testnet = options.network === 'testnet' ? 1 : 0;
+        if (!options.mnemonicPhrase) throw new Error('Seed phrase is required.');
+        if (options?.numAddresses && (isNaN(options.numAddresses) || options.numAddresses <0) ) throw new Error('Seed phrase is required.');
+
         const addrs = await zen.deriveFromPhrase(
-            options.numAddresses || options.na || 5,
-            options.mnemonicPhrase || options.ph,
-            options.mnemonicPassword || options.pw || "",
-            options.derivationPath || options.dp || `m/44'/121'/0'/0/`,
-            options.derivationAddressIndexOffset || options.do || 0,
-            network,
-            options.verbose || options.v || false,
+            options.numAddresses || 5,
+            options.mnemonicPhrase,
+            options.mnemonicPassword || "",
+            options.derivationPath || `m/44'/121'/0'/0/`,
+            options.derivationAddressIndexOffset || 0,
+            testnet,
+            options.verbose || false,
         );
-
-        if (addrs.error) {
-            console.error(addrs.error.red);
-            process.exit(1);
-        }
-
-        return options.stringify || options.s ? JSON.stringify(addrs, null, 2) : addrs;
-    } catch (error) {
-        console.error('Unable to complete'.red, error.message.red);
-        if (process.env.ERROR_DETAILS) console.error(error);
-        process.exit(1);
+        return options.stringify ? JSON.stringify(addrs, null, 1) : addrs;
+    } catch (err) {
+        if (options.verbose) console.log(error.message)
+        return { error: err.message };
     }
 }
 
@@ -99,9 +93,18 @@ async function main(args) {
 
     const options = parseArguments(args);
     const result = await deriveAddresses(options);
-    console.log(result);
+
+    if (result.error) {
+        console.error(result.error);
+        process.exit(1);
+    }
+
+    const output = options?.stringify ? JSON.stringify(result, null, 2) : result;
     if (options.verbose) console.log('no errors');
+    console.log(output);
 }
+
+
 
 // Export the deriveAddresses function for use as a module
 export { deriveAddresses };

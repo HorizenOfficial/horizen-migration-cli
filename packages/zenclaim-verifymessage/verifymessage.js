@@ -2,6 +2,8 @@
 
 import * as zen from "./verifyutils.js";
 import 'colors';
+import { isEthAddress } from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
 const version = packageJson.version;
@@ -26,12 +28,7 @@ const flags = long.splice(-3).concat(short.splice(-3));
 
 // Function to parse arguments
 function parseArguments(args) {
-  let options = {
-    message: null,
-    zenAddress: null,
-    signature: null,
-    verbose: false,
-  };
+  const options = {}
 
   for (let i = 0; i < args.length; i++) {
     const val = args[i].split('=');
@@ -56,9 +53,26 @@ function parseArguments(args) {
 }
 
 // Function to verify the message
-function verifyMessage(message, zenAddress, signature) {
+function verifyMessage(options) {
   try {
-    const valid = zen.verify(message, zenAddress, signature);
+    // message , zenAddress, signature) 
+    if (!options.message) throw new Error('Missing message');
+    if (!options.zenAddress) throw new Error('Missing zenAddress');
+    if (!options.signature) throw new Error('Missing signature');
+    const network = options.zenAddress.startsWith("zt") ? 1 : 0
+
+    const msg = options.message.split("0x");
+    if (msg.length === 1) throw new Error('Message should contain the destination address with 0x prefix.');
+    if (msg.length > 3) throw new Error('Invalid message. Check instructions');
+    if (msg[0] !== ZENCLAIM_MESSAGE_PREFIX && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET)
+      throw new Error(`Message should begin with ${network ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX}`);
+    if (network === 1 && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) throw new Error('Incorrect prefix testnet in message')
+    if (network === 0 && msg[0] !== ZENCLAIM_MESSAGE_PREFIX) throw new Error('Incorrect prefix for mainnet in message')
+    const dest = `0x${msg[2] || msg[1]}`
+    if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions');
+    if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
+
+    const valid = zen.verify(options.message, options.zenAddress, options.signature);
     return valid;
   } catch (error) {
     return { error: error.message || 'Unable to verify the signature'.red };
@@ -78,7 +92,7 @@ async function main(args) {
     console.log('Arguments received:'.cyan, options);
   }
 
-  const result = verifyMessage(options.message, options.zenAddress, options.signature);
+  const result = verifyMessage(options);
   if (result?.error) {
     console.error(result.error);
     process.exit(1);

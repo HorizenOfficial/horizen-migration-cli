@@ -10,7 +10,7 @@ const isBase58 = value => /^[A-HJ-NP-Za-km-z1-9]*$/.test(value);
  */
 /**
  * 
- * @param {strin} privKey  key in WIF or raw format
+ * @param {string} privKey  key in WIF or raw format
  * @param {boolean} compressed  compress signature and public key
  * @param {number} testnet 1 for testnet, 0 for mainet
  * @param {boolean} verbose  display additional values to help check for errors

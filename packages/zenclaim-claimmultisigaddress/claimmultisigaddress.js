@@ -40,17 +40,7 @@ const allowed = long.concat(short);
 
 // Function to parse arguments
 function parseArguments(args) {
-    let options = {
-        multisigAddress: null,
-        destinationAddress: null,
-        redeemScript: null,
-        signatures: null,
-        senderAddressPrivKey: null,
-        maxFeePerGas: 20000000000,
-        maxPriorityFeePerGas: 20000000000,
-        network: "mainnet",
-        verbose: false,
-    };
+    const options = {isCLI: true}
 
     for (let i = 0; i < args.length; i++) {
         const val = args[i].split('=');
@@ -81,25 +71,35 @@ function parseArguments(args) {
 
     if (options.verbose) console.log('zenclaim-claimultisigaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-    if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
-        console.error('zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required. For help: use --help or -h'.red);
-        process.exit(1);
-    }
 
     return options;
 }
 
 function buildMessage(options) {
-    const prefix = options.network === 'testnet' ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
+    const testnet = options?.network === 'testnet' ? 1 : 0;
+    const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
+    // Validate inputs
+    if (!zen.isZenAddress(options.multisigAddress, testnet, true)) {
+        throw new Error("Not a valid zen multisig address");
+    }
+    if (!zen.isEthAddress(options.destinationAddress)) {
+        throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
+    }
     const message = `${prefix}0x${ms.decodeZenAddress(options.multisigAddress).toString('hex')}${options.destinationAddress}`;
     return message;
 }
 
 // Function to claim ZEN
 async function claimMultisig(options) {
-    const { multisigAddress, destinationAddress, redeemScript, signatures, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
-    const testnet = network === 'testnet' ? 1 : 0;
     try {
+        const { multisigAddress, destinationAddress, redeemScript, signatures, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
+        if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
+            const missing = 'zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required.'
+            if (options.isCLI) missing += ' For help: use --help or -h'.red
+            throw new Error(missing);
+        }
+
+        const testnet = network === 'testnet' ? 1 : 0;
         // Validate inputs
         if (!zen.isZenAddress(multisigAddress, testnet, true, verbose)) {
             throw new Error("Not a valid zen multisig address");
@@ -107,7 +107,7 @@ async function claimMultisig(options) {
         if (!zen.isEthAddress(destinationAddress)) {
             throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
-        if (!ms.checkRedeemScript(redeemScript)) {
+        if (!ms.checkRedeemScript(redeemScript, verbose)) {
             throw new Error("Not a valid redeemScript");
         }
         if (!zen.isEthPrivKey(senderAddressPrivKey)) {
@@ -146,10 +146,11 @@ async function claimMultisig(options) {
         if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
 
         // Claim ZEN
-        const txResult = await submitMultisigClaim(multisig, destinationAddress, orderedSignatures, orderedPubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
+        const isTest = options?.isTest
+        const txResult = await submitMultisigClaim(multisig, destinationAddress, orderedSignatures, orderedPubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose, isTest);
         return txResult;
     } catch (error) {
-        throw new Error(error.message);
+        return { error: error.message || 'Unable to create the transaction'.red };
     }
 }
 

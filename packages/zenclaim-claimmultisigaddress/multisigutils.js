@@ -4,16 +4,15 @@ import OPCODES from "bitcoinjs-lib/src/ops.js"
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey, base58DecodeZenAddress } from '../zenclaim-recoverpubkey/recoverutils.js';
 
 const OP_INT_BASE = OPCODES.OPS.OP_RESERVED;
-const checkRedeemScript = (rscript) => {
+const checkRedeemScript = (rscript, verbose) => {
     // Check if the redeemScript is a valid hex string
-    if (!/^[0-9a-fA-F]+$/.test(rscript)) {
+    if (!/^[0-9a-fA-F]+$/.test(rscript))
         return false;
-    }
-    console.log("check rscript. length=", rscript.length);
-    if (rscript.length === 0 || rscript.length < 120) {
 
+    if (verbose) console.log("check rscript. length=", rscript.length);
+    if (rscript.length === 0 || rscript.length < 120)
         return false;
-    }
+
     return true
 }
 
@@ -95,7 +94,7 @@ function verifySigsAndGetCoords(signatures, multisig, message, testnet, verbose)
     const orderedPubKeyCoords = new Array(addrs.length).fill([pkFill, pkFill]);
     const orderedSignatures = new Array(addrs.length).fill(Buffer.from("", "base64"));
     for (let i = 0; i < signatures.length; i++) {
-        const sigPubKey = getPublicKeyFromSignature (message, signatures[i])
+        const sigPubKey = getPublicKeyFromSignature(message, signatures[i])
         for (let x = 0; x < addrs.length; x++) {
             const result = verifyAndRecoverPubKey(addrs[x], sigPubKey, testnet, verbose);
             if (result.pubkeyXcoordinate) {

@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 import * as zen from "./signutils.js";
+import { isEthAddress } from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
+
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
@@ -30,14 +33,7 @@ const allowed = long.concat(short);
 
 // Function to parse arguments
 function parseArguments(args) {
-  let options = {
-    privKey: null,
-    message: null,
-    compressed: true,
-    network: "mainnet",
-    stringify: false,
-    verbose: false,
-  };
+  let options = {}
 
   for (let i = 0; i < args.length; i++) {
     const val = args[i].split('=');
@@ -47,7 +43,7 @@ function parseArguments(args) {
     }
     if (val[0] === '-pk' || val[0] === '--privKey') { options.privKey = val[1]; continue; }
     if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
-    if (val[0] === '-cp' || val[0] === '--compressed') { options.compressed = val[1] === 'true'; continue; }
+    if (val[0] === '-cp' || val[0] === '--compressed') { options.compressed = val[1] == 'false' ? false : true; continue; }
     if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
     if (val[0] === '-s' || val[0] === '--stringify') { options.stringify = true; continue; }
     if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
@@ -55,8 +51,8 @@ function parseArguments(args) {
 
   if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-  if (!options.privKey || !options.message) {
-    console.error('message and private key are required'.red);
+  if (!options.privKey || !options.message || options.message === '' || options.message === 'undefined' || options.message.length < 50) {
+    console.error('private key and message are required. For help: use --help or -h'.red);
     process.exit(1);
   }
 
@@ -64,12 +60,33 @@ function parseArguments(args) {
 }
 
 // Function to sign a message
-function signMessage(message, privKey, compressed, network, verbose) {
-  if (verbose) console.log("message=", message);
+function signMessage(options) {
+  if (options.verbose)  console.log("options=", options);
+  const testnet = options.network === 'testnet' ? 1 : 0;
+
   try {
-    const signature = zen.signMessage(message, privKey, compressed, network, verbose);
+    // validation checks
+    if (!options.privKey) throw new Error('Missing private key');
+    if (!options.message) throw new Error('Missing message');
+    const msg = options.message.split("0x");
+    if(msg.length === 1) throw new Error('Message should contain the destination address with 0x prefix.');
+    if(msg.length > 3) throw new Error('Invalid message. Check instructions');
+    if(msg[0]!== ZENCLAIM_MESSAGE_PREFIX && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) 
+      throw new Error(`Message should begin with ${network ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX}`);
+    const dest = `0x${msg[2] || msg[1]}`
+    if (!isEthAddress(dest) ) throw new Error('Invalid destination address in message. Check instructions');
+    if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
+
+
+    const signature = zen.signMessage(
+      options.message,
+      options.privKey,
+      options.compressed || true,
+      testnet,
+      options.verbose);
     return signature;
   } catch (error) {
+    if (options.verbose) console.log(error.message)
     return { error: error.message };
   }
 }
@@ -87,17 +104,16 @@ async function main(args) {
     console.log('Arguments received:'.cyan, options);
   }
 
-  const network = options.network === 'testnet' ? 1 : 0;
-  const result = signMessage(options.message, options.privKey, options.compressed, network, options.verbose);
+  const result = signMessage(options);
 
   if (result.error) {
     console.error(result.error);
     process.exit(1);
   }
 
-  const output = options.stringify ? JSON.stringify(result, null, 2) : result;
-  console.log(output);
+  const output = options?.stringify ? JSON.stringify(result, null, 1) : result;
   if (options.verbose) console.log('no errors');
+  console.log(output);
 }
 
 // Export the signMessage function for use as a module

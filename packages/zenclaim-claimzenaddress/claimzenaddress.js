@@ -34,16 +34,7 @@ const allowed = long.concat(short);
 
 // Function to parse arguments
 function parseArguments(args) {
-  let options = {
-    zenAddress: null,
-    destinationAddress: null,
-    signature: null,
-    senderAddressPrivKey: null,
-    maxFeePerGas: 20000000000,
-    maxPriorityFeePerGas: 20000000000,
-    network: "mainnet",
-    verbose: false,
-  };
+  const options = {isCLI: true};
 
   for (let i = 0; i < args.length; i++) {
     const val = args[i].split('=');
@@ -63,19 +54,19 @@ function parseArguments(args) {
 
   if (options.verbose) console.log('zenclaim-claimsenaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-  if (!options.zenAddress || !options.destinationAddress || !options.signature || !options.senderAddressPrivKey) {
-    console.error('zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required. For help: use --help or -h'.red);
-    process.exit(1);
-  }
-
   return options;
 }
 
 // Function to claim ZEN
 async function claimZen(options) {
-  const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
-  const testnet = network === 'testnet' ? 1 : 0;
   try {
+    const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
+  if (!zenAddress || !destinationAddress || !signature || !senderAddressPrivKey) {
+    const missing ='zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required.';
+    if (options.isCLI) missing +=  ' For help: use --help or -h'.red
+    throw new Error(missing);
+  }
+  const testnet = network === 'testnet' ? 1 : 0;
     // Validate inputs
     if (!zen.isZenAddress(zenAddress, testnet, false, verbose)) {
       throw new Error("Not a valid zenAddress");
@@ -105,11 +96,12 @@ async function claimZen(options) {
     }
     if (verbose) console.log('Sender balance is enough to pay gas (gwei): ', senderEthBalance.balance.toString());
 
+    const isTest = options?.isTest
     // Claim ZEN
-    const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose);
+    const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose, isTest);
     return txResult;
   } catch (error) {
-    throw new Error(error.message);
+    return { error: error.message || 'Unable to create the transaction'.red };
   }
 }
 
@@ -128,6 +120,11 @@ async function main(args) {
 
   try {
     const result = await claimZen(options);
+    
+    if (result?.error) {
+      console.error(result.error);
+      process.exit(1);
+    }
     if (options.verbose) console.log('no errors');
     console.log(result);
   } catch (error) {

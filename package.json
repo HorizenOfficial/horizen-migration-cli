@@ -24,8 +24,12 @@
     "zenclaim-claimmultisigaddress": "./packages/zenclaim-claimmultisigaddress/claimmultisigaddress.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "env NODE_OPTIONS='--experimental-vm-modules' jest",
+    "testcoverage:win": "env NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
   },
   "author": "allan@zensystems.io",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "29.7.0"
+  }
 }

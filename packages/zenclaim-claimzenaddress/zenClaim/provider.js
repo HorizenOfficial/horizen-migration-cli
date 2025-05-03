@@ -80,7 +80,7 @@ async function checkClaimBalance(zenAddress, testnet, verbose) {
     if (verbose) console.log("Claim balance: ", ethers.formatEther(balance.toString()));
     return balance;
   } catch (error) {
-    console.error("Error checking claim balance: ", error);
+    console.log("Error checking claim balance: ", error?.info?.error || error?.shortMessage || error );
     throw new Error("Error checking claim balance.");
   }
 }
@@ -108,7 +108,8 @@ async function submitClaim(
   maxFeePerGas,
   maxPriorityFeePerGas,
   testnet,
-  verbose
+  verbose,
+  isTest,
 ) {
   try {
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
@@ -129,6 +130,9 @@ async function submitClaim(
     // get the nonce last
     const nonce = await claim.signer.getNonce();
     if (verbose) console.log("RPC Nonce: ", nonce);
+
+    // don't send if test
+    if(isTest) return "Test completed"
 
     const txResponse = await claim.signer.sendTransaction({
       to: contractAddress,
@@ -158,7 +162,8 @@ async function submitMultisigClaim(
   maxFeePerGas,
   maxPriorityFeePerGas,
   testnet,
-  verbose
+  verbose,  
+  isTest,
 ) {
   try {
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
@@ -177,7 +182,10 @@ async function submitMultisigClaim(
     // get the nonce last
     const nonce = await claim.signer.getNonce();
     if (verbose) console.log("RPC Nonce: ", nonce);
-
+    
+    // don't send if test
+    if(isTest) return "Test completed"
+    
     const txResponse = await claim.signer.sendTransaction({
       to: contractAddress,
       data: tx.data,
