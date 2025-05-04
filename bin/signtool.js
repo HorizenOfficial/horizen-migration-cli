@@ -80,7 +80,7 @@ function signMessage(options) {
     const signature = sign(
       options.message,
       options.privKey,
-      options.compressed || true,
+      options.compressed,
       testnet,
       options.verbose);
     return signature;
