@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import 'colors';
-import { isEthAddress, verifySignedMessage } from "../src/utils/claimzenutils.js";
+import { isEthAddress, verifySignedMessage } from "../src/utils/claimutils.js";
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
+import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;

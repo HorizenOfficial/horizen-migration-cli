@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as zen from "../src/utils/phraseutils.js";
+import { deriveFromPhrase } from "../src/utils/phraseutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -68,7 +68,7 @@ async function deriveAddresses(options) {
         if (!options.mnemonicPhrase) throw new Error('Seed phrase is required.');
         if (options?.numAddresses && (isNaN(options.numAddresses) || options.numAddresses <0) ) throw new Error('Seed phrase is required.');
 
-        const addrs = await zen.deriveFromPhrase(
+        const addrs = await deriveFromPhrase(
             options.numAddresses || 5,
             options.mnemonicPhrase,
             options.mnemonicPassword || "",
@@ -100,7 +100,7 @@ async function main(args) {
         process.exit(1);
     }
 
-    const output = options?.stringify ? JSON.stringify(result, null, 2) : result;
+    const output = options?.stringify ? JSON.stringify(result) : result;
     if (options.verbose) console.log('no errors');
     console.log(output);
 }

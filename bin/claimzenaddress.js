@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as zen from "../src/utils/claimzenutils.js";
+import { isZenAddress, isEthAddress, isEthPrivKey, verifySignedMessage, getPubKeyInfo} from "../src/utils/claimutils.js";
 import { submitClaim } from '../src/utils/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
@@ -34,7 +34,7 @@ const allowed = long.concat(short);
 
 // Function to parse arguments
 function parseArguments(args) {
-  const options = {isCLI: true};
+  const options = { isCLI: true };
 
   for (let i = 0; i < args.length; i++) {
     const val = args[i].split('=');
@@ -42,7 +42,7 @@ function parseArguments(args) {
       console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
       process.exit(1);
     }
-    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue;}
+    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
     if (val[0] === '-da' || val[0] === '--destinationAddress') { options.destinationAddress = val[1]; continue; }
     if (val[0] === '-sg' || val[0] === '--signature') { options.signature = args[i].slice(args[i].indexOf('=') + 1); continue; }
     if (val[0] === '-pk' || val[0] === '--senderAddressPrivKey') { options.senderAddressPrivKey = val[1]; continue; }
@@ -61,32 +61,32 @@ function parseArguments(args) {
 async function claimZen(options) {
   try {
     const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
-  if (!zenAddress || !destinationAddress || !signature || !senderAddressPrivKey) {
-    const missing ='zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required.';
-    if (options.isCLI) missing +=  ' For help: use --help or -h'.red
-    throw new Error(missing);
-  }
-  const testnet = network === 'testnet' ? 1 : 0;
+    if (!zenAddress || !destinationAddress || !signature || !senderAddressPrivKey) {
+      const missing = 'zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required.';
+      if (options.isCLI) missing += ' For help: use --help or -h'.red
+      throw new Error(missing);
+    }
+    const testnet = network === 'testnet' ? 1 : 0;
     // Validate inputs
-    if (!zen.isZenAddress(zenAddress, testnet, false, verbose)) {
+    if (!isZenAddress(zenAddress, testnet, false, verbose)) {
       throw new Error("Not a valid zenAddress");
     }
-    if (!zen.isEthAddress(destinationAddress)) {
+    if (!isEthAddress(destinationAddress)) {
       throw new Error("Not a valid destinationAddress");
     }
-    if (!zen.isEthPrivKey(senderAddressPrivKey)) {
+    if (!isEthPrivKey(senderAddressPrivKey)) {
       throw new Error("Not a valid senderAddressPrivKey");
     }
     const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
     const message = `${prefix}${destinationAddress}`;
-    if (!zen.verifySignedMessage(message, zenAddress, signature)) {
+    if (!verifySignedMessage(message, zenAddress, signature)) {
       throw new Error("Not a valid signature for signed message");
     }
-    const pubKeyCoords = zen.getPubKeyInfo(message, zenAddress, signature, testnet, verbose);
+    const pubKeyCoords = getPubKeyInfo(message, zenAddress, signature, testnet, verbose);
     if (pubKeyCoords.error) {
       throw new Error(pubKeyCoords.error);
     }
-    
+
     const isTest = options?.isTest
     // Claim ZEN
     const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose, isTest);
@@ -111,7 +111,7 @@ async function main(args) {
 
   try {
     const result = await claimZen(options);
-    
+
     if (result?.error) {
       console.error(result.error);
       process.exit(1);

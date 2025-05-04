@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import * as claimUtils from "../src/utils/claimzenutils.js";
-import * as msUtils from "../src/utils/multisigutils.js";
+import { isZenAddress, isEthAddress, isEthPrivKey, addressToDecodedHex } from "../src/utils/claimutils.js";
+import { decodeMulti, checkRedeemScript, validateSignatures, verifySigsAndGetCoords } from "../src/utils/multisigutils.js";
 import { submitMultisigClaim } from '../src/utils/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
@@ -71,7 +71,6 @@ function parseArguments(args) {
 
     if (options.verbose) console.log('zenclaim-claimultisigaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-
     return options;
 }
 
@@ -79,13 +78,13 @@ function buildMessage(options) {
     const testnet = options?.network === 'testnet' ? 1 : 0;
     const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
     // Validate inputs
-    if (!claimUtils.isZenAddress(options.multisigAddress, testnet, true)) {
+    if (!isZenAddress(options.multisigAddress, testnet, true)) {
         throw new Error("Not a valid zen multisig address");
     }
-    if (!claimUtils.isEthAddress(options.destinationAddress)) {
+    if (!isEthAddress(options.destinationAddress)) {
         throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
     }
-    const message = `${prefix}0x${claimUtils.addressToDecodedHex(options.multisigAddress)}${options.destinationAddress}`;
+    const message = `${prefix}0x${addressToDecodedHex(options.multisigAddress)}${options.destinationAddress}`;
     return message;
 }
 
@@ -101,19 +100,19 @@ async function claimMultisig(options) {
 
         const testnet = network === 'testnet' ? 1 : 0;
         // Validate inputs
-        if (!claimUtils.isZenAddress(multisigAddress, testnet, true, verbose)) {
+        if (!isZenAddress(multisigAddress, testnet, true, verbose)) {
             throw new Error("Not a valid zen multisig address");
         }
-        if (!claimUtils.isEthAddress(destinationAddress)) {
+        if (!isEthAddress(destinationAddress)) {
             throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
-        if (!msUtils.checkRedeemScript(redeemScript, verbose)) {
+        if (!checkRedeemScript(redeemScript, verbose)) {
             throw new Error("Not a valid redeemScript");
         }
-        if (!claimUtils.isEthPrivKey(senderAddressPrivKey)) {
+        if (!isEthPrivKey(senderAddressPrivKey)) {
             throw new Error("Not a valid senderAddressPrivKey");
         }
-        const multisig = msUtils.decodeMulti(redeemScript, testnet, verbose);
+        const multisig = decodeMulti(redeemScript, testnet, verbose);
         if (multisig.error) {
             throw new Error(multisig.error);
         }
@@ -124,13 +123,13 @@ async function claimMultisig(options) {
         }
 
         let signaturesArray = JSON.parse(signatures);
-        const isSigArrayValid = msUtils.validateSignatures(signaturesArray, multisig);
+        const isSigArrayValid = validateSignatures(signaturesArray, multisig);
         if (isSigArrayValid?.error)
             throw new Error(isSigArrayValid.error);
 
         const message = buildMessage({ multisigAddress, destinationAddress, network });
 
-        const [orderedPubKeyCoords, orderedSignatures] = msUtils.verifySigsAndGetCoords(signaturesArray, multisig, message, testnet, verbose);
+        const [orderedPubKeyCoords, orderedSignatures] = verifySigsAndGetCoords(signaturesArray, multisig, message, testnet, verbose);
         let count = orderedPubKeyCoords.filter((a) => Number(a[0]) !== 0).length;
         if (count < multisig.requiredSigs) {
             throw new Error(`Not enough valid signatures found. Required: ${multisig.requiredSigs}, found: ${count}`);

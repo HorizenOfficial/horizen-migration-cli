@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-import * as zen from "../src/utils/signutils.js";
-import { isEthAddress } from "../src/utils/claimzenutils.js";
+import { sign } from "../src/utils/signutils.js";
+import { isEthAddress } from "../src/utils/claimutils.js";
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
-
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -78,7 +77,7 @@ function signMessage(options) {
     if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
 
 
-    const signature = zen.signMessage(
+    const signature = sign(
       options.message,
       options.privKey,
       options.compressed || true,
@@ -111,7 +110,7 @@ async function main(args) {
     process.exit(1);
   }
 
-  const output = options?.stringify ? JSON.stringify(result, null, 1) : result;
+  const output = options?.stringify ? JSON.stringify(result) : result;
   if (options.verbose) console.log('no errors');
   console.log(output);
 }

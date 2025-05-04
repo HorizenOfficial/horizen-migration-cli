@@ -6,7 +6,7 @@ import {
 } from "../lib/contractConsts.js";
 import { ethers } from "ethers";
 import { rpcURLs } from "../../mainconfig.js";
-import { decodeZenAddress } from "./claimzenutils.js";
+import { decodeZenAddress } from "./claimutils.js";
 
 /*
     Using ethers.js v6 for provider and claim contract

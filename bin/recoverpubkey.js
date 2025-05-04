@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import * as zen from "../src/utils/recoverutils.js";
-import 'colors';
-import { isEthAddress } from "../src/utils/claimzenutils.js";
+import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from "../src/utils/recoverutils.js";
+import { isEthAddress } from "../src/utils/claimutils.js";
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
+import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
@@ -74,8 +74,8 @@ function recoverPubkey(options) {
     if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions');
     if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
 
-    const sigPubKey = zen.getPublicKeyFromSignature(options.message, options.signature);
-    const keys = zen.verifyAndRecoverPubKey(options.zenAddress, sigPubKey, network, options.verbose);
+    const sigPubKey = getPublicKeyFromSignature(options.message, options.signature);
+    const keys = verifyAndRecoverPubKey(options.zenAddress, sigPubKey, network, options.verbose);
     return keys;
   } catch (error) {
     return { error: error.message || 'Unable to verify the signature'.red };

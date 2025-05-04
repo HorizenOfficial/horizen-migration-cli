@@ -1,8 +1,7 @@
 import varuint from 'varuint-bitcoin';
 import zencashjs from 'zencashjs';
 import secp256k1 from 'secp256k1';
-// import bs58check from 'bs58check';
-import { isZenAddress, addressToDecodedHex } from './claimzenutils.js';
+import { isZenAddress, addressToDecodedHex } from './claimutils.js';
 
 // see zencashjs/src/message.js for the origin of the next 3 functions
 function _magicHash(message) {

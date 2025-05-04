@@ -1,5 +1,5 @@
 import zencashjs from "zencashjs";
-import { isZenAddress } from "./claimzenutils.js";
+import { isZenAddress } from "./claimutils.js";
 
 const isBase58 = value => /^[A-HJ-NP-Za-km-z1-9]*$/.test(value);
 
@@ -49,12 +49,12 @@ const pubKeyToAddr = (pubKey, tnet) => {
  * @param {number} testnet 1 for testnet, 0 for mainet
  * @returns object with signature and zen address
  */
-const signMessage = (message, privKey, compressed, testnet, verbose) => {
+const sign = (message, privKey, compressed, testnet, verbose) => {
     const checked = checkPrivKey(privKey, compressed, testnet, verbose);
     const signature = zencashjs.message.sign(message, checked.privateKey, compressed);
     return { signature: signature.toString('base64'), address: checked.address };
 }
 
 export {
-    signMessage
+    sign
 }
