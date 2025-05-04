@@ -1,6 +1,5 @@
 import zencashjs from "zencashjs";
-import { isZenAddress } from "./claimutils.js";
-
+import { isZenAddress, checkPrivKeyWif } from "./claimutils.js";
 const isBase58 = value => /^[A-HJ-NP-Za-km-z1-9]*$/.test(value);
 
 /**
@@ -18,16 +17,25 @@ const isBase58 = value => /^[A-HJ-NP-Za-km-z1-9]*$/.test(value);
  *
  */
 const checkPrivKey = (privKey, compressed, testnet, verbose) => {
-        const pk = isBase58(privKey) ? zencashjs.address.WIFToPrivKey(privKey) : privKey
-        const pubkey = zencashjs.address.privKeyToPubKey(pk, compressed);
-        if (verbose) console.log(`public key= ${pubkey}`)
-        const addr = pubKeyToAddr(pubkey, testnet); 
-        if (isZenAddress(addr, testnet, false, verbose)) {
-            return {privateKey: pk, publicKey: pubkey, address: addr};
-        } 
-        throw new Error("Invalid private key");
+    try {
+        
+        if (checkPrivKeyWif(privKey, testnet, verbose)) {
+            const pk = zencashjs.address.WIFToPrivKey(privKey, compressed, testnet ? zencashjs.config.testnet.wif : zencashjs.config.mainnet.wif);
+            const pubkey = zencashjs.address.privKeyToPubKey(pk, compressed);
+            if (verbose) console.log(`public key= ${pubkey}`)
+                const addr = pubKeyToAddr(pubkey, testnet);
+            if (isZenAddress(addr, testnet, false, verbose)) 
+                return { privateKey: pk, publicKey: pubkey, address: addr };
+            
+            throw new Error("Invalid private key");
+        } else { //if (isBase58(privKey)) {
+            const pk = zencashjs.address.privKeyToWIF(privKey, compressed, testnet ? zencashjs.config.testnet.wif : zencashjs.config.mainnet.wif);
+            return checkPrivKey(pk, compressed, testnet, verbose);
+        }
+    } catch (error) {
+        throw new Error(`Invalid private key. ${error.message}`);        
+    }
 }
-
 /**
  *
  * @param {string} pubKey  public key

@@ -108,4 +108,4 @@ const deriveFromPhrase = async (numAddresses, mnPhrase, mnPassword, derivationPr
   }
 }
 
-export { deriveFromPhrase }
+export { bip32Network, deriveFromPhrase }

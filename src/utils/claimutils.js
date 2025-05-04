@@ -3,7 +3,9 @@ import eip55 from "eip55";
 import { ethers } from "ethers";
 import { Buffer } from 'buffer';
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from './recoverutils.js';
+import { bip32Network } from "./phraseutils.js";  
 import zencashjs from "zencashjs";
+
 /**
  *
  * @param {string} addr
@@ -15,25 +17,26 @@ const isZenAddress = (address, testnet, isMulti = false, verbose) => {
 
   let prefix;
   try {
-    prefix = Buffer.from(bs58check.decode(address)).toString("hex").slice(0, 4);
+    prefix = Number(Buffer.from(bs58check.decode(address)).toString("hex").slice(0, 4));
   } catch (err) {
     if (verbose) console.log(err.message);
     return false;
   }
-
-  if (!testnet && prefix !== "2089" && prefix !== "2096") {
+  const main = bip32Network['mainnet'];
+  const test = bip32Network['testnet'];
+  if (!testnet && prefix !== main.pubKeyHash && prefix !==main.scriptHash) {
     if (verbose) console.log("ZEN isZenAddress rejecting non mainnet address");
     return false;
   }
-  if (testnet && prefix !== "2098" && prefix !== "2092") {
+  if (testnet && prefix !== test.pubKeyHash && prefix !== test.scriptHash) {
     if (verbose) console.log("ZEN isZenAddress rejecting non testnet address");
     return false;
-  }
-  if (isMulti && prefix !== "2096" && prefix !== "2092") {
+  } 
+  if (isMulti && prefix !== main.scriptHash && prefix !==test.scriptHash) {
     if (verbose) console.log("ZEN isZenAddress rejecting non multisig address");
     return false;
   }
-  if (!isMulti && prefix == "2096" && prefix == "2092") {
+  if (!isMulti && (prefix === main.scriptHash || prefix === test.scriptHash)) {
     if (verbose) console.log("ZEN isZenAddress rejecting multisig address");
     return false;
   }
@@ -41,6 +44,16 @@ const isZenAddress = (address, testnet, isMulti = false, verbose) => {
   if (verbose) console.log("ZEN zenAddress ok");
   return true;
 };
+
+const checkPrivKeyWif = (privKey, testnet, verbose) => {
+  try {
+    const prefix = Buffer.from(bs58check.decode(privKey)).toString("hex").slice(0, 2);
+    return Number("0x" +prefix) == bip32Network[testnet ? "testnet" : "mainnet"].wif;
+  } catch (err) {
+    if (verbose) console.log(err.message);
+    return false;
+  }
+}
 
 /**
 *
@@ -97,5 +110,6 @@ export {
   verifySignedMessage,
   getPubKeyInfo,
   decodeZenAddress,
-  addressToDecodedHex
+  addressToDecodedHex,
+  checkPrivKeyWif
 }
