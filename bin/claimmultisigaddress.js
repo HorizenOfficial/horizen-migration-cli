@@ -14,7 +14,7 @@ const version = packageJson.version;
 const usage = `${'npx zenclaim-claimmultisigaddress  --argument="" --argument="" ... '.cyan}
 arguments:
  --zenMultisigAddress="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address) 
- --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2) 
+ --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding)
  --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
  --signatures='["",""]' (mandatory, n signatures of a n-of-m multisig address) 
  --senderAddressPrivKey="0x.." (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
@@ -27,7 +27,7 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v -b
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM the base58checked decode of the multisig address and the destination Ethereum address on Base L2 
+The message to sign should consist of the word ZENCLAIM the base58check decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding
 The addresses must be in the format 0x{hex}.
 Example "ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"
 Signatures must be created with the public key of each zenAddress the multisig address is composed of. 
