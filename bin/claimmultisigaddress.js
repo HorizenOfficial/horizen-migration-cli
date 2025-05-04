@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import * as zen from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
-import * as ms from "./multisigutils.js";
-import { submitMultisigClaim } from '../zenclaim-claimzenaddress/zenClaim/provider.js'
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
+import * as claimUtils from "../src/utils/claimzenutils.js";
+import * as msUtils from "../src/utils/multisigutils.js";
+import { submitMultisigClaim } from '../src/utils/provider.js'
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
 import { readFileSync } from 'fs';
-const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 
@@ -79,13 +79,13 @@ function buildMessage(options) {
     const testnet = options?.network === 'testnet' ? 1 : 0;
     const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
     // Validate inputs
-    if (!zen.isZenAddress(options.multisigAddress, testnet, true)) {
+    if (!claimUtils.isZenAddress(options.multisigAddress, testnet, true)) {
         throw new Error("Not a valid zen multisig address");
     }
-    if (!zen.isEthAddress(options.destinationAddress)) {
+    if (!claimUtils.isEthAddress(options.destinationAddress)) {
         throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
     }
-    const message = `${prefix}0x${ms.decodeZenAddress(options.multisigAddress).toString('hex')}${options.destinationAddress}`;
+    const message = `${prefix}0x${claimUtils.addressToDecodedHex(options.multisigAddress)}${options.destinationAddress}`;
     return message;
 }
 
@@ -101,19 +101,19 @@ async function claimMultisig(options) {
 
         const testnet = network === 'testnet' ? 1 : 0;
         // Validate inputs
-        if (!zen.isZenAddress(multisigAddress, testnet, true, verbose)) {
+        if (!claimUtils.isZenAddress(multisigAddress, testnet, true, verbose)) {
             throw new Error("Not a valid zen multisig address");
         }
-        if (!zen.isEthAddress(destinationAddress)) {
+        if (!claimUtils.isEthAddress(destinationAddress)) {
             throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
-        if (!ms.checkRedeemScript(redeemScript, verbose)) {
+        if (!msUtils.checkRedeemScript(redeemScript, verbose)) {
             throw new Error("Not a valid redeemScript");
         }
-        if (!zen.isEthPrivKey(senderAddressPrivKey)) {
+        if (!claimUtils.isEthPrivKey(senderAddressPrivKey)) {
             throw new Error("Not a valid senderAddressPrivKey");
         }
-        const multisig = ms.decodeMulti(redeemScript, testnet, verbose);
+        const multisig = msUtils.decodeMulti(redeemScript, testnet, verbose);
         if (multisig.error) {
             throw new Error(multisig.error);
         }
@@ -124,13 +124,13 @@ async function claimMultisig(options) {
         }
 
         let signaturesArray = JSON.parse(signatures);
-        const isSigArrayValid = ms.validateSignatures(signaturesArray, multisig);
+        const isSigArrayValid = msUtils.validateSignatures(signaturesArray, multisig);
         if (isSigArrayValid?.error)
             throw new Error(isSigArrayValid.error);
 
         const message = buildMessage({ multisigAddress, destinationAddress, network });
 
-        const [orderedPubKeyCoords, orderedSignatures] = ms.verifySigsAndGetCoords(signaturesArray, multisig, message, testnet, verbose);
+        const [orderedPubKeyCoords, orderedSignatures] = msUtils.verifySigsAndGetCoords(signaturesArray, multisig, message, testnet, verbose);
         let count = orderedPubKeyCoords.filter((a) => Number(a[0]) !== 0).length;
         if (count < multisig.requiredSigs) {
             throw new Error(`Not enough valid signatures found. Required: ${multisig.requiredSigs}, found: ${count}`);

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import * as zen from "./zenClaim/claimzenutils.js";
-import { submitClaim } from './zenClaim/provider.js'
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "./zenClaim/contractConsts.js";
+import * as zen from "../src/utils/claimzenutils.js";
+import { submitClaim } from '../src/utils/provider.js'
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
 import { readFileSync } from 'fs';
-const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 // HELP
@@ -52,7 +52,7 @@ function parseArguments(args) {
     if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
   }
 
-  if (options.verbose) console.log('zenclaim-claimsenaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
+  if (options.verbose) console.log('zenclaim-claimszenaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
   return options;
 }
@@ -79,7 +79,7 @@ async function claimZen(options) {
     }
     const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
     const message = `${prefix}${destinationAddress}`;
-    if (!zen.verifyMessage(message, zenAddress, signature)) {
+    if (!zen.verifySignedMessage(message, zenAddress, signature)) {
       throw new Error("Not a valid signature for signed message");
     }
     const pubKeyCoords = zen.getPubKeyInfo(message, zenAddress, signature, testnet, verbose);

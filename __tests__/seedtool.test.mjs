@@ -1,5 +1,5 @@
 
-import { deriveAddresses } from 'zenclaim-seedtool/seedtool.js';
+import { deriveAddresses } from '../bin/seedtool.js';
 
 describe('seedtool.js', () => {
   const validOptions = {

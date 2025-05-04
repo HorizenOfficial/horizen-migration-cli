@@ -1,8 +1,8 @@
 import varuint from 'varuint-bitcoin';
 import zencashjs from 'zencashjs';
 import secp256k1 from 'secp256k1';
-import bs58check from 'bs58check';
-import { isZenAddress } from '../zenclaim-claimzenaddress/zenClaim/claimzenutils.js';
+// import bs58check from 'bs58check';
+import { isZenAddress, addressToDecodedHex } from './claimzenutils.js';
 
 // see zencashjs/src/message.js for the origin of the next 3 functions
 function _magicHash(message) {
@@ -27,13 +27,6 @@ function decodeSignature(buffer) {
   }
 };
 
-function base58DecodeZenAddress(address) {
-  // prefix is 2 bytes in zencash instead of 1
-  const decoded = bs58check.decode(address).subarray(2)
-  if (decoded.length !== 20) throw new Error('Invalid address length')
-  return decoded
-}
-
 function getPublicKeyFromSignature(message, signature) {
   if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
   const parsed = decodeSignature(signature)
@@ -55,9 +48,10 @@ function getPublicKeyFromSignature(message, signature) {
  * @returns [ {Boolean} true if the signature is valid, (string) publicKey ]
  */
 function verifyMatch(zenAddress, sigPubKey) {
-  const publicKeyHash = zencashjs.crypto.hash160Buf(sigPubKey)
-  const expected = base58DecodeZenAddress(zenAddress)
-  return [(expected.equals(publicKeyHash)), sigPubKey.toString("hex")];
+  const publicKeyHash = zencashjs.crypto.hash160Buf(sigPubKey).toString("hex");
+  const expected = addressToDecodedHex(zenAddress);
+  return [(expected === publicKeyHash), sigPubKey.toString("hex")];
+  // return [(expected.equals(publicKeyHash)), sigPubKey.toString("hex")];
 };
 
 
@@ -71,6 +65,9 @@ function verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose) {
     return { error: "Not a valid zenAddress" };
   }
   const [validMessage, pubkeyRecovered] = verifyMatch(zenAddress, sigPubKey);
+  if (!validMessage) {
+    return { error: `zenAddress ${zenAddress} does not match the public key derived from signature` };
+  }
   const pubkeyRecoveredConvertedUncompressed = secp256k1.publicKeyConvert(Buffer.from(pubkeyRecovered, "hex"), false).toString("hex")
 
   const addr = zencashjs.address.pubKeyToAddr(
@@ -94,4 +91,4 @@ function verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose) {
   return { pubkeyXcoordinate, pubkeyYcoordinate };
 }
 
-export { getPublicKeyFromSignature, verifyAndRecoverPubKey, base58DecodeZenAddress }
+export { getPublicKeyFromSignature, verifyAndRecoverPubKey}

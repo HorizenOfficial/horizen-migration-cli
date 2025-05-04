@@ -1,11 +1,9 @@
 import bs58check from "bs58check";
 import eip55 from "eip55";
 import { ethers } from "ethers";
-import { Keccak } from 'sha3';
 import { Buffer } from 'buffer';
-import { verify as verifyMsg } from "../../zenclaim-verifymessage/verifyutils.js";
-import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from '../../zenclaim-recoverpubkey/recoverutils.js';
-
+import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from './recoverutils.js';
+import zencashjs from "zencashjs";
 /**
  *
  * @param {string} addr
@@ -70,14 +68,10 @@ const isEthPrivKey = (value) => {
 
 }
 
-// check sender address balance for funds to pay gas
-const senderBal = async (senderPrivateKey) => {
-  const bal = await findSenderBalance(senderPrivateKey);
-  return bal
 
-}
-const verifyMessage = (message, zenAddress, signature) => {
-  return verifyMsg(message, zenAddress, signature)
+const verifySignedMessage = (message, zAddr, signature) => {
+  const verification = zencashjs.message.verify(message, zAddr, signature);
+  return verification;
 }
 
 const getPubKeyInfo = (message, zenAddress, signature, network, verbose) => {
@@ -86,18 +80,22 @@ const getPubKeyInfo = (message, zenAddress, signature, network, verbose) => {
   return result;
 }
 
-const decodeZenAddress = (zenAddress) => {
-  const decodedFull = bs58check.decode(zenAddress);
-  const decodedAddr = decodedFull.slice(2)
-  return { decodedFull, decodedAddr };
+function decodeZenAddress(address) {
+  // prefix is 2 bytes in zencash instead of 1
+  const decoded = bs58check.decode(address).subarray(2)
+  if (decoded.length !== 20) throw new Error('Invalid address length')
+  return decoded
 }
-
+function addressToDecodedHex (address) {
+  const decoded = decodeZenAddress(address);
+  return Buffer.from(decoded).toString("hex");
+}
 export {
   isZenAddress,
   isEthAddress,
   isEthPrivKey,
-  senderBal,
-  verifyMessage,
+  verifySignedMessage,
   getPubKeyInfo,
   decodeZenAddress,
+  addressToDecodedHex
 }

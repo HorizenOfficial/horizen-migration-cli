@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import * as zen from "./phraseutils.js";
+import * as zen from "../src/utils/phraseutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
-const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 // ///////////////////////////////////////////////////////////////////
@@ -21,7 +21,8 @@ arguments:
   --network="mainnet||testnet" (optional, default "mainnet")
   --stringify (optional default array, array as JSON.stringify() output)
   --help  display this help
-  --verbose display additional values to help debug
+  --verbose display additional values to help 
+  debug
   ${'Short forms of arguments'.cyan} 
   -ph="" -pw="" -na= -dp="" -do= -nt="" -s -h -v
 `;

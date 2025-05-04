@@ -1,5 +1,5 @@
 
-import { claimMultisig } from 'zenclaim-claimmultisigaddress/claimmultisigaddress.js';
+import { claimMultisig } from '../bin/claimmultisigaddress.js';
 
 // The senderAddressPrivKey must maintain a small balance (gas) for the tests to complete. 
 describe('claimmultisigaddress.js', () => {
@@ -118,7 +118,6 @@ describe('claimmultisigaddress.js', () => {
 
   test('claimMultisig should return a string with one of the succcess values when valid options', async () => {
     const result = await claimMultisig(validOptions);
-    console.log("Final test result:", result)
     expect(typeof result).toBe('string');
     expect(checkStringContainsAny(result, successes)).toBe(true);
   });

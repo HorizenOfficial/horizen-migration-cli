@@ -101,13 +101,6 @@ const deriveFromPhrase = async (numAddresses, mnPhrase, mnPassword, derivationPr
       });
     }
 
-    // if (verbose) {
-    //   const accountExtendedKey = calcBip32ExtendedKey(hdNode, derivationPrefix);
-    //   const accountXprv = accountExtendedKey.toBase58();
-    //   console.log(`account privkey="${accountXprv}`);
-    //   const xpubkey = accountExtendedKey.neutered().toBase58();
-    //   console.log(`extended public key="${xpubkey}`);
-    // }
     if (verbose) console.info("derived count=", addrKeys.length);
     return addrKeys;
   } catch (error) {

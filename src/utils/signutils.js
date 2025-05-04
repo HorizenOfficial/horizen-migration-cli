@@ -1,5 +1,5 @@
 import zencashjs from "zencashjs";
-import { isZenAddress } from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
+import { isZenAddress } from "./claimzenutils.js";
 
 const isBase58 = value => /^[A-HJ-NP-Za-km-z1-9]*$/.test(value);
 

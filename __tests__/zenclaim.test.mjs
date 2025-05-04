@@ -1,5 +1,5 @@
 
-import { claimZen } from 'zenclaim-claimzenaddress/claimzenaddress.js';
+import { claimZen } from '../bin/claimzenaddress.js';
 
 // The senderAddressPrivKey must maintain a small balance (gas) for the tests to complete. 
 describe('claimzenaddress.js', () => {
@@ -100,6 +100,7 @@ describe('claimzenaddress.js', () => {
 
   test('claimZen should return a string with one of the succcess values when valid options', async () => {
     const result = await claimZen(validOptions);
+    console.log("Test result:", result)
     expect(typeof result).toBe('string');
     console.log("Final test result:", result)
     expect(checkStringContainsAny(result, successes)).toBe(true);

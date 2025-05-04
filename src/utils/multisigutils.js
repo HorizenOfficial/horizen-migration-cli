@@ -1,7 +1,7 @@
 import zencashjs from "zencashjs"
 import bscript from "bitcoinjs-lib/src/script.js"
 import OPCODES from "bitcoinjs-lib/src/ops.js"
-import { getPublicKeyFromSignature, verifyAndRecoverPubKey, base58DecodeZenAddress } from '../zenclaim-recoverpubkey/recoverutils.js';
+import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from './recoverutils.js';
 
 const OP_INT_BASE = OPCODES.OPS.OP_RESERVED;
 const checkRedeemScript = (rscript, verbose) => {
@@ -16,9 +16,6 @@ const checkRedeemScript = (rscript, verbose) => {
     return true
 }
 
-const decodeZenAddress = (address) => {
-    return base58DecodeZenAddress(address);
-}
 /**
  *
  * @param {string} pubKey  public key
@@ -112,6 +109,5 @@ export {
     decodeMulti,
     validateSignatures,
     verifySigsAndGetCoords,
-    decodeZenAddress
 }
 

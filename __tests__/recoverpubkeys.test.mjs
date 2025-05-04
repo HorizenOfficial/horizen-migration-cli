@@ -1,5 +1,5 @@
 
-import { recoverPubkey } from 'zenclaim-recoverpubkey/recoverpubkey.js';
+import { recoverPubkey } from '../bin/recoverpubkey.js';
 
 describe('recoverPubkey.js', () => {
   // privKey used = 'KzFBhL99mZDTdjMhX4jMnybVxkTTACLm6gq9veUjpXcQuXbaAnHf';

@@ -1,5 +1,5 @@
 
-import { verifyMessage } from 'zenclaim-verifymessage/verifymessage.js';
+import { verifyMessage } from '../bin/verifymessage.js';
 
 describe('verifymessage.js', () => {
   // privKey used = 'KzFBhL99mZDTdjMhX4jMnybVxkTTACLm6gq9veUjpXcQuXbaAnHf';

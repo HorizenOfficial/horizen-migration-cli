@@ -1,5 +1,5 @@
 
-import { signMessage } from 'zenclaim-signtool/signtool.js';
+import { signMessage } from '../bin/signtool.js';
 
 describe('signtool.js', () => {
   const privKey = 'KzFBhL99mZDTdjMhX4jMnybVxkTTACLm6gq9veUjpXcQuXbaAnHf';

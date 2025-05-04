@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import * as zen from "./verifyutils.js";
 import 'colors';
-import { isEthAddress } from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
+import { isEthAddress, verifySignedMessage } from "../src/utils/claimzenutils.js";
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import { readFileSync } from 'fs';
-const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 // HELP
@@ -24,7 +23,6 @@ ${'Short forms of arguments'.cyan}
 const long = ['--message', '--zenAddress', '--signature', '--help', '--verbose'];
 const short = ['-ms', '-za', '-sg', '-h', '-v'];
 const allowed = long.concat(short);
-const flags = long.splice(-3).concat(short.splice(-3));
 
 // Function to parse arguments
 function parseArguments(args) {
@@ -72,7 +70,7 @@ function verifyMessage(options) {
     if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions');
     if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
 
-    const valid = zen.verify(options.message, options.zenAddress, options.signature);
+    const valid = verifySignedMessage(options.message, options.zenAddress, options.signature);
     return valid;
   } catch (error) {
     return { error: error.message || 'Unable to verify the signature'.red };

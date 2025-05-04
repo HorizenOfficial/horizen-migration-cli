@@ -3,13 +3,13 @@ import {
   FUNCTION_NAME_CLAIM_P2PKH,
   FUNCTION_NAME_CLAIM_P2SH,
   ZEND_BACKUP_VAULT_CONTRACT_ADDRESS, ZEND_BACKUP_VAULT_CONTRACT_ADDRESS_TESTNET
-} from "./contractConsts.js";
+} from "../lib/contractConsts.js";
 import { ethers } from "ethers";
 import { rpcURLs } from "../../mainconfig.js";
 import { decodeZenAddress } from "./claimzenutils.js";
 
 /*
-    Using ethers.js v6 to call the claim contract
+    Using ethers.js v6 for provider and claim contract
 */
 
 let provider;
@@ -72,7 +72,7 @@ async function getContractAndSigner(senderAddressPrivKey, testnet, verbose) {
 async function checkClaimBalance(zenAddress, claim, verbose) {
   try {
     const addrDecoded = decodeZenAddress(zenAddress);
-    const balance = await claim.contract.balances(addrDecoded.decodedAddr);
+    const balance = await claim.contract.balances(addrDecoded);
     if (verbose) console.log("Claim balance: ", ethers.formatEther(balance.toString()));
     return balance;
   } catch (error) {

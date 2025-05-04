@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import * as zen from "./recoverutils.js";
+import * as zen from "../src/utils/recoverutils.js";
 import 'colors';
-import { isEthAddress } from "../zenclaim-claimzenaddress/zenClaim/claimzenutils.js";
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../zenclaim-claimzenaddress/zenClaim/contractConsts.js";
+import { isEthAddress } from "../src/utils/claimzenutils.js";
+import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import { readFileSync } from 'fs';
-const packageJson = JSON.parse(readFileSync(new URL('./package.json', import.meta.url)));
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 // HELP

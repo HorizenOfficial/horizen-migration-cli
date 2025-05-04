@@ -2,30 +2,38 @@
   "name": "zenclaim-cli",
   "version": "0.1.0",
   "description": "command line tools for claiming zen on Horizen 2.0",
-  "main": "index.js",
   "type": "module",
-  "workspaces": [
-    "./packages/*"
-  ],
   "bin": {
-    "zenclaim-seedtool": "packages/zenclaim-seedtool/seedtool.js",
-    "zenclaim-signtool": "packages/zenclaim-signtool/signtool.js",
-    "zenclaim-verifymessage": "packages/zenclaim-verifymessage/verifymessage.js",
-    "zenclaim-claimzenaddress": "packages/zenclaim-claimzenaddress/claimzenaddress.js",
-    "zenclaim-recoverpubkey": "packages/zenclaim-recoverpubkey/recoverpubkey.js",
-    "zenclaim-claimmultisigaddress": "packages/zenclaim-claimmultisigaddress/claimmultisigaddress.js"
+    "zenclaim-seedtool": "bin/seedtool.js",
+    "zenclaim-signtool": "bin/signtool.js",
+    "zenclaim-verifymessage": "bin/verifymessage.js",
+    "zenclaim-claimzenaddress": "bin/claimzenaddress.js",
+    "zenclaim-recoverpubkey": "bin/recoverpubkey.js",
+    "zenclaim-claimmultisigaddress": "bin/claimmultisigaddress.js"
   },
   "exports": {
-    "zenclaim-seedtool": "./packages/zenclaim-seedtool/seedtool.js",
-    "zenlaim-signtool": "./packages/zenclaim-signtool/signtool.js",
-    "zenclaim-verifymessage": "./packages/zenclaim-verifymessage/verifymessage.js",
-    "zenclaim-claimzenaddress": "./packages/zenclaim-claimzenaddress/claimzenaddress.js",
-    "zenclaim-recoverpubkey": "./packages/zenclaim-recoverpubkey/recoverpubkey.js",
-    "zenclaim-claimmultisigaddress": "./packages/zenclaim-claimmultisigaddress/claimmultisigaddress.js"
+    "./zenclaim-seedtool": "./bin/seedtool.js",
+    "./zenclaim-signtool": "./bin/signtool.js",
+    "./zenclaim-verifymessage": "./bin/verifymessage.js",
+    "./zenclaim-claimzenaddress": "./bin/claimzenaddress.js",
+    "./zenclaim-recoverpubkey": "./bin/recoverpubkey.js",
+    "./zenclaim-claimmultisigaddress": "./bin/claimmultisigaddress.js"
   },
   "scripts": {
     "test": "env NODE_OPTIONS='--experimental-vm-modules' jest",
     "testcoverage:win": "env NODE_OPTIONS='--experimental-vm-modules' jest --coverage"
+  },
+  "dependencies": {
+    "bip32": "4.0.0",
+    "bip39": "3.1.0",
+    "colors": "1.4.0",
+    "tiny-secp256k1": "2.2.3",
+    "zencashjs": "2.2.0",
+    "bs58check": "4.0.0",
+    "eip55": "2.1.1",
+    "ethers": "6.13.7",
+    "sha3": "2.1.4",
+    "bitcoinjs-lib": "6.1.7"
   },
   "author": "allan@zensystems.io",
   "license": "MIT",
