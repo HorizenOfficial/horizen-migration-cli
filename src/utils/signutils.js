@@ -28,7 +28,7 @@ const checkPrivKey = (privKey, compressed, testnet, verbose) => {
                 return { privateKey: pk, publicKey: pubkey, address: addr };
             
             throw new Error("Invalid private key");
-        } else { //if (isBase58(privKey)) {
+        } else { 
             const pk = zencashjs.address.privKeyToWIF(privKey, compressed, testnet ? zencashjs.config.testnet.wif : zencashjs.config.mainnet.wif);
             return checkPrivKey(pk, compressed, testnet, verbose);
         }
