@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { isZenAddress, isEthAddress, isEthPrivKey, addressToDecodedHex } from "../src/utils/claimutils.js";
+import { isZenAddress, isEthAddress, isEthPrivKey, addressToDecodedHex, checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
 import { decodeMulti, checkRedeemScript, validateSignatures, verifySigsAndGetCoords } from "../src/utils/multisigutils.js";
 import { submitMultisigClaim } from '../src/utils/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
@@ -8,7 +8,6 @@ import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
-
 
 // HELP
 const usage = `${'npx zenclaim-claimmultisigaddress  --argument="" --argument="" ... '.cyan}
@@ -30,7 +29,7 @@ ${'Claiming ZEN:'.cyan}
 The message to sign should consist of the word ZENCLAIM the base58check decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding
 The addresses must be in the format 0x{hex}.
 Example "ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"
-Signatures must be created with the public key of each zenAddress the multisig address is composed of. 
+Signatures must be created with the public key of each zenAddress used to create the multisig address. 
 `;
 
 // Allowed arguments
@@ -45,7 +44,7 @@ function parseArguments(args) {
     for (let i = 0; i < args.length; i++) {
         const val = args[i].split('=');
         if (allowed.indexOf(val[0]) === -1) {
-            console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
+            console.error(`${val[0]} is not valid. ${help}`.red);
             process.exit(1);
         }
         if (val[0] === '-ma' || val[0] === '--zenMultisigAddress') { options.multisigAddress = val[1]; continue; }
@@ -61,7 +60,7 @@ function parseArguments(args) {
     }
     if (options.buildmessage) {
         if (!options.multisigAddress || !options.destinationAddress) {
-            console.error('zenMultisigAddress and destinationAddress are required. For help: use --help or -h'.red);
+            console.error(`zenMultisigAddress and destinationAddress are required. ${help}`.red);
             process.exit(1);
         }
         const message = buildMessage(options);
@@ -94,7 +93,7 @@ async function claimMultisig(options) {
         const { multisigAddress, destinationAddress, redeemScript, signatures, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
         if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
             const missing = 'zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required.'
-            if (options.isCLI) missing += ' For help: use --help or -h'.red
+            if (options.isCLI) `${missing} ${help}`;
             throw new Error(missing);
         }
 
@@ -146,16 +145,10 @@ async function claimMultisig(options) {
 
 // Main function for CLI
 async function main(args) {
-    const callHelp = args.includes('--help') || args.includes('-h');
-    if (callHelp || args.length === 0) {
-        console.log(usage);
-        process.exit(0);
-    }
+    checkHelp(args, usage);
 
     const options = parseArguments(args);
-    if (options.verbose) {
-        console.log('Arguments received:'.cyan, options);
-    }
+    listArgs(options);
 
     try {
         const result = await claimMultisig(options);
@@ -170,8 +163,4 @@ async function main(args) {
 export { claimMultisig };
 
 // If the script is run directly, execute the main function
-const argv = process.argv;
-const isCLI = argv[0].includes('node') && argv[1].endsWith('claimmultisigaddress.js');
-if (isCLI) {
-    main(argv.slice(2));
-}
+run(process.argv, 'claimmultisigaddress.js', main);

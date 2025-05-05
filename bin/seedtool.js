@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { deriveFromPhrase } from "../src/utils/phraseutils.js";
+import { checkHelp, listArgs, run, help} from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -37,7 +38,7 @@ function parseArguments(args) {
     for (let i = 0; i < args.length; i++) {
         const val = args[i].split('=');
         if (allowed.indexOf(val[0]) === -1) {
-            console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
+            console.error(`${val[0]} is not valid. ${help}`.red);
             process.exit(1);
         }
         if (val[0] === '-ph' || val[0] === '--mnemonicPhrase') { options.mnemonicPhrase = val[1]; continue; }
@@ -54,7 +55,7 @@ function parseArguments(args) {
 
 
     if (!options.mnemonicPhrase) {
-        console.error('Seed phrase is required. For help: use --help or -h'.red);
+        console.error(`Seed phrase is required. ${help}`.red);
         process.exit(1);
     }
 
@@ -86,17 +87,15 @@ async function deriveAddresses(options) {
 
 // Main function for CLI
 async function main(args) {
-    const callHelp = args.includes('--help') || args.includes('-h');
-    if (callHelp || args.length === 0) {
-        console.log(usage);
-        process.exit(0);
-    }
-
+    checkHelp(args, usage);
+  
     const options = parseArguments(args);
+    listArgs(options);
+  
     const result = await deriveAddresses(options);
 
     if (result.error) {
-        console.error(result.error);
+        console.error(result.error.red);
         process.exit(1);
     }
 
@@ -105,14 +104,8 @@ async function main(args) {
     console.log(output);
 }
 
-
-
 // Export the deriveAddresses function for use as a module
 export { deriveAddresses };
 
 // If the script is run directly, execute the main function
-const argv = process.argv
-const isCLI = argv[0].includes('node') && argv[1].endsWith('seedtool.js')
-if (isCLI) {
-    main(argv.slice(2));
-}
+run(process.argv,'seedtool.js', main);

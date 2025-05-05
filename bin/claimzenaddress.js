@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { isZenAddress, isEthAddress, isEthPrivKey, verifySignedMessage, getPubKeyInfo} from "../src/utils/claimutils.js";
+import { isZenAddress, isEthAddress, isEthPrivKey, verifySignedMessage, getPubKeyInfo, checkHelp, listArgs, run, help} from "../src/utils/claimutils.js";
 import { submitClaim } from '../src/utils/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
@@ -39,7 +39,7 @@ function parseArguments(args) {
   for (let i = 0; i < args.length; i++) {
     const val = args[i].split('=');
     if (allowed.indexOf(val[0]) === -1) {
-      console.error(`${val[0]} is not valid. For help: use --help or -h`.red);
+      console.error(`${val[0]} is not valid. ${help}`.red);
       process.exit(1);
     }
     if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
@@ -63,7 +63,7 @@ async function claimZen(options) {
     const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
     if (!zenAddress || !destinationAddress || !signature || !senderAddressPrivKey) {
       const missing = 'zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required.';
-      if (options.isCLI) missing += ' For help: use --help or -h'.red
+      if (options.isCLI) `${missing} ${help}`;
       throw new Error(missing);
     }
     const testnet = network === 'testnet' ? 1 : 0;
@@ -98,22 +98,16 @@ async function claimZen(options) {
 
 // Main function for CLI
 async function main(args) {
-  const callHelp = args.includes('--help') || args.includes('-h');
-  if (callHelp || args.length === 0) {
-    console.log(usage);
-    process.exit(0);
-  }
-
+  checkHelp(args, usage);
+  
   const options = parseArguments(args);
-  if (options.verbose) {
-    console.log('Arguments received:'.cyan, options);
-  }
+  listArgs(options);
 
   try {
     const result = await claimZen(options);
 
     if (result?.error) {
-      console.error(result.error);
+      console.error(result.error.red);
       process.exit(1);
     }
     if (options.verbose) console.log('no errors');
@@ -128,8 +122,4 @@ async function main(args) {
 export { claimZen };
 
 // If the script is run directly, execute the main function
-const argv = process.argv;
-const isCLI = argv[0].includes('node') && argv[1].endsWith('claimzenaddress.js');
-if (isCLI) {
-  main(argv.slice(2));
-}
+run(process.argv, 'claimzenaddress.js', main);

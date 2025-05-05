@@ -3,7 +3,7 @@ import eip55 from "eip55";
 import { ethers } from "ethers";
 import { Buffer } from 'buffer';
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from './recoverutils.js';
-import { bip32Network } from "./phraseutils.js";  
+import { bip32Network } from "./phraseutils.js";
 import zencashjs from "zencashjs";
 
 /**
@@ -12,7 +12,7 @@ import zencashjs from "zencashjs";
  * @param {number} testnet 0 or 1
  * @returns boolean
  */
-const isZenAddress = (address, testnet, isMulti = false, verbose) => {
+const isZenAddress = (address, isTestnet, isMultiSig = false, verbose) => {
   if (verbose) console.log("ZEN isZenAddress check", address);
 
   let prefix;
@@ -22,22 +22,23 @@ const isZenAddress = (address, testnet, isMulti = false, verbose) => {
     if (verbose) console.log(err.message);
     return false;
   }
-  const main = bip32Network['mainnet'];
-  const test = bip32Network['testnet'];
-  if (!testnet && prefix !== main.pubKeyHash && prefix !==main.scriptHash) {
-    if (verbose) console.log("ZEN isZenAddress rejecting non mainnet address");
+  const mainnet = bip32Network['mainnet'];
+  const testnet = bip32Network['testnet'];
+
+  if (isTestnet && isMultiSig && prefix !== testnet.scriptHash) {
+    if (verbose) console.log(`${address} is not a valid testnet multisig address`);
     return false;
   }
-  if (testnet && prefix !== test.pubKeyHash && prefix !== test.scriptHash) {
-    if (verbose) console.log("ZEN isZenAddress rejecting non testnet address");
-    return false;
-  } 
-  if (isMulti && prefix !== main.scriptHash && prefix !==test.scriptHash) {
-    if (verbose) console.log("ZEN isZenAddress rejecting non multisig address");
+  if (!isTestnet && isMultiSig && prefix !== mainnet.scriptHash) {
+    if (verbose) console.log(`${address} is not a valid mainnet multisig address`);
     return false;
   }
-  if (!isMulti && (prefix === main.scriptHash || prefix === test.scriptHash)) {
-    if (verbose) console.log("ZEN isZenAddress rejecting multisig address");
+  if (isTestnet && !isMultiSig && prefix !== testnet.pubKeyHash) {
+    if (verbose) console.log(`${address} is not a valid testnet address`);
+    return false;
+  }
+  if (!isTestnet && !isMultiSig && prefix !== mainnet.pubKeyHash) {
+    if (verbose) console.log(`${address} is not a valid mainnet address`);
     return false;
   }
 
@@ -48,7 +49,7 @@ const isZenAddress = (address, testnet, isMulti = false, verbose) => {
 const checkPrivKeyWif = (privKey, testnet, verbose) => {
   try {
     const prefix = Buffer.from(bs58check.decode(privKey)).toString("hex").slice(0, 2);
-    return Number("0x" +prefix) == bip32Network[testnet ? "testnet" : "mainnet"].wif;
+    return Number("0x" + prefix) == bip32Network[testnet ? "testnet" : "mainnet"].wif;
   } catch (err) {
     if (verbose) console.log(err.message);
     return false;
@@ -78,9 +79,7 @@ const isEthPrivKey = (value) => {
     }
     return false;
   }
-
 }
-
 
 const verifySignedMessage = (message, zAddr, signature) => {
   const verification = zencashjs.message.verify(message, zAddr, signature);
@@ -88,7 +87,7 @@ const verifySignedMessage = (message, zAddr, signature) => {
 }
 
 const getPubKeyInfo = (message, zenAddress, signature, network, verbose) => {
-  const sigPubKey = getPublicKeyFromSignature (message, signature)
+  const sigPubKey = getPublicKeyFromSignature(message, signature)
   const result = verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose);
   return result;
 }
@@ -99,10 +98,32 @@ function decodeZenAddress(address) {
   if (decoded.length !== 20) throw new Error('Invalid address length')
   return decoded
 }
-function addressToDecodedHex (address) {
+function addressToDecodedHex(address) {
   const decoded = decodeZenAddress(address);
   return Buffer.from(decoded).toString("hex");
 }
+
+function checkHelp(args, usage) {
+  const call = args.includes('--help') || args.includes('-h');
+  if (call || args.length === 0) {
+    console.log(usage);
+    process.exit(0);
+  }
+}
+function listArgs(options) {
+  if (options.verbose) {
+    console.log('Arguments received:'.cyan, options);
+  }
+}
+function run(argv, file, main) {
+  const isCLI = argv[0].includes('node') && argv[1].endsWith(file);
+  if (isCLI) {
+      main(argv.slice(2));
+  }
+}
+
+const help = 'For help: use --help or -h';
+
 export {
   isZenAddress,
   isEthAddress,
@@ -111,5 +132,9 @@ export {
   getPubKeyInfo,
   decodeZenAddress,
   addressToDecodedHex,
-  checkPrivKeyWif
+  checkPrivKeyWif,
+  checkHelp,
+  listArgs,
+  run,
+  help
 }
