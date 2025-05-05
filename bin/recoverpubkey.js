@@ -25,7 +25,6 @@ ${'Short forms of arguments'.cyan}
 const long = ['--message', '--zenAddress', '--signature', '--network', '--help', '--verbose'];
 const short = ['-ms', '-za', '-sg', '-nt', '-h', '-v'];
 const allowed = long.concat(short);
-// const flags = long.splice(-3).concat(short.splice(-3));
 
 // Function to parse arguments
 function parseArguments(args) {
