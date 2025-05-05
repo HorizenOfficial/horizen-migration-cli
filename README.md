@@ -4,8 +4,8 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 ## Overview
 A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a website to make simple claims (see horizen.io website). For more complex or bulk claims and for claiming funds from multisig addresses this tool helps with all steps of the process.
 
-The general claim process is to create and sign a message with the private key of the ZEN address that contains the ZEN.
-The message and a Base destination is then sent to a contract on the Base network after verifying the message and the balance.
+The general claim process is to create and sign a message with the private key of the ZEN address that contains the ZEN.    
+The message and a Base destination is then sent to a contract on the Base network after verifying the message and the balance.    
 The contract sends the amount found in the snapshot to the destination address on Base.
 
 ## Tools included
@@ -18,7 +18,7 @@ Tools included allow you to:
    - return the public key recovered from a signed message
 
 ## CAUTION
-This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be take to protect the secret values in all environments.
+This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be taken to protect the secret values in all environments.
 
 
 ## Installation
@@ -42,11 +42,11 @@ npx zenclaim-signtool --help
 
 
 ## Usage
-For ease of use references have been created that point to the individual main files. These files support runing as both command line (bash) or importing as a module.  The mapping may be found in the package.json file.
+For ease of use, references have been created that point to the individual main files. These files support running as both command line (bash) or importing as a module.  The mapping may be found in the package.json file.
 
 
 ### zenclaim-seedtool
-Derive ZEN addresses and keys from a seed phrase.  Most seed phrases are 24 words. Some older wallets used 12 words.  Any number of words are supported the tool.  Be sure to enter words separated by one space with no leading or trailing spaces. The words and their order must match the original exactly.  Check the addresses returned.
+Derive ZEN addresses and keys from a seed phrase.  Most seed phrases are 24 words. Some older wallets used 12 words.  Any number of words are supported by the tool.  Be sure to enter words separated by one space with no leading or trailing spaces. The words and their order must match the original exactly.  Check the addresses returned.
 
 This returns a JSON object with multiple addresses and keys or an object with an error message.
 
@@ -76,7 +76,7 @@ deriveAddresses(options).then(result => {
 ```
 
 #### Arguments/Options:    
-Only the mnemonicPhrase is required. Defaults are for ZEN mainnet and the common derivation path.   
+Only the mnemonicPhrase is required. Defaults are for ZEN mainnet and the default derivation path.   
 Drop the dashes when creating an options object for module use.
 ```javascript
   --mnemonicPhrase="" (mandatory, usually 12 or 24 words)
@@ -351,7 +351,7 @@ Only use the required number of signatures. e.g. a 3 of 5 multisig expects 3 of 
 
 ## Troubleshooting
 If referencing the aliases of the modules does not resolve, the modules may be loaded by file names. The full path may be needed depending on where they were dowloaded.    
-Locations relative to the repository folder
+Locations relative to the repository folder:
 ```
 zenclaim-seedtool: "bin/seedtool.js",
 zenclaim-signtool: "bin/signtool.js",
