@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { isZenAddress, isEthAddress, isEthPrivKey, addressToDecodedHex, checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
+import { isZenAddress, isEthAddress, addressToDecodedHex, checkHelp, listArgs, checkFeeFormat, run, help } from "../src/utils/claimutils.js";
 import { decodeMulti, checkRedeemScript, validateSignatures, verifySigsAndGetCoords } from "../src/utils/multisigutils.js";
+import { validPrivateKey } from "../src/utils/signutils.js";
 import { submitMultisigClaim } from '../src/utils/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
@@ -42,21 +43,21 @@ function parseArguments(args) {
     const options = { isCLI: true }
 
     for (let i = 0; i < args.length; i++) {
-        const val = args[i].split('=');
-        if (allowed.indexOf(val[0]) === -1) {
-            console.error(`${val[0]} is not valid. ${help}`.red);
+        const [key, val] = args[i].split('=');
+        if (allowed.indexOf(key) === -1) {
+            console.error(`${key} is not valid. ${help}`.red);
             process.exit(1);
         }
-        if (val[0] === '-ma' || val[0] === '--zenMultisigAddress') { options.multisigAddress = val[1]; continue; }
-        if (val[0] === '-da' || val[0] === '--destinationAddress') { options.destinationAddress = val[1]; continue; }
-        if (val[0] === '-rs' || val[0] === '--redeemScript') { options.redeemScript = val[1]; continue; }
-        if (val[0] === '-sg' || val[0] === '--signatures') { options.signatures = args[i].slice(args[i].indexOf('=') + 1); continue; }
-        if (val[0] === '-pk' || val[0] === '--senderAddressPrivKey') { options.senderAddressPrivKey = val[1]; continue; }
-        if (val[0] === '-gf' || val[0] === '--maxFeePerGas') { options.maxFeePerGas = Number(val[1]); continue; }
-        if (val[0] === '-pf' || val[0] === '--maxPriorityFeePerGas') { options.maxPriorityFeePerGas = Number(val[1]); continue; }
-        if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
-        if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
-        if (val[0] === '-b' || val[0] === '--buildmessage') { options.buildmessage = true; continue; }
+        if (key === '-ma' || key === '--zenMultisigAddress') { options.multisigAddress = val; continue; }
+        if (key === '-da' || key === '--destinationAddress') { options.destinationAddress = val; continue; }
+        if (key === '-rs' || key === '--redeemScript') { options.redeemScript = val; continue; }
+        if (key === '-sg' || key === '--signatures') { options.signatures = args[i].slice(args[i].indexOf('=') + 1); continue; }
+        if (key === '-pk' || key === '--senderAddressPrivKey') { options.senderAddressPrivKey = val; continue; }
+        if (key === '-gf' || key === '--maxFeePerGas') { options.maxFeePerGas = Number(val); continue; }
+        if (key === '-pf' || key === '--maxPriorityFeePerGas') { options.maxPriorityFeePerGas = Number(val); continue; }
+        if (key === '-nt' || key === '--network') { options.network = val; continue; }
+        if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
+        if (key === '-b' || key === '--buildmessage') { options.buildmessage = true; continue; }
     }
     if (options.buildmessage) {
         if (!options.multisigAddress || !options.destinationAddress) {
@@ -93,11 +94,11 @@ async function claimMultisig(options) {
         const { multisigAddress, destinationAddress, redeemScript, signatures, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
         if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
             const missing = 'zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required.'
-            if (options.isCLI) `${missing} ${help}`;
+            if (options.isCLI)`${missing} ${help}`;
             throw new Error(missing);
         }
 
-        const testnet = network === 'testnet' ? 1 : 0;
+        const testnet = network === 'testnet';
         // Validate inputs
         if (!isZenAddress(multisigAddress, testnet, true, verbose)) {
             throw new Error("Not a valid zen multisig address");
@@ -108,7 +109,7 @@ async function claimMultisig(options) {
         if (!checkRedeemScript(redeemScript, verbose)) {
             throw new Error("Not a valid redeemScript");
         }
-        if (!isEthPrivKey(senderAddressPrivKey)) {
+        if (!validPrivateKey(senderAddressPrivKey)) {
             throw new Error("Not a valid senderAddressPrivKey");
         }
         const multisig = decodeMulti(redeemScript, testnet, verbose);
@@ -133,10 +134,12 @@ async function claimMultisig(options) {
         if (count < multisig.requiredSigs) {
             throw new Error(`Not enough valid signatures found. Required: ${multisig.requiredSigs}, found: ${count}`);
         }
+        const mfpg = checkFeeFormat(maxFeePerGas);
+        const mpfpg = checkFeeFormat(maxPriorityFeePerGas);
 
         // Claim ZEN
         const isTest = options?.isTest
-        const txResult = await submitMultisigClaim(multisig, destinationAddress, orderedSignatures, orderedPubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose, isTest);
+        const txResult = await submitMultisigClaim(multisig, destinationAddress, orderedSignatures, orderedPubKeyCoords, senderAddressPrivKey, mfpg, mpfpg, testnet, verbose, isTest);
         return txResult;
     } catch (error) {
         return { error: error.message || 'Unable to create the transaction'.red };

@@ -172,6 +172,7 @@ Drop the dashes when creating an options object for module use.
  --message="" (mandatory) 
  --zenAddress="" (mandatory)
  --signature="" (mandatory)
+ --network="mainnet||testnet" (optional, default mainnet)
  --help  display this help
  --verbose  display arguments received
 Short forms of arguments for command line 

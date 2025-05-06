@@ -31,16 +31,16 @@ function parseArguments(args) {
   const options = {}
 
   for (let i = 0; i < args.length; i++) {
-    const val = args[i].split('=');
-    if (allowed.indexOf(val[0]) === -1) {
-      console.error(`${val[0]} is not valid. ${help}`.red);
+    const [key, val] = args[i].split('=');
+    if (allowed.indexOf(key) === -1) {
+      console.error(`${key} is not valid. ${help}`.red);
       process.exit(1);
     }
-    if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
-    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
-    if (val[0] === '-sg' || val[0] === '--signature') { options.signature = val[1]; continue; }
-    if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
-    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
+    if (key === '-ms' || key === '--message') { options.message = val; continue; }
+    if (key === '-za' || key === '--zenAddress') { options.zenAddress = val; continue; }
+    if (key === '-sg' || key === '--signature') { options.signature = val; continue; }
+    if (key === '-nt' || key === '--network') { options.network = val; continue; }
+    if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
   }
 
   if (options.verbose) console.log('zenclaim-recoverpubkey CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
@@ -55,7 +55,7 @@ function parseArguments(args) {
 
 // Function to verify the message and recover the public key
 function recoverPubkey(options) {
-  const network = (options.network === 'testnet') ? 1 : 0;
+  const testnet = options.network === 'testnet';
 
   try {
     if (!options.message) throw new Error('Missing message');
@@ -67,14 +67,14 @@ function recoverPubkey(options) {
     if (msg.length > 3) throw new Error('Invalid message. Check instructions');
     if (msg[0] !== ZENCLAIM_MESSAGE_PREFIX && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET)
       throw new Error(`Message should begin with ${network ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX}`);
-    if (network === 1 && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) throw new Error('Incorrect prefix testnet in message')
-    if (network === 0 && msg[0] !== ZENCLAIM_MESSAGE_PREFIX) throw new Error('Incorrect prefix for mainnet in message')
+    if (testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) throw new Error('Incorrect prefix testnet in message')
+    if (!testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX) throw new Error('Incorrect prefix for mainnet in message')
     const dest = `0x${msg[2] || msg[1]}`
     if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions');
     if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
 
     const sigPubKey = getPublicKeyFromSignature(options.message, options.signature);
-    const keys = verifyAndRecoverPubKey(options.zenAddress, sigPubKey, network, options.verbose);
+    const keys = verifyAndRecoverPubKey(options.zenAddress, sigPubKey, testnet, options.verbose);
     return keys;
   } catch (error) {
     return { error: error.message || 'Unable to verify the signature'.red };

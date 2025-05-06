@@ -13,7 +13,7 @@ import zencashjs from "zencashjs";
  * @returns boolean
  */
 const isZenAddress = (address, isTestnet, isMultiSig = false, verbose) => {
-  if (verbose) console.log("ZEN isZenAddress check", address);
+  if (verbose) console.log("checking address:", address);
 
   let prefix;
   try {
@@ -56,29 +56,15 @@ const checkPrivKeyWif = (privKey, testnet, verbose) => {
   }
 }
 
+
 /**
-*
-* @param {string} destinationAddress (eth) address. expects 0x prefix
-* @returns boolean
+ *
+ * @param {string} destinationAddress (eth) address. expects 0x prefix
+ * @returns boolean
 */
 const isEthAddress = (destinationAddress) => {
   //this can throw an error if the address is not valid.
   return eip55.verify(destinationAddress, false);
-}
-/**
-*
-* @param {string} value  (eth) private key
-* @returns boolean
-*/
-const isEthPrivKey = (value) => {
-  if (ethers.isHexString(value)) {
-    return true;
-  } else {
-    if (value.length === 64) {
-      return ethers.isHexString(`0x${value}`);
-    }
-    return false;
-  }
 }
 
 const verifySignedMessage = (message, zAddr, signature) => {
@@ -86,9 +72,9 @@ const verifySignedMessage = (message, zAddr, signature) => {
   return verification;
 }
 
-const getPubKeyInfo = (message, zenAddress, signature, network, verbose) => {
+const getPubKeyInfo = (message, zenAddress, signature, testnet, verbose) => {
   const sigPubKey = getPublicKeyFromSignature(message, signature)
-  const result = verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose);
+  const result = verifyAndRecoverPubKey(zenAddress, sigPubKey, testnet, verbose);
   return result;
 }
 
@@ -101,6 +87,21 @@ function decodeZenAddress(address) {
 function addressToDecodedHex(address) {
   const decoded = decodeZenAddress(address);
   return Buffer.from(decoded).toString("hex");
+}
+
+/**
+ *
+ * @param {string} pubKey  public key
+ * @param {string or number} tnet  0 or 1
+ * @returns the zen address of the public key
+ */
+
+function publicKeyToAddr(pubKey, tnet) {
+    const testnet = Number(tnet) || 0;
+    return zencashjs.address.pubKeyToAddr(
+        pubKey,
+        testnet ? zencashjs.config.testnet.pubKeyHash : zencashjs.config.mainnet.pubKeyHash,
+    );
 }
 
 function checkHelp(args, usage) {
@@ -122,19 +123,28 @@ function run(argv, file, main) {
   }
 }
 
+function checkFeeFormat(fee){
+  if(!fee) return undefined;
+  if (typeof fee === 'string' && fee.slice(-1)=== 'n') return Number(fee.slice(0, -1));
+  if (typeof fee === BigInt || !isNaN(Number(fee))) return Number(fee);
+  
+  return undefined;
+}
+
 const help = 'For help: use --help or -h';
 
 export {
   isZenAddress,
   isEthAddress,
-  isEthPrivKey,
   verifySignedMessage,
   getPubKeyInfo,
   decodeZenAddress,
   addressToDecodedHex,
   checkPrivKeyWif,
+  publicKeyToAddr,
   checkHelp,
   listArgs,
   run,
-  help
+  help,
+  checkFeeFormat
 }

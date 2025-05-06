@@ -2,6 +2,7 @@ import zencashjs from "zencashjs"
 import bscript from "bitcoinjs-lib/src/script.js"
 import OPCODES from "bitcoinjs-lib/src/ops.js"
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from './recoverutils.js';
+import { publicKeyToAddr } from "./claimutils.js";
 
 const OP_INT_BASE = OPCODES.OPS.OP_RESERVED;
 const checkRedeemScript = (rscript, verbose) => {
@@ -16,20 +17,7 @@ const checkRedeemScript = (rscript, verbose) => {
     return true
 }
 
-/**
- *
- * @param {string} pubKey  public key
- * @param {string or number} tnet  0 or 1
- * @returns the zen address of the public key
- */
 
-function pubKeyToAddr(pubKey, tnet) {
-    const testnet = Number(tnet) || 0;
-    return zencashjs.address.pubKeyToAddr(
-        pubKey,
-        testnet ? zencashjs.config.testnet.pubKeyHash : zencashjs.config.mainnet.pubKeyHash,
-    );
-}
 
 /**
  *
@@ -65,7 +53,7 @@ function decodeMulti(rscript, testnet, verbose) {
         );
         ms.address = addr;
         if (verbose) console.log("ZEN decode multisig addr", addr);
-        ms.addresses = ms.pubkeys.map((a) => pubKeyToAddr(a, testnet));
+        ms.addresses = ms.pubkeys.map((a) => publicKeyToAddr(a, testnet));
         return ms;
     } catch (error) {
         if (verbose) console.log(error);

@@ -54,8 +54,7 @@ function verifyMatch(zenAddress, sigPubKey) {
 };
 
 
-function verifyAndRecoverPubKey(zenAddress, sigPubKey, network, verbose) {
-  const testnet = Number(network) || 0;
+function verifyAndRecoverPubKey(zenAddress, sigPubKey, testnet, verbose) {
   if (verbose) console.log(`testnet= ${testnet}`)
   if (!zenAddress || !sigPubKey) {
     return { error: "zenAddress and signature public key are both required" };

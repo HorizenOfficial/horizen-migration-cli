@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { isZenAddress, isEthAddress, isEthPrivKey, verifySignedMessage, getPubKeyInfo, checkHelp, listArgs, run, help} from "../src/utils/claimutils.js";
+import { isZenAddress, isEthAddress, verifySignedMessage, getPubKeyInfo, checkHelp, checkFeeFormat, listArgs, run, help } from "../src/utils/claimutils.js";
+import { validPrivateKey } from "../src/utils/signutils.js";
 import { submitClaim } from '../src/utils/provider.js'
 import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 import 'colors';
@@ -37,19 +38,19 @@ function parseArguments(args) {
   const options = { isCLI: true };
 
   for (let i = 0; i < args.length; i++) {
-    const val = args[i].split('=');
-    if (allowed.indexOf(val[0]) === -1) {
-      console.error(`${val[0]} is not valid. ${help}`.red);
+    const [key, val] = args[i].split('=');
+    if (allowed.indexOf(key) === -1) {
+      console.error(`${key} is not valid. ${help}`.red);
       process.exit(1);
     }
-    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
-    if (val[0] === '-da' || val[0] === '--destinationAddress') { options.destinationAddress = val[1]; continue; }
-    if (val[0] === '-sg' || val[0] === '--signature') { options.signature = args[i].slice(args[i].indexOf('=') + 1); continue; }
-    if (val[0] === '-pk' || val[0] === '--senderAddressPrivKey') { options.senderAddressPrivKey = val[1]; continue; }
-    if (val[0] === '-gf' || val[0] === '--maxFeePerGas') { options.maxFeePerGas = Number(val[1]); continue; }
-    if (val[0] === '-pf' || val[0] === '--maxPriorityFeePerGas') { options.maxPriorityFeePerGas = Number(val[1]); continue; }
-    if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
-    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
+    if (key === '-za' || key === '--zenAddress') { options.zenAddress = val; continue; }
+    if (key === '-da' || key === '--destinationAddress') { options.destinationAddress = val; continue; }
+    if (key === '-sg' || key === '--signature') { options.signature = args[i].slice(args[i].indexOf('=') + 1); continue; }
+    if (key === '-pk' || key === '--senderAddressPrivKey') { options.senderAddressPrivKey = val; continue; }
+    if (key === '-gf' || key === '--maxFeePerGas') { options.maxFeePerGas = val; continue; }
+    if (key === '-pf' || key === '--maxPriorityFeePerGas') { options.maxPriorityFeePerGas = val; continue; }
+    if (key === '-nt' || key === '--network') { options.network = val; continue; }
+    if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
   }
 
   if (options.verbose) console.log('zenclaim-claimszenaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
@@ -63,10 +64,10 @@ async function claimZen(options) {
     const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
     if (!zenAddress || !destinationAddress || !signature || !senderAddressPrivKey) {
       const missing = 'zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required.';
-      if (options.isCLI) `${missing} ${help}`;
+      if (options.isCLI)`${missing} ${help}`;
       throw new Error(missing);
     }
-    const testnet = network === 'testnet' ? 1 : 0;
+    const testnet = network === 'testnet'
     // Validate inputs
     if (!isZenAddress(zenAddress, testnet, false, verbose)) {
       throw new Error("Not a valid zenAddress");
@@ -74,7 +75,7 @@ async function claimZen(options) {
     if (!isEthAddress(destinationAddress)) {
       throw new Error("Not a valid destinationAddress");
     }
-    if (!isEthPrivKey(senderAddressPrivKey)) {
+    if (!validPrivateKey(senderAddressPrivKey)) {
       throw new Error("Not a valid senderAddressPrivKey");
     }
     const prefix = testnet ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX;
@@ -86,10 +87,12 @@ async function claimZen(options) {
     if (pubKeyCoords.error) {
       throw new Error(pubKeyCoords.error);
     }
-
+    const mfpg = checkFeeFormat(maxFeePerGas);
+    const mpfpg = checkFeeFormat(maxPriorityFeePerGas);
     const isTest = options?.isTest
+
     // Claim ZEN
-    const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, testnet, verbose, isTest);
+    const txResult = await submitClaim(zenAddress, destinationAddress, signature, pubKeyCoords, senderAddressPrivKey, mfpg, mpfpg, testnet, verbose, isTest);
     return txResult;
   } catch (error) {
     return { error: error.message || 'Unable to create the transaction'.red };
@@ -99,7 +102,7 @@ async function claimZen(options) {
 // Main function for CLI
 async function main(args) {
   checkHelp(args, usage);
-  
+
   const options = parseArguments(args);
   listArgs(options);
 

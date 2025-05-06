@@ -31,15 +31,14 @@ const setProvider = async (testnet, verbose) => {
 
 async function setWallet(privateKey, testnet, verbose) {
   if (!privateKey) {
-    console.error("Private key is required to set wallet.");
     return { error: "Private key is required to set wallet." };
   }
   if (verbose) console.log("RPC Setting wallet with private key",);
   try {
     if (!provider) await setProvider(testnet, verbose);
-    wallet = new ethers.Wallet(privateKey, provider);
+    wallet = await new ethers.Wallet(privateKey, provider);
   } catch (error) {
-    console.error("Error setting wallet: ", error);
+    console.error("Error setting wallet: ", error.message);
     return { error: "Error setting wallet." };
   }
 }
@@ -48,8 +47,6 @@ async function setWallet(privateKey, testnet, verbose) {
 //check sender funds to pay gas
 async function findSenderBalance(privateKey, testnet, verbose) {
   try {
-    if (!provider) await setProvider(testnet, verbose);
-    if (!wallet) setWallet(privateKey, testnet, verbose);
     const balance = await provider.getBalance(wallet.address);
     if (verbose) console.log(`Senders eth balance ${ethers.formatEther(balance)}`);
     return balance;
@@ -60,19 +57,18 @@ async function findSenderBalance(privateKey, testnet, verbose) {
 }
 
 async function getContractAndSigner(senderAddressPrivKey, testnet, verbose) {
-  if (!provider) await setProvider(testnet, verbose);
   if (verbose) console.log("RPC Prepping data for smart contract");
-
-  if (!wallet) await setWallet(senderAddressPrivKey, testnet, verbose);
+  await setProvider(testnet, verbose);
+  await setWallet(senderAddressPrivKey, testnet, verbose);
   const signer = wallet.connect(provider);
   const contract = new ethers.Contract(contractAddress, ABI_ZEND_CLAIM, provider);
   return { contract, signer }
 }
 
-async function checkClaimBalance(zenAddress, claim, verbose) {
+async function checkClaimBalance(zenAddress, contract, verbose) {
   try {
     const addrDecoded = decodeZenAddress(zenAddress);
-    const balance = await claim.contract.balances(addrDecoded);
+    const balance = await contract.balances(addrDecoded);
     if (verbose) console.log("Claim balance: ", ethers.formatEther(balance.toString()));
     return balance;
   } catch (error) {
@@ -96,7 +92,7 @@ async function submitClaim(
   try {
     // check balances
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const claimBalance = await checkClaimBalance(zenAddress, claim, verbose);
+    const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;
     }
@@ -163,7 +159,7 @@ async function submitMultisigClaim(
   try {
     //check balances
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const claimBalance = await checkClaimBalance(multisig.address, claim, verbose);
+    const claimBalance = await checkClaimBalance(multisig.address, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${multisig.address}`;
     }

@@ -36,20 +36,20 @@ function parseArguments(args) {
     const options = {}
 
     for (let i = 0; i < args.length; i++) {
-        const val = args[i].split('=');
-        if (allowed.indexOf(val[0]) === -1) {
-            console.error(`${val[0]} is not valid. ${help}`.red);
+        const [key, val] = args[i].split('=');
+        if (allowed.indexOf(key) === -1) {
+            console.error(`${key} is not valid. ${help}`.red);
             process.exit(1);
         }
-        if (val[0] === '-ph' || val[0] === '--mnemonicPhrase') { options.mnemonicPhrase = val[1]; continue; }
-        if (val[0] === '-na' || val[0] === '--numAddresses') { options.numAddresses = Number(val[1]); continue; }
-        if (val[0] === '-pw' || val[0] === '--mnemonicPassword') { options.mnemonicPassword = val[1]; continue; }
-        if (val[0] === '-na' || val[0] === '--numAddresses') { options.numAddresses = Number(val[1]); continue; }
-        if (val[0] === '-dp' || val[0] === '--derivationPath') { options.derivationPath = val[1];; continue; }
-        if (val[0] === '-do' || val[0] === '--derivationAddressIndexOffset') { options.derivationAddressIndexOffset = Number(val[1]); continue; }
-        if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
-        if (val[0] === '-s' || val[0] === '--stringify') { options.stringify = true; continue; }
-        if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
+        if (key === '-ph' || key === '--mnemonicPhrase') { options.mnemonicPhrase = val; continue; }
+        if (key === '-na' || key === '--numAddresses') { options.numAddresses = Number(val); continue; }
+        if (key === '-pw' || key === '--mnemonicPassword') { options.mnemonicPassword = val; continue; }
+        if (key === '-na' || key === '--numAddresses') { options.numAddresses = Number(val); continue; }
+        if (key === '-dp' || key === '--derivationPath') { options.derivationPath = val;; continue; }
+        if (key === '-do' || key === '--derivationAddressIndexOffset') { options.derivationAddressIndexOffset = Number(val); continue; }
+        if (key === '-nt' || key === '--network') { options.network = val; continue; }
+        if (key === '-s' || key === '--stringify') { options.stringify = true; continue; }
+        if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
     }
     if (options.verbose) console.log('zenclaim-seedtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
@@ -65,9 +65,10 @@ function parseArguments(args) {
 // Function to derive addresses
 async function deriveAddresses(options) {
     try {
-        const testnet = options.network === 'testnet' ? 1 : 0;
+        const testnet = options.network === 'testnet';
         if (!options.mnemonicPhrase) throw new Error('Seed phrase is required.');
-        if (options?.numAddresses && (isNaN(options.numAddresses) || options.numAddresses <0) ) throw new Error('Seed phrase is required.');
+        if (options?.numAddresses && (isNaN(options.numAddresses) || options.numAddresses <0) ) 
+            throw new Error('Number of addresses or should be a number greater than 0.');
 
         const addrs = await deriveFromPhrase(
             options.numAddresses || 5,

@@ -13,15 +13,16 @@ arguments:
  --message="" (mandatory) 
  --zenAddress="" (mandatory)
  --signature="" (mandatory)
+ --network="mainnet||testnet" (optional, default mainnet)
  --help  display this help
  --verbose display arguments received
 ${'Short forms of arguments'.cyan} 
-  -ms="" -za="" -sg="" -h -v 
+  -ms="" -za="" -sg="" -nt="" -h -v 
 `;
 
 // Allowed arguments
-const long = ['--message', '--zenAddress', '--signature', '--help', '--verbose'];
-const short = ['-ms', '-za', '-sg', '-h', '-v'];
+const long = ['--message', '--zenAddress', '--signature', '--network', '--help', '--verbose'];
+const short = ['-ms', '-za', '-sg', '-nt', '-h', '-v'];
 const allowed = long.concat(short);
 
 // Function to parse arguments
@@ -29,15 +30,16 @@ function parseArguments(args) {
   const options = {}
 
   for (let i = 0; i < args.length; i++) {
-    const val = args[i].split('=');
-    if (allowed.indexOf(val[0]) === -1) {
-      console.error(`${val[0]} is not valid. ${help}`.red);
+    const [key, val] = args[i].split('=');
+    if (allowed.indexOf(key) === -1) {
+      console.error(`${key} is not valid. ${help}`.red);
       process.exit(1);
     }
-    if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
-    if (val[0] === '-za' || val[0] === '--zenAddress') { options.zenAddress = val[1]; continue; }
-    if (val[0] === '-sg' || val[0] === '--signature') { options.signature = val[1]; continue; }
-    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
+    if (key === '-ms' || key === '--message') { options.message = val; continue; }
+    if (key === '-za' || key === '--zenAddress') { options.zenAddress = val; continue; }
+    if (key === '-sg' || key === '--signature') { options.signature = val; continue; }
+    if (key === '-nt' || key === '--network') { options.network = val; continue; }
+    if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
   }
 
   if (options.verbose) console.log('zenclaim-verifymessage CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
@@ -52,23 +54,23 @@ function parseArguments(args) {
 
 // Function to verify the message
 function verifyMessage(options) {
+  if (options.verbose)  console.log("options=", options);
+  const testnet = options.network === 'testnet';
+
   try {
     // message , zenAddress, signature) 
     if (!options.message) throw new Error('Missing message');
     if (!options.zenAddress) throw new Error('Missing zenAddress');
     if (!options.signature) throw new Error('Missing signature');
-    const network = options.zenAddress.startsWith("zt") ? 1 : 0
 
     const msg = options.message.split("0x");
-    if (msg.length === 1) throw new Error('Message should contain the destination address with 0x prefix.');
-    if (msg.length > 3) throw new Error('Invalid message. Check instructions');
-    if (msg[0] !== ZENCLAIM_MESSAGE_PREFIX && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET)
-      throw new Error(`Message should begin with ${network ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX}`);
-    if (network === 1 && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) throw new Error('Incorrect prefix testnet in message')
-    if (network === 0 && msg[0] !== ZENCLAIM_MESSAGE_PREFIX) throw new Error('Incorrect prefix for mainnet in message')
+    if (msg.length === 1) throw new Error('Invalid message. Message should contain the destination address with 0x prefix.');
+    if (msg.length > 3) throw new Error('Invalid message. Check instructions.');
+    if (testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) throw new Error('Incorrect testnet prefix in message.')
+    if (!testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX) throw new Error('Incorrect mainnet prefix in message.')
     const dest = `0x${msg[2] || msg[1]}`
-    if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions');
-    if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
+    if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions.');
+    if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress.');
 
     const valid = verifySignedMessage(options.message, options.zenAddress, options.signature);
     return valid;

@@ -35,17 +35,17 @@ function parseArguments(args) {
   let options = {}
 
   for (let i = 0; i < args.length; i++) {
-    const val = args[i].split('=');
-    if (allowed.indexOf(val[0]) === -1) {
-      console.error(`${val[0]} is not valid. ${help}`.red);
+    const [key, val] = args[i].split('=');
+    if (allowed.indexOf(key) === -1) {
+      console.error(`${key} is not valid. ${help}`.red);
       process.exit(1);
     }
-    if (val[0] === '-pk' || val[0] === '--privKey') { options.privKey = val[1]; continue; }
-    if (val[0] === '-ms' || val[0] === '--message') { options.message = val[1]; continue; }
-    if (val[0] === '-cp' || val[0] === '--compressed') { options.compressed = val[1] == 'false' ? false : true; continue; }
-    if (val[0] === '-nt' || val[0] === '--network') { options.network = val[1]; continue; }
-    if (val[0] === '-s' || val[0] === '--stringify') { options.stringify = true; continue; }
-    if (val[0] === '-v' || val[0] === '--verbose') { options.verbose = true; continue; }
+    if (key === '-pk' || key === '--privKey') { options.privKey = val; continue; }
+    if (key === '-ms' || key === '--message') { options.message = val; continue; }
+    if (key === '-cp' || key === '--compressed') { options.compressed = val == 'false' ? false : true; continue; }
+    if (key === '-nt' || key === '--network') { options.network = val; continue; }
+    if (key === '-s' || key === '--stringify') { options.stringify = true; continue; }
+    if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
   }
 
   if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
@@ -58,10 +58,10 @@ function parseArguments(args) {
   return options;
 }
 
-// Function to sign a message
+// Function to sign a messagenpm
 function signMessage(options) {
   if (options.verbose)  console.log("options=", options);
-  const testnet = options.network === 'testnet' ? 1 : 0;
+  const testnet = options.network === 'testnet';
 
   try {
     // validation checks
@@ -70,12 +70,13 @@ function signMessage(options) {
     const msg = options.message.split("0x");
     if(msg.length === 1) throw new Error('Message should contain the destination address with 0x prefix.');
     if(msg.length > 3) throw new Error('Invalid message. Check instructions');
-    if(msg[0]!== ZENCLAIM_MESSAGE_PREFIX && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) 
-      throw new Error(`Message should begin with ${network ? ZENCLAIM_MESSAGE_PREFIX_TESTNET : ZENCLAIM_MESSAGE_PREFIX}`);
+    if(testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) 
+      throw new Error(`Message should begin with ${ZENCLAIM_MESSAGE_PREFIX_TESTNET}`);
+    if(!testnet && msg[0]!== ZENCLAIM_MESSAGE_PREFIX) 
+      throw new Error(`Message should begin with ${ZENCLAIM_MESSAGE_PREFIX}`);
     const dest = `0x${msg[2] || msg[1]}`
     if (!isEthAddress(dest) ) throw new Error('Invalid destination address in message. Check instructions');
     if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress');
-
 
     const signature = sign(
       options.message,
