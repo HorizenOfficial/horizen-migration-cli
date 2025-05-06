@@ -213,4 +213,4 @@ async function submitMultisigClaim(
   }
 }
 
-export { findSenderBalance, submitClaim, submitMultisigClaim };
+export { submitClaim, submitMultisigClaim };
