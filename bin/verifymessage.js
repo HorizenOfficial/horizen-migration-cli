@@ -63,15 +63,6 @@ function verifyMessage(options) {
     if (!options.zenAddress) throw new Error('Missing zenAddress');
     if (!options.signature) throw new Error('Missing signature');
 
-    const msg = options.message.split("0x");
-    if (msg.length === 1) throw new Error('Invalid message. Message should contain the destination address with 0x prefix.');
-    if (msg.length > 3) throw new Error('Invalid message. Check instructions.');
-    if (testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX_TESTNET) throw new Error('Incorrect testnet prefix in message.')
-    if (!testnet && msg[0] !== ZENCLAIM_MESSAGE_PREFIX) throw new Error('Incorrect mainnet prefix in message.')
-    const dest = `0x${msg[2] || msg[1]}`
-    if (!isEthAddress(dest)) throw new Error('Invalid destination address in message. Check instructions.');
-    if (msg.length === 3 && msg[1].length !== 40) throw new Error('Invalid message for multisig. Check build message instructions for zenclaim-claimmultisigaddress.');
-
     const valid = verifySignedMessage(options.message, options.zenAddress, options.signature);
     return valid;
   } catch (error) {

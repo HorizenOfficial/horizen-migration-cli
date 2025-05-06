@@ -29,14 +29,6 @@ describe('verifymessage.js', () => {
     const result = verifyMessage({ message: messageMainnet, zenAddress: addressMainnet });
     expect(result).toHaveProperty('error');
   });
-  test('verifyMessage should return an error on incorrect message', () => {
-    const result = verifyMessage({ message: messageTestnet, zenAddress: addressMainnet, signature: sigMainnet });
-    expect(result).toHaveProperty('error');
-  });
-  test('verifyMessage should return an error on incorrect testnet message', () => {
-    const result = verifyMessage({ message: messageMainnet, network: "testnet", zenAddress: addressTestnet, signature: sigTestnet });
-    expect(result).toHaveProperty('error');
-  });
   test('verifyMessage should return true verifying a testnet message and signature', () => {
     const result = verifyMessage({ message: messageTestnet, network: "testnet", zenAddress: addressTestnet, signature: sigTestnet });
     expect(result).toBe(true);
