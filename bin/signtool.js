@@ -58,7 +58,7 @@ function parseArguments(args) {
   return options;
 }
 
-// Function to sign a messagenpm
+// Function to sign a message
 function signMessage(options) {
   if (options.verbose)  console.log("options=", options);
   const testnet = options.network === 'testnet';
