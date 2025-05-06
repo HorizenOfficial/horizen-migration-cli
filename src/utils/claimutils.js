@@ -13,7 +13,7 @@ import zencashjs from "zencashjs";
  * @returns boolean
  */
 const isZenAddress = (address, isTestnet, isMultiSig = false, verbose) => {
-  if (verbose) console.log("checking address:", address);
+  if (verbose) console.log("checking zen address:", address);
 
   let prefix;
   try {
@@ -42,7 +42,7 @@ const isZenAddress = (address, isTestnet, isMultiSig = false, verbose) => {
     return false;
   }
 
-  if (verbose) console.log("ZEN zenAddress ok");
+  if (verbose) console.log("zen address ok");
   return true;
 };
 
