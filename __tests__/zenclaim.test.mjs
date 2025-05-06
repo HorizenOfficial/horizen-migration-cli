@@ -102,7 +102,6 @@ describe('claimzenaddress.js', () => {
     const result = await claimZen(validOptions);
     console.log("Test result:", result)
     expect(typeof result).toBe('string');
-    console.log("Final test result:", result)
     expect(checkStringContainsAny(result, successes)).toBe(true);
   });
 });

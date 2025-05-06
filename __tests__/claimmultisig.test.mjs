@@ -90,7 +90,7 @@ describe('claimmultisigaddress.js', () => {
       expect.objectContaining({ error: expect.any(String) })
     );
   });
-  test('claimMultisig should return an error for invalid senderAddresPrivKey', async () => {
+  test('claimMultisig should return an error for invalid senderAddressPrivKey', async () => {
     const invalidOptions = { ...validOptions, senderAddressPrivKey: "12345" };
     const result = await claimMultisig(invalidOptions);
     expect(typeof result).toBe('object');

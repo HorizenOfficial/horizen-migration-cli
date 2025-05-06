@@ -10,7 +10,7 @@ describe('signtool.js', () => {
   const compressed = true;  //default
   const network = "testnet";
   const verbose = true;
-  const multisigMessage ='ZT1CLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x0Fd343F9a263906bD6AfebfDD4011579979E8aeC';
+  const multisigMessage ='ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x0Fd343F9a263906bD6AfebfDD4011579979E8aeC';
 
   // response data;
   const expectedAddressTestnet = 'ztfPyquDswoUBUBNNWqcPeZrpD7x7QSE9Zt';
@@ -21,7 +21,7 @@ describe('signtool.js', () => {
   const expectedAddressCompressedFalse ='znfcURubKKLPzURUEvZ8C6VVShkgGQjeu6X';
   const expectedSigCompressedFalse= 'HHe0yZyQfLbsA19QZf1i8get70ckrRI4FHDRF8A6dHCxYUVJ/us3PdViOnc/7zoBGoCGR65EVCQl7KI9f9IuQXA='
   const expectedSigRaw= 'IHe0yZyQfLbsA19QZf1i8get70ckrRI4FHDRF8A6dHCxYUVJ/us3PdViOnc/7zoBGoCGR65EVCQl7KI9f9IuQXA='
-  const expectedSigMultisig = 'Gxz8yEDGwf7fXuYEKKmoQIf5TeYQaA2Gga2BOwggAQTLJWeRlGThLr8y1jiwgJ+QxudvYXIAo2OG+PhT9AQtAbQ=';
+  const expectedSigMultisig = 'HA+OyDIOm+9qSQe92xsABiKm9FZeTNbvGfVBUW4Bg1I7LXEHZDAdlICFF2RdIUkLkEgq3Ms3DgapJ8Lt4HlqGOA=';
 
   test('signMessage should reject a missing or invalid message', () => {
     const isValid = signMessage({ privKey, network});
@@ -40,27 +40,25 @@ describe('signtool.js', () => {
     expect(result.address).toBe(expectedAddressMainnetAlt);
   });
   test('signMessage should return a different signature and address when commpressed is false', () => {
-    const result = signMessage({message, privKey, compressed: false, verbose});
+    const result = signMessage({message, privKey, compressed: false});
     expect(typeof result).toBe('object');
     expect(result.address).toBe(expectedAddressCompressedFalse);
     expect(result.signature).toBe(expectedSigCompressedFalse);
   });
   test('signMessage should sign a message and return an object with signature and address', () => {
     const result = signMessage({message, privKey});
-    console.log(result);
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSig);
     expect(result.address).toBe(expectedAddressMainnet);
   });
   test('signMessage should sign a message and return an object with testnet signature and address', () => {
-    const result = signMessage({message: messageTestnet, privKey:privKeyTestnet, network:"testnet", verbose});
-    console.log(result);
+    const result = signMessage({message: messageTestnet, privKey:privKeyTestnet, network:"testnet"});
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSigTestnet);
     expect(result.address).toBe(expectedAddressTestnet);
   });
   test('signMessage should sign a message with a raw key and return an object with signature and address', () => {
-    const result = signMessage({message, privKey: privKeyRaw, network: "mainnet", compressed, verbose})
+    const result = signMessage({message, privKey: privKeyRaw, network: "mainnet", compressed})
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSigRaw);
     expect(result.address).toBe(expectedAddressMainnetAlt);
