@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import { sign } from "../src/utils/signutils.js";
-import { isEthAddress, checkHelp, listArgs, run, help  } from "../src/utils/claimutils.js";
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
+import { checkHelp, listArgs, run, help, promptPrivateKey } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -11,7 +10,6 @@ const version = packageJson.version;
 // HELP
 const usage = `${'Usage: npx zenclaim-signtool --argument="" --argument="" ... '.cyan}
 arguments:
- --privKey="" (mandatory, WIF (Wallet Import Format) or raw format private key)
  --message="" (mandatory) 
  --compressed=true||false (optional, default true) 
  --network="mainnet||testnet" (optional, default mainnet)
@@ -19,16 +17,17 @@ arguments:
  --help  display this help
  --verbose  display additional values to help debug
 ${'Short forms of arguments'.cyan} 
-  -pk="" -ms="" -cp= -nt="" -s -h -v
+  -ms="" -cp= -nt="" -s -h -v
 ${'Claiming ZEN:'.cyan}
 The message to sign should consist of the word ZENCLAIM and the destination address on Base
   Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
 See the multisig claim tool for the message to sign for multisig addresses. That tool can generate the message to sign for you.
 `;
 
-const long = ['--privKey', '--message', '--compressed', '--network', '--stringify', '--help', '--verbose'];
-const short = ['-pk', '-ms', '-cp', '-nt', '-s', '-h', '-v'];
+const long = ['--message', '--compressed', '--network', '--stringify', '--help', '--verbose'];
+const short = ['-ms', '-cp', '-nt', '-s', '-h', '-v'];
 const allowed = long.concat(short);
+const messageLength = 50;
 
 // Function to parse arguments
 function parseArguments(args) {
@@ -40,7 +39,6 @@ function parseArguments(args) {
       console.error(`${key} is not valid. ${help}`.red);
       process.exit(1);
     }
-    if (key === '-pk' || key === '--privKey') { options.privKey = val; continue; }
     if (key === '-ms' || key === '--message') { options.message = val; continue; }
     if (key === '-cp' || key === '--compressed') { options.compressed = val == 'false' ? false : true; continue; }
     if (key === '-nt' || key === '--network') { options.network = val; continue; }
@@ -50,8 +48,8 @@ function parseArguments(args) {
 
   if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-  if (!options.privKey || !options.message || options.message === '' || options.message === 'undefined' || options.message.length < 50) {
-    console.error(`private key and message are required. ${help}`.red);
+  if (!options.message || options.message === '' || options.message === 'undefined' || options.message.length < messageLength) {
+    console.error(`Message is required. ${help}`.red);
     process.exit(1);
   }
 
@@ -86,6 +84,7 @@ async function main(args) {
   checkHelp(args, usage);
   
   const options = parseArguments(args);
+  options.privKey = promptPrivateKey();
   listArgs(options);
 
   const result = signMessage(options);

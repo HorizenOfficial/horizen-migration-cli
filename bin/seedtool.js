@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { deriveFromPhrase } from "../src/utils/phraseutils.js";
-import { checkHelp, listArgs, run, help} from "../src/utils/claimutils.js";
+import { checkHelp, listArgs, run, help, promptMnemonicPhrase, promptMnemonicPassword } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -14,8 +14,6 @@ const version = packageJson.version;
 // CLI usage instructions
 const usage = `${'Usage: npx zenclaim-seedtool --argument1 --argument2... '.cyan}
 arguments:
-  --mnemonicPhrase="" (${'mandatory'.magenta} usually 12 or 24 words)
-  --mnemonicPassword="" (optional, default "", seed password)
   --numAddresses=int (optional, default 5)
   --derivationPath="" (optional, default "m/44'/121'/0'/0/")
   --derivationAddressIndexOffset=int (optional, default 0, offset of last integer in derivation path)
@@ -25,13 +23,13 @@ arguments:
   --verbose display additional values to help 
   debug
   ${'Short forms of arguments'.cyan} 
-  -ph="" -pw="" -na= -dp="" -do= -nt="" -s -h -v
+  -na= -dp="" -do= -nt="" -s -h -v
 `;
 
 // Function to parse CLI arguments
 function parseArguments(args) {
-    const long = ['--mnemonicPhrase', '--mnemonicPassword', '--numAddresses', '--derivationPath', '--derivationAddressIndexOffset', '--network', '--stringify', '--help', '--verbose'];
-    const short = ['-ph', '-pw', '-na', '-dp', '-do', '-nt', '-s', '-h', '-v'];
+    const long = ['--numAddresses', '--derivationPath', '--derivationAddressIndexOffset', '--network', '--stringify', '--help', '--verbose'];
+    const short = ['-na', '-dp', '-do', '-nt', '-s', '-h', '-v'];
     const allowed = long.concat(short);
     const options = {}
 
@@ -41,9 +39,7 @@ function parseArguments(args) {
             console.error(`${key} is not valid. ${help}`.red);
             process.exit(1);
         }
-        if (key === '-ph' || key === '--mnemonicPhrase') { options.mnemonicPhrase = val; continue; }
         if (key === '-na' || key === '--numAddresses') { options.numAddresses = Number(val); continue; }
-        if (key === '-pw' || key === '--mnemonicPassword') { options.mnemonicPassword = val; continue; }
         if (key === '-na' || key === '--numAddresses') { options.numAddresses = Number(val); continue; }
         if (key === '-dp' || key === '--derivationPath') { options.derivationPath = val;; continue; }
         if (key === '-do' || key === '--derivationAddressIndexOffset') { options.derivationAddressIndexOffset = Number(val); continue; }
@@ -52,12 +48,6 @@ function parseArguments(args) {
         if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
     }
     if (options.verbose) console.log('zenclaim-seedtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
-
-
-    if (!options.mnemonicPhrase) {
-        console.error(`Seed phrase is required. ${help}`.red);
-        process.exit(1);
-    }
 
     return options;
 }
@@ -88,9 +78,22 @@ async function deriveAddresses(options) {
 
 // Main function for CLI
 async function main(args) {
-    checkHelp(args, usage);
+    const noRequiredArgs = true;
+    checkHelp(args, usage, noRequiredArgs);
   
     const options = parseArguments(args);
+
+    const mnemonicPhrase = promptMnemonicPhrase();
+    const mnemonicPassword = promptMnemonicPassword();
+
+    options.mnemonicPhrase = mnemonicPhrase;
+    options.mnemonicPassword = mnemonicPassword;
+
+    if (!options.mnemonicPhrase) {
+        console.error(`Seed phrase is required. ${help}`.red);
+        process.exit(1);
+    }
+
     listArgs(options);
   
     const result = await deriveAddresses(options);

@@ -1,10 +1,13 @@
 import bs58check from "bs58check";
 import eip55 from "eip55";
-import { ethers } from "ethers";
 import { Buffer } from 'buffer';
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from './recoverutils.js';
 import { bip32Network } from "./phraseutils.js";
 import zencashjs from "zencashjs";
+
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const readlineSync = require('readline-sync');
 
 /**
  *
@@ -104,18 +107,20 @@ function publicKeyToAddr(pubKey, tnet) {
     );
 }
 
-function checkHelp(args, usage) {
+function checkHelp(args, usage, noArgsExpected = false) {
   const call = args.includes('--help') || args.includes('-h');
-  if (call || args.length === 0) {
+  if (call || (args.length === 0 && !noArgsExpected)) {
     console.log(usage);
     process.exit(0);
   }
 }
+
 function listArgs(options) {
   if (options.verbose) {
     console.log('Arguments received:'.cyan, options);
   }
 }
+
 function run(argv, file, main) {
   const isCLI = argv[0].includes('node') && argv[1].endsWith(file);
   if (isCLI) {
@@ -123,7 +128,7 @@ function run(argv, file, main) {
   }
 }
 
-function checkFeeFormat(fee){
+function checkFeeFormat(fee) {
   if(!fee) return undefined;
   if (typeof fee === 'string' && fee.slice(-1)=== 'n') return Number(fee.slice(0, -1));
   if (typeof fee === BigInt || !isNaN(Number(fee))) return Number(fee);
@@ -132,6 +137,30 @@ function checkFeeFormat(fee){
 }
 
 const help = 'For help: use --help or -h';
+
+function promptPrivateKey() {
+  const privateKey = readlineSync.question('Enter your private key: ', {
+    hideEchoBack: true
+  });
+
+  return privateKey;
+}
+
+function promptMnemonicPhrase() {
+  const phrase = readlineSync.question('Enter your mnemonic phrase (mandatory - usually 12 or 24 words): ', {
+    hideEchoBack: true
+  });
+
+  return phrase;
+}
+
+function promptMnemonicPassword() {
+  const password = readlineSync.question('Enter your mnemonic password (optional): ', {
+    hideEchoBack: true
+  });
+
+  return password;
+}
 
 export {
   isZenAddress,
@@ -146,5 +175,8 @@ export {
   listArgs,
   run,
   help,
-  checkFeeFormat
+  checkFeeFormat,
+  promptPrivateKey,
+  promptMnemonicPhrase,
+  promptMnemonicPassword
 }

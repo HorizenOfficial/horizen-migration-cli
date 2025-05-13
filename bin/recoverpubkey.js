@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import { getPublicKeyFromSignature, verifyAndRecoverPubKey } from "../src/utils/recoverutils.js";
-import { isEthAddress, checkHelp, listArgs, run, help} from "../src/utils/claimutils.js";
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
+import { checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
