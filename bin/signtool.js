@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
 import { sign } from "../src/utils/signutils.js";
-import { isEthAddress, checkHelp, listArgs, run, help  } from "../src/utils/claimutils.js";
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
+import { checkHelp, listArgs, run, help, securityConsideration } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -24,6 +23,7 @@ ${'Claiming ZEN:'.cyan}
 The message to sign should consist of the word ZENCLAIM and the destination address on Base
   Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
 See the multisig claim tool for the message to sign for multisig addresses. That tool can generate the message to sign for you.
+${securityConsideration.yellow}
 `;
 
 const long = ['--privKey', '--message', '--compressed', '--network', '--stringify', '--help', '--verbose'];
