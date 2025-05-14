@@ -133,6 +133,12 @@ function checkFeeFormat(fee){
 
 const help = 'For help: use --help or -h';
 
+const securityConsideration = `
+Security Considerations:
+  - Disable shell history before using this tool (e.g., run \`set +o history\` in bash).
+  - Avoid running in multi-user environments, as secrets passed via command-line arguments may be exposed to other users via the process list.
+`;
+
 export {
   isZenAddress,
   isEthAddress,
@@ -146,5 +152,6 @@ export {
   listArgs,
   run,
   help,
-  checkFeeFormat
+  checkFeeFormat,
+  securityConsideration
 }

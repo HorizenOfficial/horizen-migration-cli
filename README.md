@@ -17,8 +17,17 @@ Tools included allow you to:
    - submit a claim for a multisig address
    - return the public key recovered from a signed message
 
-## CAUTION
+## ⚠️ **SECURITY CONSIDERATIONS** ⚠️
 This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be taken to protect the secret values in all environments.
+
+Please follow these precautions to avoid leaking sensitive information:
+- **Disable shell history** before running the tool to prevent secrets from being recorded:
+  
+  ```bash
+  set +o history
+  ```
+
+- **Avoid running in multi-user environments** where other users can access the system process list. Command-line arguments, which may contain secrets, could be visible to other users.
 
 
 ## Installation

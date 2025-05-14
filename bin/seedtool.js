@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { deriveFromPhrase } from "../src/utils/phraseutils.js";
-import { checkHelp, listArgs, run, help} from "../src/utils/claimutils.js";
+import { checkHelp, listArgs, run, help, securityConsideration } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -26,6 +26,7 @@ arguments:
   debug
   ${'Short forms of arguments'.cyan} 
   -ph="" -pw="" -na= -dp="" -do= -nt="" -s -h -v
+  ${securityConsideration.yellow}
 `;
 
 // Function to parse CLI arguments
