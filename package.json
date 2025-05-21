@@ -9,7 +9,8 @@
     "zenclaim-verifymessage": "bin/verifymessage.js",
     "zenclaim-claimzenaddress": "bin/claimzenaddress.js",
     "zenclaim-recoverpubkey": "bin/recoverpubkey.js",
-    "zenclaim-claimmultisigaddress": "bin/claimmultisigaddress.js"
+    "zenclaim-claimmultisigaddress": "bin/claimmultisigaddress.js",
+    "zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js"
   },
   "exports": {
     "./zenclaim-seedtool": "./bin/seedtool.js",
@@ -17,7 +18,8 @@
     "./zenclaim-verifymessage": "./bin/verifymessage.js",
     "./zenclaim-claimzenaddress": "./bin/claimzenaddress.js",
     "./zenclaim-recoverpubkey": "./bin/recoverpubkey.js",
-    "./zenclaim-claimmultisigaddress": "./bin/claimmultisigaddress.js"
+    "./zenclaim-claimmultisigaddress": "./bin/claimmultisigaddress.js",
+    "./zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js"
   },
   "scripts": {
     "test": "env NODE_OPTIONS='--experimental-vm-modules' jest",
@@ -29,6 +31,7 @@
     "bitcoinjs-lib": "6.1.7",
     "bs58check": "4.0.0",
     "colors": "1.4.0",
+    "create-hash": "1.2.0",
     "eip55": "2.1.1",
     "elliptic": "6.6.1",
     "ethers": "6.13.7",
