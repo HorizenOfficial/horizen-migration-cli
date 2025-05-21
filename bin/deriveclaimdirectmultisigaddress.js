@@ -8,7 +8,7 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 const version = packageJson.version;
 
 // HELP
-const usage = `${'npx zenclaim-deriveclaimdirectaddress  --argument="" --argument="" ... '.cyan}
+const usage = `${'npx zenclaim-deriveclaimdirectmultisigaddress  --argument="" --argument="" ... '.cyan}
 arguments:
  --zenAddressPubKey="" (mandatory, compressed or uncompressed public key of a ZEN P2PKH address)
  --baseEthAddress="" (mandatory, Ethereum address on Base) 

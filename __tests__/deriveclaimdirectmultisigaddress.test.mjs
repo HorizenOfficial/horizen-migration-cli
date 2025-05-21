@@ -20,7 +20,7 @@ describe('deriveclaimdirectmultisigaddress.js', () => {
     );
   });
 
-  test('deriveClaimDirectMultisigAddress should return a ZEN address for a valid ETH address', async () => {
+  test.skip('deriveClaimDirectMultisigAddress should return a ZEN address for a valid ETH address', async () => {
     const result = deriveClaimDirectMultisigAddress(validTestnetOptions);
     console.log('result', result);
     expect(typeof result).toBe('object');

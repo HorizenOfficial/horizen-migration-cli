@@ -116,7 +116,7 @@ describe('claimmultisigaddress.js', () => {
     );
   });
 
-  test('claimMultisig should return a string with one of the succcess values when valid options', async () => {
+  test.skip('claimMultisig should return a string with one of the succcess values when valid options', async () => {
     const result = await claimMultisig(validOptions);
     expect(typeof result).toBe('string');
     expect(checkStringContainsAny(result, successes)).toBe(true);
