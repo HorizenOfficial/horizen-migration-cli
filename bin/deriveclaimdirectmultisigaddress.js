@@ -71,12 +71,15 @@ function compressZenAddressPublicKey(pubKey) {
 }
 
 function deriveClaimDirectMultisigHorizenPubKey(ethereumAddress) {
+    const compressedPubKeyIdentifier = "02";
+    const ethAddressHexString = ethAddressToHexString(ethereumAddress);
     return (
-        "02" +
+        compressedPubKeyIdentifier +
         createHash("sha256")
-          .update(Buffer.from(ethereumAddress.slice(2).toLowerCase(), "hex"))
-          .digest("hex")
-      );}
+        .update(Buffer.from(ethAddressHexString, "hex"))
+        .digest("hex")
+    );
+}
   
 function createClaimDirectMultisigRedeemScript(pubKey, derivedPubKey) {
     console.log('public key', pubKey);
