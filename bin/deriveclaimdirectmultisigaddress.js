@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { isEthAddress, checkHelp, listArgs, run, help, ethAddressToHexString } from "../src/utils/claimutils.js";
+import { isEthAddress, checkHelp, listArgs, run, help, ethAddressToHexString, isValidPubKey } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 import zencashjs from "zencashjs";
@@ -20,6 +20,8 @@ ${'Short forms of arguments'.cyan}
   -pk="" -a="" -nt="" -v
 ${'Claiming ZEN:'.cyan}
 Derive a P2SH zenMultisigAddress from ethAddress.
+- Send ZEN to this address before the snapshot
+- Claim from this address after the snapshot using the contract method or CLI command claimdirectmultisig
 `;
 
 // Allowed arguments
@@ -48,28 +50,6 @@ function parseArguments(args) {
     return options;
 }
 
-function compressZenAddressPublicKey(pubKey) {
-    // Check if pubkey is compressed
-    if (pubKey.length === 66 && (pubKey.startsWith('02') || pubKey.startsWith('03'))) {
-        return pubKey;
-    }
-
-    // Check if valid uncompressed pubkey
-    if (!pubKey.startsWith('04') || pubKey.length !== 130) {
-        throw new Error('Invalid uncompressed public key');
-    }
-
-    const x = uncompressedKey.slice(2, 66);
-    const y = uncompressedKey.slice(66);
-    const yLastByte = parseInt(y.slice(-2), 16);
-  
-    // Check if Y is even or odd
-    const prefix = (yLastByte % 2 === 0) ? '02' : '03';
-  
-    const compressedKey = prefix + x;
-    return compressedKey;
-}
-
 function deriveClaimDirectMultisigHorizenPubKey(ethereumAddress) {
     const compressedPubKeyIdentifier = "02";
     const ethAddressHexString = ethAddressToHexString(ethereumAddress);
@@ -82,8 +62,6 @@ function deriveClaimDirectMultisigHorizenPubKey(ethereumAddress) {
 }
   
 function createClaimDirectMultisigRedeemScript(pubKey, derivedPubKey) {
-    console.log('public key', pubKey);
-    console.log('derived', derivedPubKey)
     return zencashjs.address.mkMultiSigRedeemScript(
         [pubKey, derivedPubKey],
         1,
@@ -101,14 +79,17 @@ function deriveClaimDirectMultisigAddress(options) {
             throw new Error(`Not a valid Base ETH Address. ${!baseEthAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
 
-        const pubKeyHorizenCompressed = compressZenAddressPublicKey(zenAddressPubKey);
+        // Validate the Horizen pubkey
+        if (!isValidPubKey(zenAddressPubKey)) {
+            throw new Error(`Not a valid ZEN address public key`);
+        }
 
         const testnet = network === 'testnet';
         const scriptHash = testnet ? zencashjs.config.testnet.scriptHash : zencashjs.config.mainnet.scriptHash
 
         // claimDirectMultisig derived Addresses
         const claimDirectMultisigEthereumDerivedRedeemScript = createClaimDirectMultisigRedeemScript(
-            pubKeyHorizenCompressed,
+            zenAddressPubKey,
             deriveClaimDirectMultisigHorizenPubKey(baseEthAddress),
         );
         const claimDirectMultisigEthereumDerivedAddress = zencashjs.address.multiSigRSToAddress(

@@ -5,8 +5,8 @@ import { claimDirectMultisig } from '../bin/claimdirectmultisig';
 describe('claimdirectmultisig.js', () => {
   const validOptions = {
     redeemScript: 
-    "52210233b8f85c9ee02ed912cd0c0a522221e5b6755c895074dc6b79b29dea611c48052103422bf5cfd49a1d16a89a0b73e2875710879c3736605d0835bf3b911b288c847221031522dcbf3f51338a41f934bf1223b38256e1c31ead1c8c0903328e42d2a647e953ae",
-    baseEthAddress: "",
+    "5121021990511ec5a9e38f9ac64ffd18f84ca62c3f7ee27fae9352791d2b96d57e59502102f65a9490210054080791bae438ced4c341b9e7d840254b0399bf902ea215caa952ae",
+    baseEthAddress: "0x8b37D2f92A09a64e3F37B1a1FABF8f18C85804b8",
     senderAddressPrivKey: 'db32c344d274a8c9f6d969c166efcbfa7bb112333669335b0524bff5647e7395',
     network: "testnet",
     isTest: true,
@@ -86,8 +86,9 @@ describe('claimdirectmultisig.js', () => {
     );
   });
 
-  test.skip('claimDirectMultisig should return a string with one of the succcess values when valid options', async () => {
+  test('claimDirectMultisig should return a string with one of the succcess values when valid options', async () => {
     const result = await claimDirectMultisig(validOptions);
+    console.log('result', result);
     expect(typeof result).toBe('string');
     expect(checkStringContainsAny(result, successes)).toBe(true);
   });
