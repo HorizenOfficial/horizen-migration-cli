@@ -19,7 +19,7 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -a="" -nt="" -v
 ${'Deriving ZEN address:'.cyan}
-Derive a P2PKH zenAddress from ethAddress.
+Derive a P2PKH zenAddress from baseEthAddress.
 - Send ZEN to this address before the snapshot
 - Claim from this address after the snapshot using the contract method or CLI command claimdirect
 `;

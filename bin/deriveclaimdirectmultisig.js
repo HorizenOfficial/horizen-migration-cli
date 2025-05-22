@@ -9,7 +9,7 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 const version = packageJson.version;
 
 // HELP
-const usage = `${'npx zenclaim-deriveclaimdirectmultisigaddress  --argument="" --argument="" ... '.cyan}
+const usage = `${'npx zenclaim-deriveclaimdirectmultisig  --argument="" --argument="" ... '.cyan}
 arguments:
  --zenAddressPubKey="" (mandatory, compressed or uncompressed public key of a ZEN P2PKH address)
  --baseEthAddress="" (mandatory, Ethereum address on Base) 
@@ -19,7 +19,7 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -pk="" -a="" -nt="" -v
 ${'Claiming ZEN:'.cyan}
-Derive a P2SH zenMultisigAddress from ethAddress.
+Derive a P2SH zenMultisigAddress and redeemScript from baseEthAddress.
 - Send ZEN to this address before the snapshot
 - Claim from this address after the snapshot using the contract method or CLI command claimdirectmultisig
 `;
@@ -45,7 +45,7 @@ function parseArguments(args) {
         if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
     }
 
-    if (options.verbose) console.log('zenclaim-deriveclaimdirectmultisigaddress CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
+    if (options.verbose) console.log('zenclaim-deriveclaimdirectmultisig CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
     return options;
 }
@@ -69,8 +69,14 @@ function createClaimDirectMultisigRedeemScript(pubKey, derivedPubKey) {
     );
 }
 
-// Function to derive claim multisig ZEN address
-function deriveClaimDirectMultisigAddress(options) {
+function deriveClaimDirectMultisigAddress(redeemScript, isTestnet) {
+    const scriptHash = isTestnet ? zencashjs.config.testnet.scriptHash : zencashjs.config.mainnet.scriptHash;
+
+    return zencashjs.address.multiSigRSToAddress(redeemScript, scriptHash);
+}
+
+// Function to derive claim multisig ZEN address and redeem script
+function deriveClaimDirectMultisig(options) {
     try {
         const { zenAddressPubKey, baseEthAddress, network } = options;
 
@@ -85,16 +91,14 @@ function deriveClaimDirectMultisigAddress(options) {
         }
 
         const testnet = network === 'testnet';
-        const scriptHash = testnet ? zencashjs.config.testnet.scriptHash : zencashjs.config.mainnet.scriptHash
 
-        // claimDirectMultisig derived Addresses
         const claimDirectMultisigEthereumDerivedRedeemScript = createClaimDirectMultisigRedeemScript(
             zenAddressPubKey,
             deriveClaimDirectMultisigHorizenPubKey(baseEthAddress),
         );
-        const claimDirectMultisigEthereumDerivedAddress = zencashjs.address.multiSigRSToAddress(
+        const claimDirectMultisigEthereumDerivedAddress = deriveClaimDirectMultisigAddress(
             claimDirectMultisigEthereumDerivedRedeemScript,
-            scriptHash
+            testnet
         );
 
         return { 
@@ -114,7 +118,7 @@ async function main(args) {
     listArgs(options);
 
     try {
-        const result = await deriveClaimDirectMultisigAddress(options);
+        const result = await deriveClaimDirectMultisig(options);
         console.log(result);
     } catch (error) {
         console.error(error.message.red);
@@ -123,7 +127,7 @@ async function main(args) {
 }
 
 // Export the claimZen function for use as a module
-export { deriveClaimDirectMultisigAddress };
+export { deriveClaimDirectMultisigAddress, deriveClaimDirectMultisig };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'deriveclaimdirectmultisigaddress.js', main);
+run(process.argv, 'deriveclaimdirectmultisig.js', main);

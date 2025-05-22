@@ -1,6 +1,6 @@
-import { deriveClaimDirectMultisigAddress } from '../bin/deriveclaimdirectmultisigaddress.js';
+import { deriveClaimDirectMultisig } from '../bin/deriveclaimdirectmultisig.js';
 
-describe('deriveclaimdirectmultisigaddress.js', () => {
+describe('deriveclaimdirectmultisig.js', () => {
   const validTestnetOptions = {
     zenAddressPubKey: "02d1edd723d043e62f1c6407b1876126b8b21e688922a0b7c858154befcfd1f8cf",
     baseEthAddress: "0xC2a0780E419d610C7a88800EC74628072f1d4c16",
@@ -17,9 +17,9 @@ describe('deriveclaimdirectmultisigaddress.js', () => {
     network: "testnet",
   }
 
-  test('deriveClaimDirectMultisigAddress should return an error for invalid ETH address', async () => {
+  test('deriveClaimDirectMultisig should return an error for invalid ETH address', async () => {
     const invalidOptions = { ...validTestnetOptions, baseEthAddress: "12345" };
-    const result = deriveClaimDirectMultisigAddress(invalidOptions);
+    const result = deriveClaimDirectMultisig(invalidOptions);
     console.log('result', result)
     expect(typeof result).toBe('object');
     expect(result).toEqual(
@@ -27,16 +27,16 @@ describe('deriveclaimdirectmultisigaddress.js', () => {
     );
   });
 
-  test('deriveClaimDirectMultisigAddress should return a ZEN address for a valid ETH address', async () => {
-    const result = deriveClaimDirectMultisigAddress(validTestnetOptions);
+  test('deriveClaimDirectMultisig should return a ZEN address for a valid ETH address', async () => {
+    const result = deriveClaimDirectMultisig(validTestnetOptions);
     console.log('result', result);
     expect(typeof result).toBe('object');
     expect(result.redeemScript).toBe(validTestnetOptions.claimDirectMultisigEthereumDerivedRedeemScriptCompressed);
     expect(result.zenMultisigAddress).toBe(validTestnetOptions.claimDirectMultisigEthereumDerivedAddressCompressed);
   });
 
-  test('deriveClaimDirectMultisigAddress should return a ZEN address for a valid ETH address', async () => {
-    const result = deriveClaimDirectMultisigAddress(validTestnetOptionsUncompressed);
+  test('deriveClaimDirectMultisig should return a ZEN address for a valid ETH address', async () => {
+    const result = deriveClaimDirectMultisig(validTestnetOptionsUncompressed);
     console.log('result', result);
     expect(typeof result).toBe('object');
     expect(result.redeemScript).toBe(validTestnetOptionsUncompressed.claimDirectMultisigEthereumDerivedRedeemScriptUncompressed);

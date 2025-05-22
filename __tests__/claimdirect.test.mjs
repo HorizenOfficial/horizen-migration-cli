@@ -39,7 +39,7 @@ describe('claimdirect.js', () => {
   });
 
 
-  test('claimDirect should return an error for invalid zenddresses', async () => {
+  test('claimDirect should return an error for invalid baseEthAddress', async () => {
     const invalidOptions = { ...validOptions, baseEthAddress: "12345" };
     const result = await claimDirect(invalidOptions);
     expect(typeof result).toBe('object');

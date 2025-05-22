@@ -76,7 +76,7 @@ async function claimDirectMultisig(options) {
         }
 
         if (!isEthAddress(baseEthAddress)) {
-            throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
+            throw new Error(`Not a valid Base ETH Address. ${!baseEthAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
         }
 
         if (!validPrivateKey(senderAddressPrivKey)) {

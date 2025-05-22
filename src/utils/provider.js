@@ -10,6 +10,7 @@ import { ethers } from "ethers";
 import { rpcURLs } from "../../mainconfig.js";
 import { decodeZenAddress } from "./claimutils.js";
 import { deriveClaimDirectAddress } from "../../bin/deriveclaimdirectaddress.js";
+import { deriveClaimDirectMultisigAddress } from "../../bin/deriveclaimdirectmultisig.js";
 
 /*
     Using ethers.js v6 for provider and claim contract
@@ -293,7 +294,8 @@ async function submitDirectClaimMultisig(
   try {
     // check claimable balance and sending addr balance
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet' : 'mainnet'});
+    // Remove 0x prefix
+    const zenAddress = deriveClaimDirectMultisigAddress(redeemScript.slice(2), testnet);
     const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;

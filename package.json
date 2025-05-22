@@ -11,7 +11,7 @@
     "zenclaim-recoverpubkey": "bin/recoverpubkey.js",
     "zenclaim-claimmultisigaddress": "bin/claimmultisigaddress.js",
     "zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js",
-    "zenclaim-deriveclaimdirectmultisigaddress": "./bin/deriveclaimdirectmultisigaddress.js",
+    "zenclaim-deriveclaimdirectmultisig": "./bin/deriveclaimdirectmultisig.js",
     "zenclaim-claimdirect": "./bin/claimdirect.js",
     "zenclaim-claimdirectmultisig": "./bin/claimdirectmultisig.js"
   },
@@ -23,7 +23,7 @@
     "./zenclaim-recoverpubkey": "./bin/recoverpubkey.js",
     "./zenclaim-claimmultisigaddress": "./bin/claimmultisigaddress.js",
     "./zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js",
-    "./zenclaim-deriveclaimdirectmultisigaddress": "./bin/deriveclaimdirectmultisigaddress.js",
+    "./zenclaim-deriveclaimdirectmultisig": "./bin/deriveclaimdirectmultisig.js",
     "./zenclaim-claimdirect": "./bin/claimdirect.js",
     "./zenclaim-claimdirectmultisig": "./bin/claimdirectmultisig.js"
   },

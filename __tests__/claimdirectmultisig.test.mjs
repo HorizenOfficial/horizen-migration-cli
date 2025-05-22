@@ -5,7 +5,7 @@ import { claimDirectMultisig } from '../bin/claimdirectmultisig';
 describe('claimdirectmultisig.js', () => {
   const validOptions = {
     redeemScript: 
-    "5121021990511ec5a9e38f9ac64ffd18f84ca62c3f7ee27fae9352791d2b96d57e59502102f65a9490210054080791bae438ced4c341b9e7d840254b0399bf902ea215caa952ae",
+    "0x5121021990511ec5a9e38f9ac64ffd18f84ca62c3f7ee27fae9352791d2b96d57e59502102f65a9490210054080791bae438ced4c341b9e7d840254b0399bf902ea215caa952ae",
     baseEthAddress: "0x8b37D2f92A09a64e3F37B1a1FABF8f18C85804b8",
     senderAddressPrivKey: 'db32c344d274a8c9f6d969c166efcbfa7bb112333669335b0524bff5647e7395',
     network: "testnet",
