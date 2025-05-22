@@ -1,4 +1,3 @@
-
 import { deriveClaimDirectMultisigAddress } from '../bin/deriveclaimdirectmultisigaddress.js';
 
 describe('deriveclaimdirectmultisigaddress.js', () => {

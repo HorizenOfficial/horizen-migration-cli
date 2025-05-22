@@ -2,7 +2,7 @@
 
 import { isEthAddress, checkHelp, listArgs, run, help, ethAddressToHexString } from "../src/utils/claimutils.js";
 import bs58check from "bs58check";
-import createHash from "create-hash";
+import { createHash } from "crypto";
 import 'colors';
 import { readFileSync } from 'fs';
 import zencashjs from "zencashjs";

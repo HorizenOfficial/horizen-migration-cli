@@ -4,9 +4,9 @@ import { claimZen } from '../bin/claimzenaddress.js';
 // The senderAddressPrivKey must maintain a small balance (gas) for the tests to complete. 
 describe('claimzenaddress.js', () => {
   const validOptions = {
-    zenAddress: "ztUjtWCsN9d7iqxydJxuQH72jh8dZry58wW",
+    zenAddress: "ztkBJxYRcZ4TqL6Ggj8DZAzzZRMHV26j5ri",
     destinationAddress: "0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC",
-    signature: "H9shScGVa28rwWFUAC17YXSXZTSN7v19sGj90743CUcmHFBcoEocPSUljS9BPpFbXgI2RAny1JZJB+4G6Pxqn68=",
+    signature: "H4Z2sV/Ri3nfbX2zZSAfI0C8pBPTVEaBqqtMxe+whXnjAKuY3GjqVvuYkvj3vFOtbNdS4aIOL19l5B+xkQw43Fc=",
     senderAddressPrivKey: 'db32c344d274a8c9f6d969c166efcbfa7bb112333669335b0524bff5647e7395',
     network: "testnet",
     isTest: true,
@@ -98,7 +98,7 @@ describe('claimzenaddress.js', () => {
     );
   });
 
-  test.skip('claimZen should return a string with one of the succcess values when valid options', async () => {
+  test('claimZen should return a string with one of the succcess values when valid options', async () => {
     const result = await claimZen(validOptions);
     console.log("Test result:", result)
     expect(typeof result).toBe('string');

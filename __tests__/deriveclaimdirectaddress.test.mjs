@@ -1,4 +1,3 @@
-
 import { deriveClaimDirectAddress } from '../bin/deriveclaimdirectaddress.js';
 
 describe('deriveclaimdirectaddress.js', () => {

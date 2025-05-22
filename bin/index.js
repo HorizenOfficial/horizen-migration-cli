@@ -4,3 +4,7 @@ export * from './verifymessage';
 export * from './recoverpubkey';
 export * from './claimzenaddress';
 export * from './claimzmultisigaddress';
+export * from './claimdirect';
+export * from './claimdirectmultisig';
+export * from './deriveclaimdirectaddress';
+export * from './deriveclaimdirectmultisigaddress';
