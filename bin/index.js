@@ -7,4 +7,4 @@ export * from './claimmultisigaddress';
 export * from './claimdirect';
 export * from './claimdirectmultisig';
 export * from './deriveclaimdirectaddress';
-export * from './deriveclaimdirectmultisigaddress';
+export * from './deriveclaimdirectmultisig';
