@@ -1,4 +1,3 @@
-
 import { claimDirect } from '../bin/claimdirect.js';
 
 // The senderAddressPrivKey must maintain a small balance (gas) for the tests to complete. 
@@ -18,7 +17,8 @@ describe('claimdirect.js', () => {
     return subs.some(sub => str.includes(sub));
   };
 
-  // error returns {error: message}. testing returns string, one of the success messsages
+  // error returns {error: message}. 
+  // testing returns string, one of the success messsages
   // tx.hash (string) is returned when not testing
   test('claimDirect should return an error for missing baseEthAddress', async () => {
     const invalidOptions = { ...validOptions, baseEthAddress: null };

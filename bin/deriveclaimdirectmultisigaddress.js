@@ -4,6 +4,7 @@ import { isEthAddress, checkHelp, listArgs, run, help } from "../src/utils/claim
 import 'colors';
 import { readFileSync } from 'fs';
 import zencashjs from "zencashjs";
+import { createHash } from "crypto";
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
@@ -18,12 +19,7 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -za="" -a="" -nt="" -v
 ${'Claiming ZEN:'.cyan}
-Derive a P2PKH zenAddress from ethAddress.
-
-The message to sign should consist of the word ZENCLAIM the base58check decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding
-The addresses must be in the format 0x{hex}.
-Example "ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"
-Signatures must be created with the public key of each zenAddress used to create the multisig address. 
+Derive a P2SH zenMultisigAddress from ethAddress.
 `;
 
 // Allowed arguments
@@ -75,8 +71,12 @@ function compressZenAddressPublicKey(pubKey) {
 }
 
 function deriveClaimDirectMultisigHorizenPubKey(ethereumAddress) {
-    return "02000000000000000000000000" + ethereumAddress.slice(2).toLowerCase();
-}
+    return (
+        "02" +
+        createHash("sha256")
+          .update(Buffer.from(ethereumAddress.slice(2).toLowerCase(), "hex"))
+          .digest("hex")
+      );}
   
 function createClaimDirectMultisigRedeemScript(pubKey, derivedPubKey) {
     console.log('public key', pubKey);
