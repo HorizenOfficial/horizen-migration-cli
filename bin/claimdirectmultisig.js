@@ -84,7 +84,7 @@ async function claimDirectMultisig(options) {
 
         // Claim ZEN
         const isTest = options?.isTest
-        const txResult = await submitDirectClaimMultisig(redeemScript, baseEthAddress, senderAddressPrivKey, mfpg, mpfpg, testnet, verbose, isTest);
+        const txResult = await submitDirectClaimMultisig(`0x${redeemScript}`, baseEthAddress, senderAddressPrivKey, mfpg, mpfpg, testnet, verbose, isTest);
         return txResult;
     } catch (error) {
         return { error: error.message || 'Unable to create the transaction'.red };

@@ -303,8 +303,6 @@ async function submitDirectClaimMultisig(
     if (senderBalance === 0n) {
       throw new Error(`No balance in sender address to pay gas.`);
     }
-    console.log('redeem script', redeemScript);
-
 
     // check fees
     const feeData = await provider.getFeeData();
