@@ -17,14 +17,14 @@ arguments:
  --verbose  display additional values to help check for errors
 
 ${'Short forms of arguments'.cyan} 
-  -za="" -a="" -nt="" -v
+  -pk="" -a="" -nt="" -v
 ${'Claiming ZEN:'.cyan}
 Derive a P2SH zenMultisigAddress from ethAddress.
 `;
 
 // Allowed arguments
 const long = ['--zenAddressPubKey', '--baseEthAddress', '--network'];
-const short = ['-za', '-a', '-nt'];
+const short = ['-pk', '-a', '-nt'];
 const allowed = long.concat(short);
 
 // Function to parse arguments
@@ -37,7 +37,7 @@ function parseArguments(args) {
             console.error(`${key} is not valid. ${help}`.red);
             process.exit(1);
         }
-        if (key === '-za' || key === '--zenAddressPubKey') { options.zenAddressPubKey = val; continue; }
+        if (key === '-pk' || key === '--zenAddressPubKey') { options.zenAddressPubKey = val; continue; }
         if (key === '-a' || key === '--baseEthAddress') { options.baseEthAddress = val; continue; }
         if (key === '-nt' || key === '--network') { options.network = val; continue; }
         if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
