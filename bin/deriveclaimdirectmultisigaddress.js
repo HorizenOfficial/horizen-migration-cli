@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { isEthAddress, checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
+import { isEthAddress, checkHelp, listArgs, run, help, ethAddressToHexString } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 import zencashjs from "zencashjs";

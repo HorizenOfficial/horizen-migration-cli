@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { isEthAddress, checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
+import { isEthAddress, checkHelp, listArgs, run, help, ethAddressToHexString } from "../src/utils/claimutils.js";
 import bs58check from "bs58check";
 import createHash from "create-hash";
 import 'colors';
@@ -47,17 +47,17 @@ function parseArguments(args) {
     return options;
 }
 
+
+
 function deriveClaimDirectHorizenAddress(prefix, ethereumAddress) {
-    // Remove "0x"
-    const ethereumAddressBytes = ethereumAddress.slice(2);
-    console.log(ethereumAddressBytes);
+    const ethAddressHexString = ethAddressToHexString(ethereumAddress);
     return bs58check.encode(
         Buffer.from(
         prefix +
             createHash("rmd160")
             .update(
                 createHash("sha256")
-                .update(Buffer.from(ethereumAddressBytes, "hex"))
+                .update(Buffer.from(ethAddressHexString, "hex"))
                 .digest(),
             )
             .digest("hex"),

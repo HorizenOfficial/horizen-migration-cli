@@ -110,4 +110,4 @@ async function main(args) {
 export { claimDirect };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'claimdirect', main);
+run(process.argv, 'claimdirect.js', main);

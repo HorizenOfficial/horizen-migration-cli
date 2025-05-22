@@ -104,6 +104,19 @@ function publicKeyToAddr(pubKey, tnet) {
     );
 }
 
+function ethAddressToHexString(ethereumAddress) {
+  let validEthAddress;
+  try {
+    validEthAddress = ethers.getAddress(ethereumAddress);
+  } catch (error) {
+    console.error(
+      "Error: ethAddressToHexString() invalid Etherum Address passed.",
+    );
+    process.exit(1);
+  }
+  return validEthAddress.slice(2);
+}
+
 function checkHelp(args, usage) {
   const call = args.includes('--help') || args.includes('-h');
   if (call || args.length === 0) {
@@ -148,6 +161,7 @@ export {
   addressToDecodedHex,
   checkPrivKeyWif,
   publicKeyToAddr,
+  ethAddressToHexString,
   checkHelp,
   listArgs,
   run,
