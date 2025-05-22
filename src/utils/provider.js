@@ -173,14 +173,13 @@ async function submitMultisigClaim(
     }
 
     // prep the transaction data
-    const pubKey = [`0x${pubKeyCoords.pubkeyXcoordinate}`, `0x${pubKeyCoords.pubkeyYcoordinate}`];
-    const signatureBuffer = Buffer.from(signature, "base64");
+    const rscript = "0x" + multisig.redeemScript
 
     // check fees
     const feeData = await provider.getFeeData();
     const maxFPG = maxFeePerGas ? ethers.toBigInt(maxFeePerGas) : feeData.maxFeePerGas;
     const maxPFPG = maxPriorityFeePerGas || maxPriorityFeePerGas === 0 ? ethers.toBigInt(maxPriorityFeePerGas) : feeData.maxPriorityFeePerGas;
-    const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_P2PKH].estimateGas(destAddress, signatureBuffer, pubKey)
+    const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_P2SH].estimateGas(destAddress, orderedSignatures, rscript, orderedPubKeyCoords)
     const maxGasCost = gasEstimate * (maxFPG + maxPFPG);
     // check if sender balance is sufficient
     if (senderBalance < maxGasCost) {

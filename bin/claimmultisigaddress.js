@@ -34,7 +34,7 @@ Signatures must be created with the public key of each zenAddress used to create
 `;
 
 // Allowed arguments
-const long = ['--zenMultisigAddress', '--destinationAddress', '--redeemscript', '--signatures', '--senderAddressPrivKey', '--maxFeePerGas', '--maxPriorityFeePerGas', '--network', '--help', '--verbose', '--buildmessage'];
+const long = ['--zenMultisigAddress', '--destinationAddress', '--redeemScript', '--signatures', '--senderAddressPrivKey', '--maxFeePerGas', '--maxPriorityFeePerGas', '--network', '--help', '--verbose', '--buildmessage'];
 const short = ['-ma', '-da', '-rs', '-sg', '-pk', '-gf', '-pf', '-nt', '-s', '-h', '-v', '-b'];
 const allowed = long.concat(short);
 
