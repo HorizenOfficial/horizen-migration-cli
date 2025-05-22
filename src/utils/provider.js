@@ -226,28 +226,24 @@ async function submitDirectClaim(
   isTest,
 ) {
   try {
-    // check balances
+    // check claimable balance and sending addr balance
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
     const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet': 'mainnet'});
-    console.log('zenAddress', zenAddress)
-    // const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
-    // if (claimBalance == 0n) {
-    //   return `No balance found in claim address ${zenAddress}`;
-    // }
+    const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
+    if (claimBalance == 0n) {
+      return `No balance found in claim address ${zenAddress}`;
+    }
+  
     const senderBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
-    console.log('sender balance', senderBalance)
     if (senderBalance === 0n) {
       throw new Error(`No balance in sender address to pay gas.`);
     }
 
     // check fees
     const feeData = await provider.getFeeData();
-    console.log('errorhere??')
     const maxFPG = maxFeePerGas ? ethers.toBigInt(maxFeePerGas) : feeData.maxFeePerGas;
-    console.log('errorhere??')
 
     const maxPFPG = maxPriorityFeePerGas || maxPriorityFeePerGas === 0 ? ethers.toBigInt(maxPriorityFeePerGas) : feeData.maxPriorityFeePerGas;
-    console.log('errorhere??')
 
     const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_DIRECT].estimateGas(baseEthAddress)
     const maxGasCost = gasEstimate * (maxFPG + maxPFPG);
@@ -255,12 +251,10 @@ async function submitDirectClaim(
       throw new Error(`Insufficient sender balance. Need up to ${ethers.formatEther(maxGasCost)} Found ${ethers.formatEther(senderBalance)}`)
     }
     if (verbose) console.log('Max eth transaction fee', ethers.formatEther(maxGasCost))
-    console.log('errorhere??')
 
     const tx = await claim.contract[
       FUNCTION_NAME_CLAIM_DIRECT
     ].populateTransaction(baseEthAddress);
-    console.log('errorhere??')
 
     // get the nonce last
     const nonce = await claim.signer.getNonce();
@@ -281,7 +275,6 @@ async function submitDirectClaim(
     // return the transaction hash
     return txResponse.hash;
   } catch (error) {
-    console.log('error...', error)
     if (error.revert) console.log(Object.keys(error.revert));
     throw error;
   }
