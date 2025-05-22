@@ -13,8 +13,8 @@ const usage = `${'npx zenclaim-claimdirect --argument="" --argument="" ... '.cya
 arguments:
  --baseEthAddress="" (mandatory, Ethereum address on Base)
  --senderAddressPrivKey="0x.." (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)
- --maxFeePerGas=int (optional, wei, default 20000000000) 
- --maxPriorityFeePerGas=int (optional, wei, default 20000000000) 
+ --maxFeePerGas=int (optional, wei) 
+ --maxPriorityFeePerGas=int (optional, wei) 
  --network="mainnet||testnet" (optional, default "mainnet")
  --help  display this help
  --verbose  display additional values to help check for errors

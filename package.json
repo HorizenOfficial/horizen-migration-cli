@@ -13,7 +13,7 @@
     "zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js",
     "zenclaim-deriveclaimdirectmultisigaddress": "./bin/deriveclaimdirectmultisigaddress.js",
     "zenclaim-claimdirect": "./bin/claimdirect.js",
-    "zenclaim-claimdirectmultisig": "./bin/claimdirectmulisig.js"
+    "zenclaim-claimdirectmultisig": "./bin/claimdirectmultisig.js"
   },
   "exports": {
     "./zenclaim-seedtool": "./bin/seedtool.js",
@@ -25,7 +25,7 @@
     "./zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js",
     "./zenclaim-deriveclaimdirectmultisigaddress": "./bin/deriveclaimdirectmultisigaddress.js",
     "./zenclaim-claimdirect": "./bin/claimdirect.js",
-    "./zenclaim-claimdirectmultisig": "./bin/claimdirectmulisig.js"
+    "./zenclaim-claimdirectmultisig": "./bin/claimdirectmultisig.js"
   },
   "scripts": {
     "test": "env NODE_OPTIONS='--experimental-vm-modules' jest",

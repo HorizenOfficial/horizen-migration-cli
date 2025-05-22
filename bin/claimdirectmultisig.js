@@ -21,7 +21,7 @@ arguments:
  --help  display this help
  --verbose  display additional values to help check for errors
 ${'Short forms of arguments'.cyan} 
-  -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v -b
+  -rs="" -a="" -pk="" -gf= -pf= -nt="" -h -v
 ${'Claiming ZEN:'.cyan}
 `;
 
@@ -99,7 +99,7 @@ async function main(args) {
     listArgs(options);
 
     try {
-        const result = await claimMultisig(options);
+        const result = await claimDirectMultisig(options);
         console.log(result);
     } catch (error) {
         console.error(error.message.red);
@@ -111,4 +111,4 @@ async function main(args) {
 export { claimDirectMultisig };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'claimmultisigaddress.js', main);
+run(process.argv, 'claimdirectmultisig.js', main);

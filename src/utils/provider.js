@@ -293,14 +293,18 @@ async function submitDirectClaimMultisig(
   try {
     // check balances
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
+    const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet': 'mainnet'});
     const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;
     }
+
     const senderBalance = await findSenderBalance(senderAddressPrivKey, testnet, verbose);
     if (senderBalance === 0n) {
       throw new Error(`No balance in sender address to pay gas.`);
     }
+    console.log('redeem script', redeemScript);
+
 
     // check fees
     const feeData = await provider.getFeeData();
