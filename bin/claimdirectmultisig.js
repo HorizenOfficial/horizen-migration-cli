@@ -12,7 +12,7 @@ const version = packageJson.version;
 // HELP
 const usage = `${'npx zenclaim-claimdirectmultisig  --argument="" --argument="" ... '.cyan}
 arguments:
- --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
+ --redeemScript="0x.." (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
  --baseEthAddress="" (mandatory, Ethereum address on Base)
  --senderAddressPrivKey="0x.." (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
  --maxFeePerGas=int (optional, wei, overrides provider estimate) 
@@ -67,7 +67,11 @@ async function claimDirectMultisig(options) {
         const testnet = network === 'testnet';
 
         // Validate inputs
-        if (!checkRedeemScript(redeemScript, verbose)) {
+        if (!redeemScript.startsWith("0x")) {
+            throw new Error("Prefix redeemScript with 0x")
+        }
+        // Remove 0x
+        if (!checkRedeemScript(redeemScript.slice(2), verbose)) {
             throw new Error("Not a valid redeemScript");
         }
 
@@ -84,7 +88,7 @@ async function claimDirectMultisig(options) {
 
         // Claim ZEN
         const isTest = options?.isTest
-        const txResult = await submitDirectClaimMultisig(`0x${redeemScript}`, baseEthAddress, senderAddressPrivKey, mfpg, mpfpg, testnet, verbose, isTest);
+        const txResult = await submitDirectClaimMultisig(redeemScript, baseEthAddress, senderAddressPrivKey, mfpg, mpfpg, testnet, verbose, isTest);
         return txResult;
     } catch (error) {
         return { error: error.message || 'Unable to create the transaction'.red };

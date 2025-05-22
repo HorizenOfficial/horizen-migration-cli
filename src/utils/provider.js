@@ -228,7 +228,7 @@ async function submitDirectClaim(
   try {
     // check claimable balance and sending addr balance
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet': 'mainnet'});
+    const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet' : 'mainnet'});
     const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;
@@ -291,9 +291,9 @@ async function submitDirectClaimMultisig(
   isTest,
 ) {
   try {
-    // check balances
+    // check claimable balance and sending addr balance
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet': 'mainnet'});
+    const zenAddress = deriveClaimDirectAddress({ baseEthAddress, network: testnet ? 'testnet' : 'mainnet'});
     const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;
