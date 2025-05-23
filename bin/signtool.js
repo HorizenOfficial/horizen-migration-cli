@@ -50,6 +50,8 @@ function parseArguments(args) {
 
   if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
+  if (options.compressed === undefined) options.compressed = true;
+
   if (!options.privKey || !options.message || options.message === '' || options.message === 'undefined' || options.message.length < 50) {
     console.error(`private key and message are required. ${help}`.red);
     process.exit(1);
