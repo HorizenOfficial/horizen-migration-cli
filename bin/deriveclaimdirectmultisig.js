@@ -80,6 +80,12 @@ function deriveClaimDirectMultisig(options) {
     try {
         const { zenAddressPubKey, baseEthAddress, network } = options;
 
+        if (!zenAddressPubKey || !baseEthAddress) {
+            const missing = 'zenAddressPubKey and baseEthAddress are required.';
+            if (options.isCLI)`${missing} ${help}`;
+            throw new Error(missing);
+        }
+
         // Validate the EIP-55 checksum of the Eth address
         if (!isEthAddress(baseEthAddress)) {
             throw new Error(`Not a valid Base ETH Address. ${!baseEthAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
