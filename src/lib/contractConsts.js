@@ -4,12 +4,14 @@ export const ZEND_BACKUP_VAULT_CONTRACT_ADDRESS = "0x000000000000000000000000000
 export const ZENCLAIM_MESSAGE_PREFIX = "ZENCLAIM";
 
 // testnet: base sepolia. (explorer - sepolia.basescan.org) chain id 84532
-export const ZEND_BACKUP_VAULT_CONTRACT_ADDRESS_TESTNET = '0x37fC33500Ea52D1AC745B55cb1E4de3bb6A19428';
-export const ZENCLAIM_MESSAGE_PREFIX_TESTNET = "ZT1CLAIM";
+export const ZEND_BACKUP_VAULT_CONTRACT_ADDRESS_TESTNET = '0xE7C98E239abc7f7cA14011781b5Ac0D8f500f4BD';
+export const ZENCLAIM_MESSAGE_PREFIX_TESTNET = "ZT2CLAIM";
 
 // regular address and multisig address
 export const FUNCTION_NAME_CLAIM_P2PKH = "claimP2PKH";
 export const FUNCTION_NAME_CLAIM_P2SH = "claimP2SH";
+export const FUNCTION_NAME_CLAIM_DIRECT = "claimDirect";
+export const FUNCTION_NAME_CLAIM_DIRECT_MULTISIG = "claimDirectMultisig";
 
 export const ABI_ZEND_CLAIM = [
   {
@@ -130,6 +132,37 @@ export const ABI_ZEND_CLAIM = [
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "baseDestAddress",
+        "type": "address"
+      }
+    ],
+    "name": "claimDirect",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "script",
+        "type": "bytes"
+      },
+      {
+        "internalType": "address",
+        "name": "baseDestAddress",
+        "type": "address"
+      }
+    ],
+    "name": "claimDirectMultisig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
 ];
 

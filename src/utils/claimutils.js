@@ -84,6 +84,7 @@ function decodeZenAddress(address) {
   if (decoded.length !== 20) throw new Error('Invalid address length')
   return decoded
 }
+
 function addressToDecodedHex(address) {
   const decoded = decodeZenAddress(address);
   return Buffer.from(decoded).toString("hex");
@@ -102,6 +103,26 @@ function publicKeyToAddr(pubKey, tnet) {
         pubKey,
         testnet ? zencashjs.config.testnet.pubKeyHash : zencashjs.config.mainnet.pubKeyHash,
     );
+}
+
+function ethAddressToHexString(ethereumAddress) {
+  let validEthAddress;
+  try {
+    validEthAddress = ethers.getAddress(ethereumAddress);
+  } catch (error) {
+    console.error(
+      "Error: ethAddressToHexString() invalid Etherum Address passed.",
+    );
+    process.exit(1);
+  }
+  return validEthAddress.slice(2);
+}
+
+function isValidPubKey(pubKey) {
+  const isValidCompressed = pubKey.length === 66 && (pubKey.startsWith('02') || pubKey.startsWith('03'));
+  const isValidUncompressed = pubKey.startsWith('04') && pubKey.length === 130;
+
+  return isValidCompressed || isValidUncompressed;
 }
 
 function checkHelp(args, usage) {
@@ -148,6 +169,8 @@ export {
   addressToDecodedHex,
   checkPrivKeyWif,
   publicKeyToAddr,
+  ethAddressToHexString,
+  isValidPubKey,
   checkHelp,
   listArgs,
   run,
