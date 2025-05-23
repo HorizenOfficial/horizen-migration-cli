@@ -7,6 +7,16 @@ describe('deriveclaimdirectaddress.js', () => {
     network: "testnet",
   }
 
+  test('deriveClaimDirectAddress should return an error for missing ETH address', async () => {
+    const invalidOptions = { ...validTestnetOptions, baseEthAddress: null };
+    const result = deriveClaimDirectAddress(invalidOptions);
+    console.log('result', result)
+    expect(typeof result).toBe('object');
+    expect(result).toEqual(
+      expect.objectContaining({ error: expect.any(String) })
+    );
+  });
+
   test('deriveClaimDirectAddress should return an error for invalid ETH address', async () => {
     const invalidOptions = { ...validTestnetOptions, baseEthAddress: "12345" };
     const result = deriveClaimDirectAddress(invalidOptions);

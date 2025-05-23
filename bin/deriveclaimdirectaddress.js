@@ -73,6 +73,12 @@ function deriveClaimDirectAddress(options) {
     try {
         const { baseEthAddress, network } = options;
 
+        if (!baseEthAddress) {
+            const missing = 'baseEthAddress is required.';
+            if (options.isCLI)`${missing} ${help}`;
+            throw new Error(missing);
+        }
+
         // Validate the EIP-55 checksum of the Eth address
         if (!isEthAddress(baseEthAddress)) {
             throw new Error(`Not a valid Base ETH Address. ${!baseEthAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);

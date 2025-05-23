@@ -17,6 +17,26 @@ describe('deriveclaimdirectmultisig.js', () => {
     network: "testnet",
   }
 
+  test('deriveClaimDirectMultisig should return an error for missing ETH address', async () => {
+    const invalidOptions = { ...validTestnetOptions, baseEthAddress: null };
+    const result = deriveClaimDirectMultisig(invalidOptions);
+    console.log('result', result)
+    expect(typeof result).toBe('object');
+    expect(result).toEqual(
+      expect.objectContaining({ error: expect.any(String) })
+    );
+  });
+
+  test('deriveClaimDirectMultisig should return an error for missing ZEN public key', async () => {
+    const invalidOptions = { ...validTestnetOptions, zenAddressPubKey: null };
+    const result = deriveClaimDirectMultisig(invalidOptions);
+    console.log('result', result)
+    expect(typeof result).toBe('object');
+    expect(result).toEqual(
+      expect.objectContaining({ error: expect.any(String) })
+    );
+  });
+
   test('deriveClaimDirectMultisig should return an error for invalid ETH address', async () => {
     const invalidOptions = { ...validTestnetOptions, baseEthAddress: "12345" };
     const result = deriveClaimDirectMultisig(invalidOptions);

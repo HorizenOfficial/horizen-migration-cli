@@ -15,7 +15,7 @@ arguments:
  --zenAddress="" (mandatory, Horizen 1 Mainchain address) 
  --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2 starting with 0x) 
  --signature="" (mandatory signed message signature from zenAddress) 
- --senderAddressPrivKey="0x.." (mandatory, private key of Ethereum address sending the transaction and paying the fee)  
+ --senderAddressPrivKey="" (mandatory, private key of Ethereum address sending the transaction and paying the fee)  
  --maxFeePerGas=int (optional, wei, overrides provider estimate) 
  --maxPriorityFeePerGas=int (optional, wei, overrides provider estimate) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -61,13 +61,19 @@ function parseArguments(args) {
 // Function to claim ZEN
 async function claimZen(options) {
   try {
-    const { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
+    let { zenAddress, destinationAddress, signature, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
     if (!zenAddress || !destinationAddress || !signature || !senderAddressPrivKey) {
       const missing = 'zenAddress, destinationAddress, signature, and senderAddressPrivKey are all required.';
       if (options.isCLI)`${missing} ${help}`;
       throw new Error(missing);
     }
     const testnet = network === 'testnet'
+
+    // Standardize senderAddressPrivateKey to not prefix with "0x"
+    if (senderAddressPrivKey.startsWith("0x")) {
+      senderAddressPrivKey = senderAddressPrivKey.slice(2);
+    }
+    
     // Validate inputs
     if (!isZenAddress(zenAddress, testnet, false, verbose)) {
       throw new Error("Not a valid zenAddress");

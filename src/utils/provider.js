@@ -293,8 +293,8 @@ async function submitDirectClaimMultisig(
   try {
     // check claimable balance and sending addr balance
     const claim = await getContractAndSigner(senderAddressPrivKey, testnet, verbose);
-    // Remove 0x prefix
-    const zenAddress = deriveClaimDirectMultisigAddress(redeemScript.slice(2), testnet);
+
+    const zenAddress = deriveClaimDirectMultisigAddress(redeemScript, testnet);
     const claimBalance = await checkClaimBalance(zenAddress, claim.contract, verbose);
     if (claimBalance == 0n) {
       return `No balance found in claim address ${zenAddress}`;
@@ -309,7 +309,7 @@ async function submitDirectClaimMultisig(
     const feeData = await provider.getFeeData();
     const maxFPG = maxFeePerGas ? ethers.toBigInt(maxFeePerGas) : feeData.maxFeePerGas;
     const maxPFPG = maxPriorityFeePerGas || maxPriorityFeePerGas === 0 ? ethers.toBigInt(maxPriorityFeePerGas) : feeData.maxPriorityFeePerGas;
-    const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_DIRECT_MULTISIG].estimateGas(redeemScript, baseEthAddress)
+    const gasEstimate = await claim.contract[FUNCTION_NAME_CLAIM_DIRECT_MULTISIG].estimateGas(`0x${redeemScript}`, baseEthAddress)
     const maxGasCost = gasEstimate * (maxFPG + maxPFPG);
     if (senderBalance < maxGasCost) {
       throw new Error(`Insufficient sender balance. Need up to ${ethers.formatEther(maxGasCost)} Found ${ethers.formatEther(senderBalance)}`)
@@ -318,7 +318,7 @@ async function submitDirectClaimMultisig(
 
     const tx = await claim.contract[
       FUNCTION_NAME_CLAIM_DIRECT_MULTISIG
-    ].populateTransaction(redeemScript, baseEthAddress);
+    ].populateTransaction(`0x${redeemScript}`, baseEthAddress);
 
     // get the nonce last
     const nonce = await claim.signer.getNonce();

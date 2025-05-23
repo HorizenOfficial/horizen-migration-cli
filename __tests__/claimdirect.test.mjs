@@ -72,4 +72,12 @@ describe('claimdirect.js', () => {
     expect(typeof result).toBe('string');
     expect(checkStringContainsAny(result, successes)).toBe(true);
   });
+
+  test('claimDirect should return a string with one of the succcess values when senderAddressPrivateKey is prefixed with 0x', async () => {
+    const options = { ...validOptions, senderAddressPrivKey: `0x${validOptions.senderAddressPrivKey}`};
+    const result = await claimDirect(options);
+    console.log("Test result:", result)
+    expect(typeof result).toBe('string');
+    expect(checkStringContainsAny(result, successes)).toBe(true);
+  });
 });

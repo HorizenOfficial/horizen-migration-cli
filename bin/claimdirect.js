@@ -9,10 +9,10 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 const version = packageJson.version;
 
 // HELP
-const usage = `${'npx zenclaim-claimdirect --argument="" --argument="" ... '.cyan}
+const usage = `${'npx zenclaim-claimdirect --baseEthAddress="" --senderAddressPrivKey="" ... '.cyan}
 arguments:
  --baseEthAddress="" (mandatory, Ethereum address on Base)
- --senderAddressPrivKey="0x.." (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)
+ --senderAddressPrivKey="" (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)
  --maxFeePerGas=int (optional, wei) 
  --maxPriorityFeePerGas=int (optional, wei) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -54,7 +54,7 @@ function parseArguments(args) {
 // Function to claim ZEN
 async function claimDirect(options) {
   try {
-    const { baseEthAddress, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
+    let { baseEthAddress, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
     if (!baseEthAddress || !senderAddressPrivKey) {
       const missing = 'baseEthAddress and senderAddressPrivKey are required.';
       if (options.isCLI) `${missing} ${help}`;
@@ -62,6 +62,11 @@ async function claimDirect(options) {
     }
 
     const testnet = network === 'testnet';
+
+    // Standardize senderAddressPrivateKey to not prefix with "0x"
+    if (senderAddressPrivKey.startsWith("0x")) {
+      senderAddressPrivKey = senderAddressPrivKey.slice(2);
+    }
 
     // Validate inputs
     if (!isEthAddress(baseEthAddress)) {

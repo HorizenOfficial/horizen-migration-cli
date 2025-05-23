@@ -17,7 +17,7 @@ arguments:
  --destinationAddress="0x.." (mandatory, claim destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding)
  --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
  --signatures='["",""]' (mandatory, n signatures of a n-of-m multisig address) 
- --senderAddressPrivKey="0x.." (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
+ --senderAddressPrivKey="" (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
  --maxFeePerGas=int (optional, wei, overrides provider estimate) 
  --maxPriorityFeePerGas=int (optional, wei, overrides provider estimate) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -91,7 +91,7 @@ function buildMessage(options) {
 // Function to claim ZEN
 async function claimMultisig(options) {
     try {
-        const { multisigAddress, destinationAddress, redeemScript, signatures, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
+        let { multisigAddress, destinationAddress, redeemScript, signatures, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
         if (!options.multisigAddress || !options.destinationAddress || !options.redeemScript || !options.signatures || !options.senderAddressPrivKey) {
             const missing = 'zenMultisigAddress, destinationAddress, redeemScript, signatures, and senderAddressPrivKey are all required.'
             if (options.isCLI)`${missing} ${help}`;
@@ -99,6 +99,12 @@ async function claimMultisig(options) {
         }
 
         const testnet = network === 'testnet';
+
+        // Standardize senderAddressPrivateKey to not prefix with "0x"
+        if (senderAddressPrivKey.startsWith("0x")) {
+            senderAddressPrivKey = senderAddressPrivKey.slice(2);
+        }
+
         // Validate inputs
         if (!isZenAddress(multisigAddress, testnet, true, verbose)) {
             throw new Error("Not a valid zen multisig address");

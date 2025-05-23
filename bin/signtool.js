@@ -32,7 +32,10 @@ const allowed = long.concat(short);
 
 // Function to parse arguments
 function parseArguments(args) {
-  let options = {}
+  let options = {
+    compressed: true,
+    network: "mainnet"
+  }
 
   for (let i = 0; i < args.length; i++) {
     const [key, val] = args[i].split('=');
@@ -42,7 +45,7 @@ function parseArguments(args) {
     }
     if (key === '-pk' || key === '--privKey') { options.privKey = val; continue; }
     if (key === '-ms' || key === '--message') { options.message = val; continue; }
-    if (key === '-cp' || key === '--compressed') { options.compressed = val == 'false' ? false : true; continue; }
+    if (key === '-cp' || key === '--compressed') { options.compressed = val === 'false' ? false : true; continue; }
     if (key === '-nt' || key === '--network') { options.network = val; continue; }
     if (key === '-s' || key === '--stringify') { options.stringify = true; continue; }
     if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
