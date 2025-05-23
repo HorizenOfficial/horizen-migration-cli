@@ -63,7 +63,7 @@ describe('signtool.js', () => {
     expect(result.signature).toBe(expectedSigRaw);
     expect(result.address).toBe(expectedAddressMainnetAlt);
   });
-  test('signMessage should return compressed address by default when compresed option is not provided', () => {
+  test('signMessage should return compressed address by default when compressed parameter is not provided', () => {
     const result = signMessage({message, privKey: privKeyRaw, network: "mainnet"})
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSigRaw);
