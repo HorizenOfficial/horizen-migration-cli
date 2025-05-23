@@ -5,7 +5,7 @@ import { claimDirectMultisig } from '../bin/claimdirectmultisig';
 describe('claimdirectmultisig.js', () => {
   const validOptions = {
     redeemScript: 
-    "0x5121021990511ec5a9e38f9ac64ffd18f84ca62c3f7ee27fae9352791d2b96d57e59502102f65a9490210054080791bae438ced4c341b9e7d840254b0399bf902ea215caa952ae",
+    "5121021990511ec5a9e38f9ac64ffd18f84ca62c3f7ee27fae9352791d2b96d57e59502102f65a9490210054080791bae438ced4c341b9e7d840254b0399bf902ea215caa952ae",
     baseEthAddress: "0x8b37D2f92A09a64e3F37B1a1FABF8f18C85804b8",
     senderAddressPrivKey: 'db32c344d274a8c9f6d969c166efcbfa7bb112333669335b0524bff5647e7395',
     network: "testnet",
@@ -88,6 +88,22 @@ describe('claimdirectmultisig.js', () => {
 
   test('claimDirectMultisig should return a string with one of the succcess values when valid options', async () => {
     const result = await claimDirectMultisig(validOptions);
+    console.log('result', result);
+    expect(typeof result).toBe('string');
+    expect(checkStringContainsAny(result, successes)).toBe(true);
+  });
+
+  test('claimDirectMultisig should return a string with one of the succcess values when redeemScript is prefixed with 0x', async () => {
+    const options = { ...validOptions, redeemScript: `0x${validOptions.redeemScript}`};
+    const result = await claimDirectMultisig(options);
+    console.log('result', result);
+    expect(typeof result).toBe('string');
+    expect(checkStringContainsAny(result, successes)).toBe(true);
+  });
+
+  test('claimDirectMultisig should return a string with one of the succcess values when senderAddressPrivKey is prefixed with 0x', async () => {
+    const options = { ...validOptions, senderAddressPrivKey: `0x${validOptions.senderAddressPrivKey}`};
+    const result = await claimDirectMultisig(options);
     console.log('result', result);
     expect(typeof result).toBe('string');
     expect(checkStringContainsAny(result, successes)).toBe(true);

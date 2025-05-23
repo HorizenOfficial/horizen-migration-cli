@@ -10,11 +10,11 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 const version = packageJson.version;
 
 // HELP
-const usage = `${'npx zenclaim-claimdirectmultisig  --argument="" --argument="" ... '.cyan}
+const usage = `${'npx zenclaim-claimdirectmultisig  --redeemScript="" --baseEthAddress="" --senderAddressPrivKey=""... '.cyan}
 arguments:
- --redeemScript="0x.." (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
+ --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
  --baseEthAddress="" (mandatory, Ethereum address on Base)
- --senderAddressPrivKey="0x.." (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
+ --senderAddressPrivKey="" (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
  --maxFeePerGas=int (optional, wei, overrides provider estimate) 
  --maxPriorityFeePerGas=int (optional, wei, overrides provider estimate) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -57,7 +57,7 @@ function parseArguments(args) {
 // Function to claim ZEN
 async function claimDirectMultisig(options) {
     try {
-        const { redeemScript, baseEthAddress, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
+        let { redeemScript, baseEthAddress, senderAddressPrivKey, maxFeePerGas, maxPriorityFeePerGas, network, verbose } = options;
         if (!redeemScript || !baseEthAddress || !senderAddressPrivKey) {
             const missing = 'redeemScript, baseEthAddress, and senderAddressPrivKey are all required.'
             if (options.isCLI)`${missing} ${help}`;
@@ -66,12 +66,18 @@ async function claimDirectMultisig(options) {
 
         const testnet = network === 'testnet';
 
-        // Validate inputs
-        if (!redeemScript.startsWith("0x")) {
-            throw new Error("Prefix redeemScript with 0x")
+        // Standardize redeemScript to not prefix with "0x"
+        if (redeemScript.startsWith("0x")) {
+            redeemScript = redeemScript.slice(2);
         }
-        // Remove 0x
-        if (!checkRedeemScript(redeemScript.slice(2), verbose)) {
+        // Standardize senderAddressPrivateKey to not prefix with "0x"
+        if (senderAddressPrivKey.startsWith("0x")) {
+            senderAddressPrivKey = senderAddressPrivKey.slice(2);
+        }
+
+        // Validate inputs
+        // Remove 0x for validation
+        if (!checkRedeemScript(redeemScript, verbose)) {
             throw new Error("Not a valid redeemScript");
         }
 
