@@ -79,7 +79,7 @@ describe('claimmultisigaddress.js', () => {
     const result = await claimMultisig(invalidOptions);
     expect(typeof result).toBe('object');
     expect(result).toEqual(
-      expect.objectContaining({ error: expect.any(String) })
+      expect.objectContaining({ error: expect.stringContaining('Not a valid destinationAddress.') })
     );
   });
   test('claimMultisig should return an error for invalid signatures', async () => {

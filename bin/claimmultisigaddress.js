@@ -82,7 +82,7 @@ function buildMessage(options) {
         throw new Error("Not a valid zen multisig address");
     }
     if (!isEthAddress(options.destinationAddress)) {
-        throw new Error(`Not a valid destinationAddress. ${!destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
+        throw new Error(`Not a valid destinationAddress. ${!options.destinationAddress.startsWith('0x') ? 'Missing 0x prefix' : ''}`);
     }
     const message = `${prefix}0x${addressToDecodedHex(options.multisigAddress)}${options.destinationAddress}`;
     return message;
