@@ -71,6 +71,24 @@ describe('seedtool.js', () => {
     expect(typeof result).toBe('string');
   });
 
+  test('deriveAddresses should error for a negative numAddresses value', async () => {
+    const invalidOptions = { ...validOptions, numAddresses: -1 };
+    const result = await deriveAddresses(invalidOptions);
+    expect(typeof result).toBe('object');
+    expect(result).toEqual(
+      expect.objectContaining({ error: expect.stringContaining('Number of addresses should be a number greater than 0.') })
+    );
+  });
+
+  test('deriveAddresses should error for a negative derivationAddressIndexOffset value', async () => {
+    const invalidOptions = { ...validOptions, derivationAddressIndexOffset: -1 };
+    const result = await deriveAddresses(invalidOptions);
+    expect(typeof result).toBe('object');
+    expect(result).toEqual(
+      expect.objectContaining({ error: expect.stringContaining('derivationAddressIndexOffset should be a non-negative number.') })
+    );
+  });
+
   test('deriveAddresses should return an object with the correct structure for valid options', async () => {
     const result = await deriveAddresses(validOptions);
     expect(typeof result).toBe('object');

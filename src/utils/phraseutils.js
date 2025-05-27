@@ -59,6 +59,12 @@ const getWIF = (privKey, tnet) => {
  */
 const deriveFromPhrase = async (numAddresses, mnPhrase, mnPassword, derivationPrefix, offset, tnet, verbose) => {
   try {
+    if (numAddresses <= 0) {
+      throw new Error('Number of addresses should be a number greater than 0.');
+    }
+    if (offset < 0) {
+      throw new Error('offset value cannot be negative.');
+    }
   
     // accept any string as a phrase.
     const mnemonicPhrase = mnPhrase;

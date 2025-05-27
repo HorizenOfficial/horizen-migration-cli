@@ -68,8 +68,10 @@ async function deriveAddresses(options) {
     try {
         const testnet = options.network === 'testnet';
         if (!options.mnemonicPhrase) throw new Error('Seed phrase is required.');
-        if (options?.numAddresses && (isNaN(options.numAddresses) || options.numAddresses <0) ) 
-            throw new Error('Number of addresses or should be a number greater than 0.');
+        if (options?.numAddresses && (isNaN(options.numAddresses) || options.numAddresses < 0)) 
+            throw new Error('Number of addresses should be a number greater than 0.');
+        if (options?.derivationAddressIndexOffset && (isNaN(options.derivationAddressIndexOffset) || options.derivationAddressIndexOffset < 0)) 
+            throw new Error('derivationAddressIndexOffset should be a non-negative number.');
 
         const addrs = await deriveFromPhrase(
             options.numAddresses || 5,
