@@ -65,6 +65,7 @@ function parseArguments(args) {
 function signMessage(options) {
   if (options.verbose)  console.log("options=", options);
   const testnet = options.network === 'testnet';
+  if (options.compressed === undefined) options.compressed = true;
 
   try {
     // validation checks

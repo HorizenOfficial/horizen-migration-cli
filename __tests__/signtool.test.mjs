@@ -42,17 +42,17 @@ describe('signtool.js', () => {
   test('signMessage should return a different signature and address when commpressed is false', () => {
     const result = signMessage({message, privKey, compressed: false});
     expect(typeof result).toBe('object');
-    expect(result.address).toBe(expectedAddressCompressedFalse);
     expect(result.signature).toBe(expectedSigCompressedFalse);
+    expect(result.address).toBe(expectedAddressCompressedFalse);
   });
   test('signMessage should sign a message and return an object with signature and address', () => {
-    const result = signMessage({message, privKey});
+    const result = signMessage({message, privKey, compressed: false});
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSig);
     expect(result.address).toBe(expectedAddressMainnet);
   });
   test('signMessage should sign a message and return an object with testnet signature and address', () => {
-    const result = signMessage({message: messageTestnet, privKey:privKeyTestnet, network:"testnet"});
+    const result = signMessage({message: messageTestnet, privKey:privKeyTestnet, network:"testnet", compressed: false});
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSigTestnet);
     expect(result.address).toBe(expectedAddressTestnet);
@@ -70,7 +70,7 @@ describe('signtool.js', () => {
     expect(result.address).toBe(expectedAddressMainnetAlt);
   });
   test('signMessage should sign a multisig formatted message and return an object with signature and address', () => {
-    const result = signMessage({message: multisigMessage, privKey, verbose})
+    const result = signMessage({message: multisigMessage, privKey, verbose, compressed: false})
     expect(typeof result).toBe('object');
     expect(result.signature).toBe(expectedSigMultisig);
     expect(result.address).toBe(expectedAddressMainnet);
