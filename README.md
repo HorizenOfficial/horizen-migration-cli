@@ -6,7 +6,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 
 [Tools Included](#tools-included)
 
-[CAUTION](#caution)
+[SECURITY CONSIDERATIONS](#caution)
 
 [Installation](#installation)
 
@@ -23,6 +23,14 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
   - [zenclaim-recoverpubkey](#zenclaim-recoverpubkey)
 
   - [zenclaim-claimmultisigaddress](#zenclaim-claimmultisigaddress)
+
+  - [zenclaim-deriveclaimdirectaddress](#zenclaim-deriveclaimdirectaddress)
+
+  - [zenclaim-claimdirect](#zenclaim-claimdirect)
+  
+  - [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)
+  
+  - [zenclaim-claimdirectmultisig](#zenclaim-claimdirectmultisig)
 
 [Submitting a Claim For a ZEN Address](#submitting-a-claim-for-a-zen-address)
 
@@ -50,7 +58,7 @@ Tools included allow you to:
 - submit a claim for a multisig address  
 - return the public key recovered from a signed message
 
-## ⚠️[CAUTION](#caution)⚠️
+## ⚠️[SECURITY CONSIDERATIONS](#caution)⚠️
 
 This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be taken to protect the secret values in all environments. .  
 Please follow these precautions to avoid leaking sensitive information:
@@ -359,7 +367,7 @@ Submit a claim for a ZEN multisig address. This tool helps you create and submit
 As a CLI:
 
 ```bash
-npx zenclaim-claimmultisigaddress   --zenMultisigAddress:"multisig_address_here" --redeemScript="your_redeem_script_here" --detinationAddress="base_address_here"  --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"...\"]"
+npx zenclaim-claimmultisigaddress   --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --detinationAddress="base_address_here"  --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"...\"]"
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -414,6 +422,74 @@ Use the \--buildmessage feature to create the message to sign.
 Note:   For testnet use “ZT1CLAIM”.
 
 Signatures must be created with the public key of each zenAddress used to create the multisig address. Only use the required number of signatures. e.g. a 3 of 5 multisig expects 3 of the signatures. Any other quantity will throw an error.  The signatures may be in any order in the array.
+
+
+### [zenclaim-deriveclaimdirectaddress](#zenclaim-deriveclaimdirectaddress)
+
+Deterministically generate a ZEN address from a Base ETH address. 
+
+As a CLI:
+
+```bash
+npx zenclaim-deriveclaimdirectaddress   --baseEthAddress="base_eth_address_here" --network="testnet" 
+```
+
+Note: adjust the quotes for the operating system you are using.
+
+As a module:
+
+```js
+import { claimMultisigAddress } from 'zenclaim-claimmultisigaddress';
+
+const options = {
+  zenMultisigAddress:"multisig_address_here",
+  destinationAddress: "base_destination_address",
+  redeemScript: "redeem_script_here", 
+  signatures: ["signature1", "signature2", "..."],
+  senderAddressPrivKey: "base_senders_private_key"
+};
+
+claimMultisigAddress(options).then(result => {
+  if (result.error) {
+    console.error(result.error);
+  } else {
+    console.log(result);
+  }
+}).catch(error => {
+  console.error(error.message);
+});
+```
+
+#### Arguments/Options:
+
+The Base ETH address is required.  
+Drop the dashes when creating an options object for module use.
+
+```js
+ --baseEthAddress="" (mandatory, Ethereum address on Base) 
+ --network="mainnet||testnet" (optional, default "mainnet")
+ --verbose  display additional values to help check for errors
+
+// Short forms of arguments for command line
+  -a="" -nt="" -v
+```
+
+
+
+### [zenclaim-claimdirect](#zenclaim-claimdirect)
+
+This method distributes a balance X of zenAddress(derive(ethAddress)) to ethAddress on Base
+
+Anyone can call this method
+
+Users would derive a P2PKH zenAddress from ethAddress prior to the snapshot, and send balance X to this zenAddress
+
+The balance X would be unspendable on Horizen 1 as no private key corresponding with zenAddress  exists, funds would be locked in this address until distributed on Base.
+
+### [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)
+
+### [zenclaim-claimdirectmultisig](#zenclaim-claimdirectmultisig)
+
 
 ## [Submitting a Claim For a ZEN Address](#submitting-a-claim-for-a-zen-address)
 
