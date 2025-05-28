@@ -426,12 +426,12 @@ Signatures must be created with the public key of each zenAddress used to create
 
 ### [zenclaim-deriveclaimdirectaddress](#zenclaim-deriveclaimdirectaddress)
 
-Deterministically generate a ZEN address from a Base ETH address. 
+Deterministically generate a P2PK ZEN address from a Base ETH address. 
 
 As a CLI:
 
 ```bash
-npx zenclaim-deriveclaimdirectaddress   --baseEthAddress="base_eth_address_here" --network="testnet" 
+npx zenclaim-deriveclaimdirectaddress --baseEthAddress="<base_eth_address>" --network="testnet" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -439,17 +439,13 @@ Note: adjust the quotes for the operating system you are using.
 As a module:
 
 ```js
-import { claimMultisigAddress } from 'zenclaim-claimmultisigaddress';
+import { deriveClaimDirectAddress } from 'zenclaim-deriveclaimdirectaddress';
 
 const options = {
-  zenMultisigAddress:"multisig_address_here",
-  destinationAddress: "base_destination_address",
-  redeemScript: "redeem_script_here", 
-  signatures: ["signature1", "signature2", "..."],
-  senderAddressPrivKey: "base_senders_private_key"
+  baseEthAddress: "<base_eth_address>"
 };
 
-claimMultisigAddress(options).then(result => {
+deriveClaimDirectAddress(options).then(result => {
   if (result.error) {
     console.error(result.error);
   } else {
@@ -474,22 +470,157 @@ Drop the dashes when creating an options object for module use.
   -a="" -nt="" -v
 ```
 
-
-
 ### [zenclaim-claimdirect](#zenclaim-claimdirect)
+This method distributes a balance from a derived ZEN address to the ETH address on Base. Derive a P2PKH ZEN address from the ETH address prior to the snapshot (use [zenclaim-deriveclaimdirectaddress](#zenclaim-deriveclaimdirectaddress)), and send the balance to this derived ZEN address.
 
-This method distributes a balance X of zenAddress(derive(ethAddress)) to ethAddress on Base
+The balance would be unspendable on Horizen 1 as no private key corresponding with the ZEN address exists, but funds would be locked in this address until distributed on Base.
 
-Anyone can call this method
+As a CLI:
 
-Users would derive a P2PKH zenAddress from ethAddress prior to the snapshot, and send balance X to this zenAddress
+```bash
+npx zenclaim-claimdirect --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="testnet" 
+```
 
-The balance X would be unspendable on Horizen 1 as no private key corresponding with zenAddress  exists, funds would be locked in this address until distributed on Base.
+Note: adjust the quotes for the operating system you are using.
+
+As a module:
+
+```js
+import { claimDirect } from 'zenclaim-claimdirect';
+
+const options = {
+  baseEthAddress: "<base_eth_address>",
+  senderAddressPrivKey: "<sender_private_key>"
+};
+
+claimDirect(options).then(result => {
+  if (result.error) {
+    console.error(result.error);
+  } else {
+    console.log(result);
+  }
+}).catch(error => {
+  console.error(error.message);
+});
+```
+
+#### Arguments/Options:
+
+The Base ETH address and sender private key are required.  
+Drop the dashes when creating an options object for module use.
+
+```js
+ --baseEthAddress="" (mandatory, Ethereum address on Base) 
+  --senderAddressPrivKey="" (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)
+ --maxFeePerGas=int (optional, wei) 
+ --maxPriorityFeePerGas=int (optional, wei) 
+ --network="mainnet||testnet" (optional, default "mainnet")
+ --help  display this help
+ --verbose  display additional values to help check for errors
+
+// Short forms of arguments for command line
+  -a="" -pk="" -gf= -pf= -nt="" -h -v
+```
 
 ### [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)
+Deterministically generate a P2SH ZEN multisig address and redeem script from a Base ETH address and ZEN public key. 
 
-### [zenclaim-claimdirectmultisig](#zenclaim-claimdirectmultisig)
+As a CLI:
 
+```bash
+npx zenclaim-deriveclaimdirectmultisig --zenAddressPubKey="<zen_public_key>" --baseEthAddress="<base_eth_address>" --network="testnet" 
+```
+
+Note: adjust the quotes for the operating system you are using.
+
+As a module:
+
+```js
+import { deriveClaimDirectMultisig } from 'zenclaim-deriveclaimdirectmultisig';
+
+const options = {
+  zenAddressPubKey: "<zen_public_key>",
+  baseEthAddress: "<base_eth_address>"
+};
+
+deriveClaimDirectMultisig(options).then(result => {
+  if (result.error) {
+    console.error(result.error);
+  } else {
+    console.log(result);
+  }
+}).catch(error => {
+  console.error(error.message);
+});
+```
+
+#### Arguments/Options:
+
+The Base ETH address and ZEN public key are required.  
+Drop the dashes when creating an options object for module use.
+
+```js
+ --zenAddressPubKey="" (mandatory, compressed or uncompressed public key of a ZEN P2PKH address)
+ --baseEthAddress="" (mandatory, Ethereum address on Base) 
+ --network="mainnet||testnet" (optional, default "mainnet")
+ --verbose  display additional values to help check for errors
+
+// Short forms of arguments for command line
+  pk="" -a="" -nt="" -v
+```
+
+
+### [zenclaim-claimdirectmultisigaddress](#zenclaim-claimdirectmultisigaddress)
+This method distributes a balance from a derived ZEN multisig address to the ETH address on Base. Derive a P2SH ZEN multisig address from the ETH address prior to the snapshot (use [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)), and send the balance to this derived ZEN multisig address.
+
+As a CLI:
+
+```bash
+npx zenclaim-claimmultisigaddress --redeemScript="<redeem_script>" --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="testnet" 
+```
+
+Note: adjust the quotes for the operating system you are using.
+
+As a module:
+
+```js
+import { claimDirectMultisig } from 'zenclaim-claimdirectmultisig';
+
+const options = {
+  redeemScript: "<redeem_script>",
+  baseEthAddress: "<base_eth_address>",
+  senderAddressPrivKey: "<sender_private_key>"
+};
+
+claimDirectMultisig(options).then(result => {
+  if (result.error) {
+    console.error(result.error);
+  } else {
+    console.log(result);
+  }
+}).catch(error => {
+  console.error(error.message);
+});
+```
+
+#### Arguments/Options:
+
+The redeemscript, Base ETH address and sender private key are required.  
+Drop the dashes when creating an options object for module use.
+
+```js
+ --redeemScript="" (mandatory, Horizen 1 Mainchain P2SH-Multisig address redeemScript) 
+ --baseEthAddress="" (mandatory, Ethereum address on Base)
+ --senderAddressPrivKey="" (mandatory, private key of Base address sending the transaction and paying the fee. must have enough funds for gas)  
+ --maxFeePerGas=int (optional, wei, overrides provider estimate) 
+ --maxPriorityFeePerGas=int (optional, wei, overrides provider estimate) 
+ --network="mainnet||testnet" (optional, default "mainnet")
+ --help  display this help
+ --verbose  display additional values to help check for errors
+
+// Short forms of arguments for command line
+  -rs="" -a="" -pk="" -gf= -pf= -nt="" -h -v
+```
 
 ## [Submitting a Claim For a ZEN Address](#submitting-a-claim-for-a-zen-address)
 

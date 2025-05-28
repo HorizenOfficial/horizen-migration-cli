@@ -9,7 +9,7 @@ const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.me
 const version = packageJson.version;
 
 // HELP
-const usage = `${'npx zenclaim-deriveclaimdirectmultisig  --argument="" --argument="" ... '.cyan}
+const usage = `${'npx zenclaim-deriveclaimdirectmultisig  --zenAddressPubKey="" --baseEthAddress="" ... '.cyan}
 arguments:
  --zenAddressPubKey="" (mandatory, compressed or uncompressed public key of a ZEN P2PKH address)
  --baseEthAddress="" (mandatory, Ethereum address on Base) 
@@ -19,7 +19,7 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -pk="" -a="" -nt="" -v
 ${'Claiming ZEN:'.cyan}
-Derive a P2SH zenMultisigAddress and redeemScript from baseEthAddress.
+Derive a P2SH zenMultisigAddress and redeemScript from baseEthAddress and zenAddressPubKey.
 - Send ZEN to this address before the snapshot
 - Claim from this address after the snapshot using the contract method or CLI command claimdirectmultisig
 `;
