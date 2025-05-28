@@ -426,7 +426,7 @@ Signatures must be created with the public key of each zenAddress used to create
 
 ### zenclaim-deriveclaimdirectaddress
 
-Deterministically generate a P2PK ZEN address from a Base ETH address. 
+Deterministically generate a P2PKH ZEN address from a Base ETH address. 
 
 As a CLI:
 
