@@ -58,7 +58,7 @@ Tools included allow you to:
 - submit a claim for a multisig address  
 - return the public key recovered from a signed message
 
-## ⚠️ SECURITY CONSIDERATIONS ⚠️
+## **SECURITY CONSIDERATIONS**
 
 This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be taken to protect the secret values in all environments. .  
 Please follow these precautions to avoid leaking sensitive information:
