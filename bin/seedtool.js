@@ -84,7 +84,7 @@ async function deriveAddresses(options) {
         );
         return options.stringify ? JSON.stringify(addrs, null, 1) : addrs;
     } catch (err) {
-        if (options.verbose) console.log(error.message)
+        if (options.verbose) console.log(err.message)
         return { error: err.message };
     }
 }
