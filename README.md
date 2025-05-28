@@ -6,7 +6,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 
 [Tools Included](#tools-included)
 
-[SECURITY CONSIDERATIONS](#caution)
+[SECURITY CONSIDERATIONS](#security-considerations)
 
 [Installation](#installation)
 
@@ -39,7 +39,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 [Troubleshooting](#troubleshooting)    
     
 
-## [Overview](#overview)
+## Overview
 
 A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a website to make simple claims (see horizen.io website). This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
 
@@ -47,7 +47,7 @@ A snapshot of all ZEN account balances was taken at a certain point in time and 
 * The message and a Base destination is then sent to a contract on the Base network after verifying the message and the balance.  
 * The contract sends the amount found in the snapshot to the destination address on Base.
 
-## [Tools Included](#tools-included)
+## Tools Included
 
 Tools included allow you to:
 
@@ -58,7 +58,7 @@ Tools included allow you to:
 - submit a claim for a multisig address  
 - return the public key recovered from a signed message
 
-## ⚠️[SECURITY CONSIDERATIONS](#caution)⚠️
+## ⚠️ SECURITY CONSIDERATIONS ⚠️
 
 This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be taken to protect the secret values in all environments. .  
 Please follow these precautions to avoid leaking sensitive information:
@@ -69,7 +69,7 @@ Please follow these precautions to avoid leaking sensitive information:
 
 Additional security best practices are beyond the scope of this guide.
 
-## [Installation](#installation)
+## Installation
 
 Prerequisites: [Node.js](https://nodejs.org/en/download) version 20 or higher installed.
 
@@ -91,11 +91,11 @@ To test the installation, in the installation folder run.
 npx zenclaim-signtool --help
 ```
 
-## [Usage](#usage)
+## Usage
 
 For ease of use, references have been created that point to the individual main files. These files support running as both command line (bash) or importing as a module.  The mapping may be found in the package.json file.
 
-### [zenclaim-seedtool](#zenclaim-seedtool)
+### zenclaim-seedtool
 
 Derive ZEN addresses and keys from a seed phrase.  Most seed phrases are 24 words. Some older wallets used 12 words.  Any number of words are supported by the tool.  Be sure to enter words separated by a single space, with no leading or trailing spaces. The words, their order, and their case must exactly match the original.  Check the addresses returned match the source.
 
@@ -148,7 +148,7 @@ Drop the dashes when creating an options object for module use.
 
 Notes: help, stringify and short forms are only available in the CLI.
 
-### [zenclaim-signtool](#zenclaim-signtool)
+### zenclaim-signtool
 
 Sign a special message with the private key of the ZEN source address. See instructions for building a message for a multisig address in the multisig tool as it has a different format.
 
@@ -199,7 +199,7 @@ Drop the dashes when creating the options object for module use.
 
 The message to sign should consist of the word ZENCLAIM and the destination address on Base Example "ZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" See the multisig claim tool for the message to sign for multisig addresses. That tool can generate a message to sign for you.   For testnet use “ZT1CLAIM”.
 
-### [zenclaim-verifymessage](#zenclaim-verifymessage)
+### zenclaim-verifymessage
 
 Verify a message when passed a message, ZEN address, and signature.  
 Returns either true or false on success or an object with an error message.
@@ -244,7 +244,7 @@ Drop the dashes when creating an options object for module use.
   -ms="" -za="" -sg="" -h -v 
 ```
 
-### [zenclaim-claimzenaddress](#zenclaim-claimzenaddress)
+### zenclaim-claimzenaddress
 
 Submit a claim for a standard ZEN transparent address.  
 This validates the claim and sends a transaction to the smart contract on Base. The call requires access to the internet and uses the sender's private key.
@@ -306,7 +306,7 @@ Drop the dashes when creating an options object for module use.
 
 The message to sign should consist of the word ZENCLAIM and the destination address (starting with 0x) on Base and should be signed with the public key of the ZEN address of the funds. Example "ZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC"
 
-### [zenclaim-recoverpubkey](#zenclaim-recoverpubkey)
+### zenclaim-recoverpubkey
 
 Recover the public key of a ZEN address from a signed message. This tool extracts the public key and determines the x and y coordinates required by the claim smart contract.
 
@@ -360,7 +360,7 @@ Drop the dashes when creating an options object for module use.
 
 ---
 
-### [zenclaim-claimmultisigaddress](#zenclaim-claimmultisigaddress)
+### zenclaim-claimmultisigaddress
 
 Submit a claim for a ZEN multisig address. This tool helps you create and submit a claim for ZEN funds from a multisig address to a Base destination address. It also can generate the message to sign for multisig claims.
 
@@ -424,7 +424,7 @@ Note:   For testnet use “ZT1CLAIM”.
 Signatures must be created with the public key of each zenAddress used to create the multisig address. Only use the required number of signatures. e.g. a 3 of 5 multisig expects 3 of the signatures. Any other quantity will throw an error.  The signatures may be in any order in the array.
 
 
-### [zenclaim-deriveclaimdirectaddress](#zenclaim-deriveclaimdirectaddress)
+### zenclaim-deriveclaimdirectaddress
 
 Deterministically generate a P2PK ZEN address from a Base ETH address. 
 
@@ -470,7 +470,7 @@ Drop the dashes when creating an options object for module use.
   -a="" -nt="" -v
 ```
 
-### [zenclaim-claimdirect](#zenclaim-claimdirect)
+### zenclaim-claimdirect
 This method distributes a balance from a derived ZEN address to the ETH address on Base. Derive a P2PKH ZEN address from the ETH address prior to the snapshot (use [zenclaim-deriveclaimdirectaddress](#zenclaim-deriveclaimdirectaddress)), and send the balance to this derived ZEN address.
 
 The balance would be unspendable on Horizen 1 as no private key corresponding with the ZEN address exists, but funds would be locked in this address until distributed on Base.
@@ -522,7 +522,7 @@ Drop the dashes when creating an options object for module use.
   -a="" -pk="" -gf= -pf= -nt="" -h -v
 ```
 
-### [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)
+### zenclaim-deriveclaimdirectmultisig
 Deterministically generate a P2SH ZEN multisig address and redeem script from a Base ETH address and ZEN public key. 
 
 As a CLI:
@@ -570,7 +570,7 @@ Drop the dashes when creating an options object for module use.
 ```
 
 
-### [zenclaim-claimdirectmultisigaddress](#zenclaim-claimdirectmultisigaddress)
+### zenclaim-claimdirectmultisigaddress
 This method distributes a balance from a derived ZEN multisig address to the ETH address on Base. Derive a P2SH ZEN multisig address from the ETH address prior to the snapshot (use [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)), and send the balance to this derived ZEN multisig address.
 
 As a CLI:
@@ -622,7 +622,7 @@ Drop the dashes when creating an options object for module use.
   -rs="" -a="" -pk="" -gf= -pf= -nt="" -h -v
 ```
 
-## [Submitting a Claim For a ZEN Address](#submitting-a-claim-for-a-zen-address)
+## Submitting a Claim For a ZEN Address
 
 ```bash
 ### Quick Start Example (Transparent Address)
@@ -666,7 +666,7 @@ In this case:
 * Use the zenclaim-message tool to verify the message.  
 * If the message valid, continue with **Submit the Claim Using zenclaim-claimzenaddress**
 
-## [Submitting a Claim for a Multisig Address](#submitting-a-claim-for-a-multisig-address)
+## Submitting a Claim for a Multisig Address
 This example is for a 3 of 5 multisig. Only submit the required number of signatures.
 
 Quick Start Example (Multisig Address)
@@ -713,9 +713,10 @@ npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" -
    * Use this transaction hash to verify the transaction on the Base network using a block explorer like basescan.org.  
    * Confirm that the ZEN has been transferred to the destination Base address.
 
-## [Troubleshooting](#troubleshooting)
+## Troubleshooting
 
 If referencing the aliases of the modules does not resolve, the modules may be loaded by file names. The full path may be needed depending on where they were downloaded.  
+
 Locations relative to the repository folder:
 
 ```
@@ -724,5 +725,9 @@ zenclaim-signtool: "bin/signtool.js",
 zenclaim-verifymessage: "bin/verifymessage.js",
 zenclaim-claimzenaddress: "bin/claimzenaddress.js",
 zenclaim-recoverpubkey: "bin/recoverpubkey.js",
-zenclaim-claimmultisigaddress: "bin/claimmultisigaddress.js"
+zenclaim-claimmultisigaddress: "bin/claimmultisigaddress.js",
+zenclaim-deriveclaimdirectaddress: "./bin/deriveclaimdirectaddress.js",
+zenclaim-deriveclaimdirectmultisig: "./bin/deriveclaimdirectmultisig.js",
+zenclaim-claimdirect: "./bin/claimdirect.js",
+zenclaim-claimdirectmultisig: "./bin/claimdirectmultisig.js"
 ```
