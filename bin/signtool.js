@@ -20,8 +20,8 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -pk="" -ms="" -cp= -nt="" -s -h -v
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM and the destination address on Base
-  Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
+The message to sign should consist of the word ${ZENCLAIM_MESSAGE_PREFIX_TESTNET} and the destination address on Base
+  Example "${ZENCLAIM_MESSAGE_PREFIX_TESTNET}0x1448283357e8FB6EA763a78836FFD5517149BF70"
 See the multisig claim tool for the message to sign for multisig addresses. That tool can generate the message to sign for you.
 ${securityConsideration.yellow}
 `;

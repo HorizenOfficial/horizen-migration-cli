@@ -24,8 +24,8 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -za="" -da="" -sg="" -pk="" -gf= -pf= -nt="" -h -v
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM and the destination address (starting with 0x) on Base  and should be signed with the public key of the zenAddress
-  Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
+The message to sign should consist of the word ${ZENCLAIM_MESSAGE_PREFIX_TESTNET} and the destination address (starting with 0x) on Base  and should be signed with the public key of the zenAddress
+  Example "${ZENCLAIM_MESSAGE_PREFIX_TESTNET}0x1448283357e8FB6EA763a78836FFD5517149BF70"
 `;
 
 // Allowed arguments

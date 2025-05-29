@@ -32,7 +32,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 
 ## Overview
 
-A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a [UI](https://pentesting.horizen.io/playground) to make simple claims. This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
+A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a [UI](https://horizen.io/zt3claim) to make simple claims. This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
 
 * The general claim process is to create and sign a message with the private key of the ZEN address that contains the ZEN.  
 * The message and the Base destination is then sent to a contract on the Base network after verifying the message and the balance.  
@@ -371,7 +371,7 @@ Submit a claim for a ZEN multisig address. This tool helps you create and submit
 As a CLI:
 
 ```bash
-npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --destinationAddress="base_address_here"  --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"...\"]"
+npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --redeemScript="your_redeem_script_here" --signatures="[\"signature1\",\"signature2\",\"...\"]" --senderAddressPrivKey="base_senders_private_key" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -402,7 +402,7 @@ claimMultisigAddress(options).then(result => {
 
 #### Arguments/Options:
 
-The redeem script, Base destination address, and signatures are required.  
+The ZEN multisig address, Base destination address, redeem script, signatures, and sender private key are required.  
 Drop the dashes when creating an options object for module use.
 
 ```js
@@ -424,7 +424,7 @@ Drop the dashes when creating an options object for module use.
 The message to sign should consist of the word “ZT3CLAIM” the base58check-decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding. The addresses must be in the format 0x{hex}. Example "ZT3CLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"  
 Use the `--buildmessage` option to create the message to sign.  
 
-Signatures must be created with the public key of each zenAddress used to create the multisig address. Only use the required number of signatures, e.g. a 3 of 5 multisig expects 3 of the signatures. Any other quantity will throw an error.  The signatures may be in any order in the array.
+Signatures must be created with the private key of each zenAddress used to create the multisig address. Only use the required number of signatures, e.g. a 3 of 5 multisig expects 3 of the signatures. Any other quantity will throw an error.  The signatures may be in any order in the array.
 
 
 ### zenclaim-deriveclaimdirectaddress
@@ -578,11 +578,14 @@ Drop the dashes when creating an options object for module use.
 
 ### zenclaim-claimdirectmultisigaddress
 This method distributes a balance from a derived ZEN multisig address to the ETH address on Base. Derive a P2SH ZEN multisig address from the ETH address prior to the snapshot (use [zenclaim-deriveclaimdirectmultisig](#zenclaim-deriveclaimdirectmultisig)), and send the balance to this derived ZEN multisig address.
+	
+Funds sent to the derived ZEN multisig address are spendable on Horizen 1 prior to the snapshot with the ZEN public/private key pair used to derive the ZEN multisig address.
 
 As a CLI:
 
 ```bash
-npx zenclaim-claimmultisigaddress --redeemScript="<redeem_script>" --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="testnet" 
+npx zenclaim-claimdirectmultisigaddress
+ --redeemScript="<redeem_script>" --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="testnet" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -658,7 +661,7 @@ Below are the basic steps to submit a claim for ZEN transparent addresses using 
      * `npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key"`  
    * This tool will validate the claim and send a transaction to the smart contract on Base.  
    * The transaction hash is returned when successful.  
-5. **Verify the Transaction:** After submitting the claim, verify the transaction using the transaction hash returned in the previous step on the Base network using a block explorer (https://basescan.org/). Check that the ZEN has been transferred to your destination Base address.
+5. **Verify the Transaction:** After submitting the claim, verify the transaction using the transaction hash returned in the previous step on the Base network using a block explorer (https://sepolia.basescan.org/)[https://sepolia.basescan.org/]. Check that the ZEN has been transferred to your destination Base address.
 
 ## Alternatives
 
@@ -714,7 +717,7 @@ Submitting a claim for a multisig address requires coordination with the holders
    * Note: Adjust the quotes for the operating system you are using (the backslash escape character may not be needed).  In module use, signatures must be an array.  
 7. **Verify the Transaction:**  
    * After submitting the claim, the tool will return a transaction hash if successful.  
-   * Use this transaction hash to verify the transaction on the Base network using a block explorer like basescan.org.  
+   * Use this transaction hash to verify the transaction on the Base network using a block explorer like [https://sepolia.basescan.org/](https://sepolia.basescan.org/).  
    * Confirm that the ZEN has been transferred to the destination Base address.
 
 ## Troubleshooting

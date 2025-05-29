@@ -27,9 +27,9 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v -b
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM the base58check decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding
+The message to sign should consist of the word ${ZENCLAIM_MESSAGE_PREFIX_TESTNET} the base58check decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding
 The addresses must be in the format 0x{hex}.
-Example "ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"
+Example "${ZENCLAIM_MESSAGE_PREFIX_TESTNET}0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"
 Signatures must be created with the public key of each zenAddress used to create the multisig address. 
 `;
 
