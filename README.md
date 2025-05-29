@@ -1,4 +1,4 @@
-# Zenclaim CLI Tool
+# ZEN Claim CLI Tool
 
 A command line utility for claiming existing ZEN migrated to Base. There are multiple tools included that may be used on the command line or as a node module in other Node.js applications.
 
@@ -41,7 +41,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 
 ## Overview
 
-A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a website to make simple claims (see horizen.io website). This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
+A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a [UI](https://pentesting.horizen.io/playground) to make simple claims. This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
 
 * The general claim process is to create and sign a message with the private key of the ZEN address that contains the ZEN.  
 * The message and a Base destination is then sent to a contract on the Base network after verifying the message and the balance.  
@@ -54,13 +54,14 @@ Tools included allow you to:
 - recover ZEN addresses and private keys from a seed phrase  
 - sign a message with a private key  
 - verify a signed message  
-- submit a claim for a standard transparent address  
-- submit a claim for a multisig address  
 - return the public key recovered from a signed message
+- submit a claim for a standard transparent address  
+- submit a claim for a multisig address
 
 ## **SECURITY CONSIDERATIONS**
 
-This tool requires seed phrases and private keys on both ZEN and Base networks for some of the tools. Steps should be taken to protect the secret values in all environments. .  
+This tool requires seed phrases and private keys on both ZEN and Base networks for some of the commands. Steps should be taken to protect the secret values in all environments.  
+
 Please follow these precautions to avoid leaking sensitive information:
 
 * Disable shell history before running the tool to prevent secrets from being recorded:  
