@@ -30,7 +30,7 @@ describe('verifymessage.js', () => {
     expect(result).toHaveProperty('error');
   });
   test('verifyMessage should return true verifying a testnet message and signature', () => {
-    const result = verifyMessage({ message: messageTestnet, network: "testnet", zenAddress: addressTestnet, signature: sigTestnet });
+    const result = verifyMessage({ message: messageTestnet, zenAddress: addressTestnet, signature: sigTestnet });
     expect(result).toBe(true);
   });
   test('verifyMessage should return true verifying a mainnet message and signature', () => {
@@ -38,7 +38,7 @@ describe('verifymessage.js', () => {
     expect(result).toBe(true);
   });
   test('verifyMessage should return true verifying a testnet multisig message and signature', () => {
-    const result = verifyMessage({ message: messageMultisig, network: "testnet", zenAddress: addressTestnet, signature: sigMultisig });
+    const result = verifyMessage({ message: messageMultisig, zenAddress: addressTestnet, signature: sigMultisig });
     expect(result).toBe(true);
   });
 

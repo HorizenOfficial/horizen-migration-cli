@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { isEthAddress, verifySignedMessage, checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
-import { ZENCLAIM_MESSAGE_PREFIX, ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
+import { verifySignedMessage, checkHelp, listArgs, run, help } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -13,7 +12,6 @@ arguments:
  --message="" (mandatory) 
  --zenAddress="" (mandatory)
  --signature="" (mandatory)
- --network="mainnet||testnet" (optional, default mainnet)
  --help  display this help
  --verbose display arguments received
 ${'Short forms of arguments'.cyan} 
@@ -21,8 +19,8 @@ ${'Short forms of arguments'.cyan}
 `;
 
 // Allowed arguments
-const long = ['--message', '--zenAddress', '--signature', '--network', '--help', '--verbose'];
-const short = ['-ms', '-za', '-sg', '-nt', '-h', '-v'];
+const long = ['--message', '--zenAddress', '--signature', '--help', '--verbose'];
+const short = ['-ms', '-za', '-sg', '-h', '-v'];
 const allowed = long.concat(short);
 
 // Function to parse arguments
@@ -38,7 +36,6 @@ function parseArguments(args) {
     if (key === '-ms' || key === '--message') { options.message = val; continue; }
     if (key === '-za' || key === '--zenAddress') { options.zenAddress = val; continue; }
     if (key === '-sg' || key === '--signature') { options.signature = val; continue; }
-    if (key === '-nt' || key === '--network') { options.network = val; continue; }
     if (key === '-v' || key === '--verbose') { options.verbose = true; continue; }
   }
 
@@ -55,10 +52,9 @@ function parseArguments(args) {
 // Function to verify the message
 function verifyMessage(options) {
   if (options.verbose)  console.log("options=", options);
-  const testnet = options.network === 'testnet';
 
   try {
-    // message , zenAddress, signature) 
+    // message , zenAddress, signature
     if (!options.message) throw new Error('Missing message');
     if (!options.zenAddress) throw new Error('Missing zenAddress');
     if (!options.signature) throw new Error('Missing signature');
