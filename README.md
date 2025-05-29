@@ -108,7 +108,7 @@ Example Usage:
 As a CLI:
 
 ```bash
-npx zenclaim-seedtool --mnemonicPhrase="your seed phrase here" 
+npx zenclaim-seedtool --mnemonicPhrase="your seed phrase here" --network="testnet"
 ```
 
 As a module:
@@ -118,6 +118,7 @@ import { deriveAddresses } from 'zenclaim-seedtool';
 
 const options = {
   mnemonicPhrase: "your usually 12 or 24 seed phrase here",
+  network: "testnet"
 };
 
 deriveAddresses(options).then(result => {
@@ -162,7 +163,7 @@ Returns an object with an address and signature or an object with an error messa
 As a CLI
 
 ```bash
-npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="your_message_here"
+npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="your_message_here" --network="testnet"
 ```
 
 As a module:
@@ -172,7 +173,8 @@ import { signMessage } from 'zenclaim-signtool';
 
 const options = { 
   privKey: "your_private_key_here", 
-  message: "your_message_here" 
+  message: "your_message_here",
+  network: "testnet"
 }
 
 signMessage(options).then(result => {
@@ -213,7 +215,7 @@ Returns either true or false on success or an object with an error message.
 As a CLI:
 
 ```bash
-npx zenclaim-verifymessage --message="your_signed_message_here" --zenAddress="your_znaddress_here" --signature="signature_here"
+npx zenclaim-verifymessage --message="your_signed_message_here" --zenAddress="your_znaddress_here" --signature="signature_here" --network="testnet"
 ```
 
 As a Module:
@@ -224,7 +226,8 @@ import { verifyMessage } from 'zenclaim-verifymessage';
 const options = { 
   message: "message_here", 
   zenAddress: "zen_address_here", 
-  signature: "signature_here"
+  signature: "signature_here",
+  network: "testnet"
 };
 
 verifyMessage(options).then(result => {
@@ -267,7 +270,7 @@ Returns the transaction hash on success or an object with an error message.
 As a CLI:
 
 ```bash
-npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key"
+npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key" --network="testnet"
 ```
 
 As a module:
@@ -279,7 +282,8 @@ const options = {
   zenAddress: "source_zen_address",
   destinationAddress: "base_destination_address",
   signature: "signature_from signed_message",
-  senderAddressPrivKey: "base_senders_private_key"
+  senderAddressPrivKey: "base_senders_private_key",
+  network: "testnet"
 };
 
 claimZenAddress(options).then(result => {
@@ -325,7 +329,7 @@ Returns an object with the x and y coordinates or an object with an error messag
 As a CLI:
 
 ```bash
-npx zenclaim-recoverpubkey --message="your_signed_message_here" --zenAddress="source_address_here" --signature="signature_here"
+npx zenclaim-recoverpubkey --message="your_signed_message_here" --zenAddress="source_address_here" --signature="signature_here" --network="testnet"
 ```
 
 As a module:
@@ -336,7 +340,8 @@ import { recoverPubKey } from 'zenclaim-recoverpubkey';
 const options = { 
   message: "your_signed_message_here",
   zenAddress: "source_address_here",
-  signature: "signature_here" 
+  signature: "signature_here",
+  network: "testnet"
 };
 
 recoverPubKey(options).then(result => {
@@ -447,7 +452,8 @@ As a module:
 import { deriveClaimDirectAddress } from 'zenclaim-deriveclaimdirectaddress';
 
 const options = {
-  baseEthAddress: "<base_eth_address>"
+  baseEthAddress: "<base_eth_address>",
+  network: "testnet"
 };
 
 deriveClaimDirectAddress(options).then(result => {
@@ -495,7 +501,8 @@ import { claimDirect } from 'zenclaim-claimdirect';
 
 const options = {
   baseEthAddress: "<base_eth_address>",
-  senderAddressPrivKey: "<sender_private_key>"
+  senderAddressPrivKey: "<sender_private_key>",
+  network: "testnet"
 };
 
 claimDirect(options).then(result => {
@@ -545,7 +552,8 @@ import { deriveClaimDirectMultisig } from 'zenclaim-deriveclaimdirectmultisig';
 
 const options = {
   zenAddressPubKey: "<zen_public_key>",
-  baseEthAddress: "<base_eth_address>"
+  baseEthAddress: "<base_eth_address>",
+  network: "testnet"
 };
 
 deriveClaimDirectMultisig(options).then(result => {
@@ -594,7 +602,8 @@ import { claimDirectMultisig } from 'zenclaim-claimdirectmultisig';
 const options = {
   redeemScript: "<redeem_script>",
   baseEthAddress: "<base_eth_address>",
-  senderAddressPrivKey: "<sender_private_key>"
+  senderAddressPrivKey: "<sender_private_key>",
+  network: "testnet"
 };
 
 claimDirectMultisig(options).then(result => {
