@@ -115,4 +115,4 @@ async function main(args) {
 export { deriveClaimDirectAddress };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'deriveclaimdirectaddress.js', main);
+run(process.argv, 'deriveclaimdirectaddress', main);

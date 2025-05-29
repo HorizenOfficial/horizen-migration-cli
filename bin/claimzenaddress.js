@@ -131,4 +131,4 @@ async function main(args) {
 export { claimZen };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'claimzenaddress.js', main);
+run(process.argv, 'claimzenaddress', main);

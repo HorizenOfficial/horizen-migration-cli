@@ -172,4 +172,4 @@ async function main(args) {
 export { claimMultisig };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'claimmultisigaddress.js', main);
+run(process.argv, 'claimmultisigaddress', main);

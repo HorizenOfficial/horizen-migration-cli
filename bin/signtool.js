@@ -114,4 +114,4 @@ async function main(args) {
 export { signMessage };
 
 // If the script is run directly, execute the main function'
-run(process.argv,'signtool.js', main);
+run(process.argv,'signtool', main);

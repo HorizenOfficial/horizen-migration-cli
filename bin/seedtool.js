@@ -112,4 +112,4 @@ async function main(args) {
 export { deriveAddresses };
 
 // If the script is run directly, execute the main function
-run(process.argv,'seedtool.js', main);
+run(process.argv, 'seedtool', main);

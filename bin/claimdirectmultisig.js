@@ -121,4 +121,4 @@ async function main(args) {
 export { claimDirectMultisig };
 
 // If the script is run directly, execute the main function
-run(process.argv, 'claimdirectmultisig.js', main);
+run(process.argv, 'claimdirectmultisig', main);
