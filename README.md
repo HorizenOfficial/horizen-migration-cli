@@ -34,7 +34,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 
 A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a [UI](https://horizen.io/zt3claim) to make simple claims. This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
 
-* The general claim process is to create and sign a message with the private key of the ZEN address that contains the ZEN.  
+* The general claim process is to create and sign a message containing the Base destination address with the private key of the ZEN address that contains the ZEN.  
 * The message and the Base destination is then sent to a contract on the Base network after verifying the message and the balance.  
 * The contract sends the amount found in the snapshot to the destination address on Base.
 
@@ -286,7 +286,7 @@ recoverPubKey(options).then(result => {
 
 #### Arguments/Options:
 
-The signed message and signature are required.  
+The signed message, ZEN address and signature are required.  
 Drop the dashes when creating an options object for module use.
 
 ```js
@@ -343,7 +343,7 @@ claimZenAddress(options).then(result => {
 
 #### Arguments/Options:
 
-The private key and Base destination address are required. Defaults are for ZEN mainnet.  
+The ZEN address, Base destination address, signature, and sender address private key are required. Defaults are for ZEN mainnet.  
 Drop the dashes when creating an options object for module use.
 
 ```js
