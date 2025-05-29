@@ -152,7 +152,7 @@ Notes: help, stringify and short forms are only available in the CLI.
 
 Sign a special message with the private key of the ZEN source address. See instructions for building a message for a multisig address in the multisig tool as it has a different format.
 
-The format of the message to sign is the word "ZENCLAIM" plus the address (checksum format) of the account on Base to receive the funds. The private key is from the address containing the ZEN at the time of the snapshot.  For testnet use “ZT1CLAIM”.
+The format of the message to sign is the word "ZENCLAIM" plus the address (checksum format) of the account on Base to receive the funds. The private key is from the address containing the ZEN at the time of the snapshot.  For testnet use “ZT2CLAIM”.
 
 Returns an object with an address and signature or an object with an error message.
 
@@ -197,7 +197,7 @@ Drop the dashes when creating the options object for module use.
   -pk="" -ms="" -cp= -nt="" -s -h -v
 ```
 
-The message to sign should consist of the word ZENCLAIM and the destination address on Base Example "ZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" See the multisig claim tool for the message to sign for multisig addresses. That tool can generate a message to sign for you.   For testnet use “ZT1CLAIM”.
+The message to sign should consist of the word ZENCLAIM and the destination address on Base Example "ZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" See the multisig claim tool for the message to sign for multisig addresses. That tool can generate a message to sign for you.   For testnet use “ZT2CLAIM”.
 
 ### zenclaim-verifymessage
 
@@ -259,7 +259,7 @@ Returns the transaction hash on success or an object with an error message.
 As a CLI:
 
 ```bash
-npx zenclaim-claimzenaddress --zenAddress="source_address_here" --detinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key"
+npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key"
 ```
 
 As a module:
@@ -358,8 +358,6 @@ Drop the dashes when creating an options object for module use.
   -ms="" -za="" -sg="" -h -v 
 ```
 
----
-
 ### zenclaim-claimmultisigaddress
 
 Submit a claim for a ZEN multisig address. This tool helps you create and submit a claim for ZEN funds from a multisig address to a Base destination address. It also can generate the message to sign for multisig claims.
@@ -367,7 +365,7 @@ Submit a claim for a ZEN multisig address. This tool helps you create and submit
 As a CLI:
 
 ```bash
-npx zenclaim-claimmultisigaddress   --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --detinationAddress="base_address_here"  --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"...\"]"
+npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --destinationAddress="base_address_here"  --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"...\"]"
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -419,7 +417,7 @@ Drop the dashes when creating an options object for module use.
 
 The message to sign should consist of the word “ZENCLAIM” the base58check-decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding. The addresses must be in the format 0x{hex}. Example "ZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"  
 Use the \--buildmessage feature to create the message to sign.  
-Note:   For testnet use “ZT1CLAIM”.
+Note:   For testnet use “ZT2CLAIM”.
 
 Signatures must be created with the public key of each zenAddress used to create the multisig address. Only use the required number of signatures. e.g. a 3 of 5 multisig expects 3 of the signatures. Any other quantity will throw an error.  The signatures may be in any order in the array.
 
@@ -511,7 +509,7 @@ Drop the dashes when creating an options object for module use.
 
 ```js
  --baseEthAddress="" (mandatory, Ethereum address on Base) 
-  --senderAddressPrivKey="" (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)
+ --senderAddressPrivKey="" (mandatory, private key of Horizen 2 address sending the transaction and paying the fee)
  --maxFeePerGas=int (optional, wei) 
  --maxPriorityFeePerGas=int (optional, wei) 
  --network="mainnet||testnet" (optional, default "mainnet")
@@ -622,6 +620,8 @@ Drop the dashes when creating an options object for module use.
   -rs="" -a="" -pk="" -gf= -pf= -nt="" -h -v
 ```
 
+---
+
 ## Submitting a Claim For a ZEN Address
 
 ```bash
@@ -652,7 +652,7 @@ Below are the basic steps to submit a claim for ZEN transparent addresses using 
    * The transaction hash is returned when successful.  
 5. **Verify the Transaction:** After submitting the claim, verify the transaction using the transaction hash returned in the previous step on the Base network using a block explorer (https://basescan.org/). Check that the ZEN has been transferred to your destination Base address.
 
-Note:  For testnet use “ZT1CLAIM”.
+Note:  For testnet use “ZT2CLAIM”.
 
 ## Alternatives
 
@@ -692,7 +692,7 @@ Submitting a claim for a multisig address requires coordination with the holders
 npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --buildmessage
 ```
 
-   * The tool will return the exact message that must be signed by each key holder. This message will be in the format "ZENCLAIM{multisig\_address\_decoded}{destination\_address}".   For testnet use “ZT1CLAIM”.  
+   * The tool will return the exact message that must be signed by each key holder. This message will be in the format "ZENCLAIM{multisig\_address\_decoded}{destination\_address}".   For testnet use “ZT2CLAIM”.  
 4. **Interact with Key Holders:**  
    * Share the message generated in the previous step with each of the three key holders.  
    * Instruct each key holder to sign the message using their respective private key and any appropriate tool (e.g., \`zenclaim-signtool\` or another signing method like the Sphere application).  
@@ -726,8 +726,8 @@ zenclaim-verifymessage: "bin/verifymessage.js",
 zenclaim-claimzenaddress: "bin/claimzenaddress.js",
 zenclaim-recoverpubkey: "bin/recoverpubkey.js",
 zenclaim-claimmultisigaddress: "bin/claimmultisigaddress.js",
-zenclaim-deriveclaimdirectaddress: "./bin/deriveclaimdirectaddress.js",
-zenclaim-deriveclaimdirectmultisig: "./bin/deriveclaimdirectmultisig.js",
-zenclaim-claimdirect: "./bin/claimdirect.js",
-zenclaim-claimdirectmultisig: "./bin/claimdirectmultisig.js"
+zenclaim-deriveclaimdirectaddress: "bin/deriveclaimdirectaddress.js",
+zenclaim-deriveclaimdirectmultisig: "bin/deriveclaimdirectmultisig.js",
+zenclaim-claimdirect: "bin/claimdirect.js",
+zenclaim-claimdirectmultisig: "bin/claimdirectmultisig.js"
 ```
