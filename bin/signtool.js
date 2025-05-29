@@ -53,9 +53,14 @@ function parseArguments(args) {
 
   if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-  if (!options.privKey || !options.message || options.message === '' || options.message === 'undefined' || options.message.length < 50) {
+  if (!options.privKey || !options.message) {
     console.error(`private key and message are required. ${help}`.red);
     process.exit(1);
+  }
+
+  if (options.message.length < 50) {
+    console.error(`message is expected to be at least 50 characters long. ${help}`.red);
+    process.exit(1);   
   }
 
   return options;
@@ -71,6 +76,7 @@ function signMessage(options) {
     // validation checks
     if (!options.privKey) throw new Error('Missing private key');
     if (!options.message) throw new Error('Missing message');
+    if (options.message.length < 50) throw new Error('Message is expected to be at least 50 characters long')
 
     const signature = sign(
       options.message,

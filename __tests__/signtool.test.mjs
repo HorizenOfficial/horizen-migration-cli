@@ -24,14 +24,22 @@ describe('signtool.js', () => {
   const expectedSigMultisig = 'HA+OyDIOm+9qSQe92xsABiKm9FZeTNbvGfVBUW4Bg1I7LXEHZDAdlICFF2RdIUkLkEgq3Ms3DgapJ8Lt4HlqGOA=';
 
   test('signMessage should reject a missing or invalid message', () => {
-    const isValid = signMessage({ privKey, network});
-    expect(typeof isValid).toBe('object');
-    expect(isValid).toHaveProperty('error');
+    const inValid = signMessage({ privKey, network});
+    expect(typeof inValid).toBe('object');
+    expect(inValid).toHaveProperty('error');
   });
+  test('signMessage should reject a message that is too short', () => {
+    const inValid = signMessage({ message: "too-short", privKey, network});
+    expect(typeof inValid).toBe('object');
+    expect(inValid).toHaveProperty('error');
+    expect(inValid).toEqual(
+      expect.objectContaining({ error: expect.stringContaining('Message is expected to be at least 50 characters long') })
+    );
+  })
   test('signMessage should reject an invalid private key', () => {
-    const isValid = signMessage({message, privKey:'123456'});
-    expect(typeof isValid).toBe('object');
-    expect(isValid).toHaveProperty('error');
+    const inValid = signMessage({message, privKey:'123456'});
+    expect(typeof inValid).toBe('object');
+    expect(inValid).toHaveProperty('error');
   });
   test('signMessage should return a mainnet address on an invalid testnet', () => {
     const result = signMessage({message, privKey, compressed, network:'invalid testnet'});
