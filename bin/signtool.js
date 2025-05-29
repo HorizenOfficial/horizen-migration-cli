@@ -4,11 +4,12 @@ import { sign } from "../src/utils/signutils.js";
 import { checkHelp, listArgs, run, help, securityConsideration } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
+import { ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 // HELP
-const usage = `${'Usage: npx zenclaim-signtool --argument="" --argument="" ... '.cyan}
+const usage = `${'Usage: npx zenclaim-signtool --privKey="" --message="" ... '.cyan}
 arguments:
  --privKey="" (mandatory, WIF (Wallet Import Format) or raw format private key)
  --message="" (mandatory) 
@@ -20,8 +21,8 @@ arguments:
 ${'Short forms of arguments'.cyan} 
   -pk="" -ms="" -cp= -nt="" -s -h -v
 ${'Claiming ZEN:'.cyan}
-The message to sign should consist of the word ZENCLAIM and the destination address on Base
-  Example "ZENCLAIM0x1448283357e8FB6EA763a78836FFD5517149BF70"
+The message to sign should consist of the word ${ZENCLAIM_MESSAGE_PREFIX_TESTNET} and the destination address on Base
+  Example "${ZENCLAIM_MESSAGE_PREFIX_TESTNET}0x1448283357e8FB6EA763a78836FFD5517149BF70"
 See the multisig claim tool for the message to sign for multisig addresses. That tool can generate the message to sign for you.
 ${securityConsideration.yellow}
 `;
@@ -53,9 +54,14 @@ function parseArguments(args) {
 
   if (options.verbose) console.log('zenclaim-signtool CLI'.green, version.yellow, 'by The Horizen Foundation'.grey);
 
-  if (!options.privKey || !options.message || options.message === '' || options.message === 'undefined' || options.message.length < 50) {
+  if (!options.privKey || !options.message) {
     console.error(`private key and message are required. ${help}`.red);
     process.exit(1);
+  }
+
+  if (options.message.length < 50) {
+    console.error(`message is expected to be at least 50 characters long. ${help}`.red);
+    process.exit(1);   
   }
 
   return options;
@@ -71,6 +77,7 @@ function signMessage(options) {
     // validation checks
     if (!options.privKey) throw new Error('Missing private key');
     if (!options.message) throw new Error('Missing message');
+    if (options.message.length < 50) throw new Error('Message is expected to be at least 50 characters long')
 
     const signature = sign(
       options.message,
@@ -108,4 +115,4 @@ async function main(args) {
 export { signMessage };
 
 // If the script is run directly, execute the main function'
-run(process.argv,'signtool.js', main);
+run(process.argv,'signtool', main);

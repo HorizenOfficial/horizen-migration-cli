@@ -1,6 +1,6 @@
 {
   "name": "zenclaim-cli",
-  "version": "1.0.0-ZT2CLAIM",
+  "version": "1.0.0-ZT3CLAIM",
   "description": "command line tools for claiming zen on Horizen 2.0",
   "type": "module",
   "bin": {
@@ -10,10 +10,10 @@
     "zenclaim-claimzenaddress": "bin/claimzenaddress.js",
     "zenclaim-recoverpubkey": "bin/recoverpubkey.js",
     "zenclaim-claimmultisigaddress": "bin/claimmultisigaddress.js",
-    "zenclaim-deriveclaimdirectaddress": "./bin/deriveclaimdirectaddress.js",
-    "zenclaim-deriveclaimdirectmultisig": "./bin/deriveclaimdirectmultisig.js",
-    "zenclaim-claimdirect": "./bin/claimdirect.js",
-    "zenclaim-claimdirectmultisig": "./bin/claimdirectmultisig.js"
+    "zenclaim-deriveclaimdirectaddress": "bin/deriveclaimdirectaddress.js",
+    "zenclaim-deriveclaimdirectmultisig": "bin/deriveclaimdirectmultisig.js",
+    "zenclaim-claimdirect": "bin/claimdirect.js",
+    "zenclaim-claimdirectmultisig": "bin/claimdirectmultisig.js"
   },
   "exports": {
     "./zenclaim-seedtool": "./bin/seedtool.js",
