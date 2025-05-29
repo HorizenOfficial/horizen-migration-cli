@@ -12,7 +12,7 @@ const version = packageJson.version;
 // ///////////////////////////////////////////////////////////////////
 
 // CLI usage instructions
-const usage = `${'Usage: npx zenclaim-seedtool --argument1 --argument2... '.cyan}
+const usage = `${'Usage: npx zenclaim-seedtool --mnemonicPhrase="" ... '.cyan}
 arguments:
   --mnemonicPhrase="" (${'mandatory'.magenta} usually 12 or 24 words)
   --mnemonicPassword="" (optional, default "", seed password)
