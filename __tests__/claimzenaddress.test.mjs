@@ -4,9 +4,9 @@ import { claimZen } from '../bin/claimzenaddress.js';
 // The senderAddressPrivKey must maintain a small balance (gas) for the tests to complete. 
 describe('claimzenaddress.js', () => {
   const validOptions = {
-    zenAddress: "ztkBJxYRcZ4TqL6Ggj8DZAzzZRMHV26j5ri",
+    zenAddress: "ztfxWYCvZvnKku1Le5AQBTvp9DRGtHYTcsQ",
     destinationAddress: "0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC",
-    signature: "H4Z2sV/Ri3nfbX2zZSAfI0C8pBPTVEaBqqtMxe+whXnjAKuY3GjqVvuYkvj3vFOtbNdS4aIOL19l5B+xkQw43Fc=",
+    signature: "IIXdrtOTxgkx6ir0f0MOX3dPio+2HlhoOWe8M5h/rHMiXoqihhfovY6BUMwHbtJMEO/iM5wFsCmLAE+xtOtzjNE=",
     senderAddressPrivKey: 'db32c344d274a8c9f6d969c166efcbfa7bb112333669335b0524bff5647e7395',
     network: "testnet",
     isTest: true,
