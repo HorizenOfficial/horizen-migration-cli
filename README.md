@@ -651,14 +651,14 @@ Below are the basic steps to submit a claim for ZEN transparent addresses using 
 3. **Sign the Message Using zenclaim-signtool:**  
    * Use the `zenclaim-signtool` to sign the message created in the previous step.  
    * Provide your ZEN private key and the message to sign as arguments or options.  
-   * Command Line Example: `npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="ZT3CLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC"`  
+   * Command Line Example: `npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="ZT3CLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" --network="testnet"`  
    * This step will provide you with a signature.  
 4. **Submit the Claim Using zenclaim-claimzenaddress:**  
    * Use the `zenclaim-claimzenaddress` command to submit the claim.  
    * Provide the source ZEN address, the destination Base address, the signature obtained from the previous step, and the sender's private key for the Base network.  
    * The sender's private key should be associated with an address that has sufficient funds to cover gas fees.  
    * Command Line Example (all on one line):   
-     * `npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key"`  
+     * `npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key" --network="testnet"`  
    * This tool will validate the claim and send a transaction to the smart contract on Base.  
    * The transaction hash is returned when successful.  
 5. **Verify the Transaction:** After submitting the claim, verify the transaction using the transaction hash returned in the previous step on the Base network using a block explorer (https://sepolia.basescan.org/)[https://sepolia.basescan.org/]. Check that the ZEN has been transferred to your destination Base address.
@@ -678,12 +678,10 @@ In this case:
 ## Submitting a Claim for a Multisig Address
 This example is for a 3 of 5 multisig. Only submit the required number of signatures.
 
-Quick Start Example (Multisig Address)
-
 ### Quick Start Example (Multisig Address)
-1. **Build Message:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --destinationAddress="YourBaseAddress" --buildmessage`
+1. **Build Message:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --destinationAddress="YourBaseAddress" --network="testnet" --buildmessage`
 2. **Sign Message:** Each required key holder signs the message returned from the previous step using their private key (e.g., with `npx zenclaim-signtool`).
-3. **Claim ZEN:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --redeemScript="YourRedeemScript" --destinationAddress="YourBaseAddress" --senderAddressPrivKey="SendersBasePrivateKey" --signatures="[\"Signature1\",\"Signature2\",\"Signature3\"]"`
+3. **Claim ZEN:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --redeemScript="YourRedeemScript" --destinationAddress="YourBaseAddress" --senderAddressPrivKey="SendersBasePrivateKey" --signatures="[\"Signature1\",\"Signature2\",\"Signature3\"]" --network="testnet"`
 
 
 Submitting a claim for a multisig address requires coordination with the holders of the private keys. The following steps detail the process for a multisig address requiring three signatures using the `zenclaim-claimmultisigaddress` tool.
@@ -696,7 +694,7 @@ Submitting a claim for a multisig address requires coordination with the holders
    * Use the `zenclaim-claimmultisigaddress` tool with the `--buildmessage` option to create the message each key holder must sign. This step requires the multisig address and the destination address.  
    * Command Line Example:
       ```bash
-      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --buildmessage
+      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --network="testnet" --buildmessage
       ```
 
    * The tool will return the exact message that must be signed by each key holder. This message will be in the format `ZT3CLAIM{multisig_address_decoded}{destination_address}`.  
@@ -711,7 +709,7 @@ Submitting a claim for a multisig address requires coordination with the holders
    * Command Line Example (all on one line):
 
       ```bash
-      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --destinationAddress="base_address_here" --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"signature3\"]"
+      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --destinationAddress="base_address_here" --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"signature3\"]" --network="testnet"
       ```
 
    * Note: Adjust the quotes for the operating system you are using (the backslash escape character may not be needed).  In module use, signatures must be an array.  

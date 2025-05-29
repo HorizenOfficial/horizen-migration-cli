@@ -4,11 +4,12 @@ import { sign } from "../src/utils/signutils.js";
 import { checkHelp, listArgs, run, help, securityConsideration } from "../src/utils/claimutils.js";
 import 'colors';
 import { readFileSync } from 'fs';
+import { ZENCLAIM_MESSAGE_PREFIX_TESTNET } from "../src/lib/contractConsts.js";
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 const version = packageJson.version;
 
 // HELP
-const usage = `${'Usage: npx zenclaim-signtool --argument="" --argument="" ... '.cyan}
+const usage = `${'Usage: npx zenclaim-signtool --privKey="" --message="" ... '.cyan}
 arguments:
  --privKey="" (mandatory, WIF (Wallet Import Format) or raw format private key)
  --message="" (mandatory) 
