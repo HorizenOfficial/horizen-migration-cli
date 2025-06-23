@@ -32,7 +32,7 @@ A command line utility for claiming existing ZEN migrated to Base. There are mul
 
 ## Overview
 
-A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a [UI](https://horizen.io/tzenclaim) to make simple claims. This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
+A snapshot of all ZEN account balances was taken at a certain point in time and added to a smart contract on Base. A claim process was created to allow ZEN holders to claim their new ZEN by creating and submitting a claim.  There is a [UI](https://horizen.io/hbetaclaim) to make simple claims. This tool supports every step of the process for more complex or bulk claims, including those involving multisig addresses.
 
 * The general claim process is to create and sign a message containing the Base destination address with the private key of the ZEN address that contains the ZEN.  
 * The message and the Base destination is then sent to a contract on the Base network after verifying the message and the balance.  
@@ -69,7 +69,7 @@ To install the package, clone the repository from github.
 
 ```
 git clone https://github.com/HorizenOfficial/horizen-migration-cli.git
-git checkout 1.0.0-tZENCLAIM
+git checkout 1.0.0-HBETACLAIM
 ```
 
 In the `horizen-migration-cli` folder created, install the node modules.
@@ -147,7 +147,7 @@ Notes: help, stringify and short forms are only available in the CLI.
 Sign a special message with the private key of the ZEN source address. 
 See [instructions](#submitting-a-claim-for-a-multisig-address) for building a message for a multisig address in the multisig tool as it has a different format.
 
-The format of the message to sign is the word "tZENCLAIM" plus the address (checksum format) of the account on Base to receive the funds. The private key is from the address containing the ZEN at the time of the snapshot.
+The format of the message to sign is the word "HBETACLAIM" plus the address (checksum format) of the account on Base to receive the funds. The private key is from the address containing the ZEN at the time of the snapshot.
 
 Returns an object with an address and signature or an object with an error message.
 
@@ -196,7 +196,7 @@ Drop the dashes when creating the options object for module use.
   -pk="" -ms="" -cp= -nt="" -s -h -v
 ```
 
-The message to sign should consist of the word tZENCLAIM and the destination address on Base Example "tZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" See the multisig claim tool for the message to sign for multisig addresses. That tool can generate a message to sign for you.
+The message to sign should consist of the word HBETACLAIM and the destination address on Base Example "HBETACLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" See the multisig claim tool for the message to sign for multisig addresses. That tool can generate a message to sign for you.
 
 ### zenclaim-verifymessage
 
@@ -360,8 +360,8 @@ Drop the dashes when creating an options object for module use.
   -za="" -da="" -sg="" -pk="" -gf= -pf= -nt="" -h -v
 ```
 
-The message to sign should consist of the word tZENCLAIM and the destination address (starting with 0x) on Base and should be signed with the public key of the ZEN address of the funds. 
-Example: `"tZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC"`
+The message to sign should consist of the word HBETACLAIM and the destination address (starting with 0x) on Base and should be signed with the public key of the ZEN address of the funds. 
+Example: `"HBETACLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC"`
 
 
 ### zenclaim-claimmultisigaddress
@@ -421,7 +421,7 @@ Drop the dashes when creating an options object for module use.
   -ma="" -da="" -ra="" -sg="" -pk="" -gf= -pf= -nt="" -h -v -b
 ```
 
-The message to sign should consist of the word “tZENCLAIM” the base58check-decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding. The addresses must be in the format 0x{hex}. Example "tZENCLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"  
+The message to sign should consist of the word “HBETACLAIM” the base58check-decoded representation of the multisig address and the destination Ethereum address on Base L2 in EIP-55 mixed-case checksum address encoding. The addresses must be in the format 0x{hex}. Example "HBETACLAIM0x7caa11b3e0cdf22e9af9a4c5ac1cdc80938c34180x1448283357e8FB6EA763a78836FFD5517149BF70"  
 Use the `--buildmessage` option to create the message to sign.  
 
 Signatures must be created with the private key of each zenAddress used to create the multisig address. Only use the required number of signatures, e.g. a 3 of 5 multisig expects 3 of the signatures. Any other quantity will throw an error.  The signatures may be in any order in the array.
@@ -637,8 +637,8 @@ Drop the dashes when creating an options object for module use.
 ## Submitting a Claim For a ZEN Address
 
 ### Quick Start Example (Transparent Address)
-1.  **Create Message:** `tZENCLAIM0xYourBaseAddressHere`
-2.  **Sign Message:** `npx zenclaim-signtool --privKey="YourPrivateKey" --message="tZENCLAIM0xYourBaseAddressHere"`
+1.  **Create Message:** `HBETACLAIM0xYourBaseAddressHere`
+2.  **Sign Message:** `npx zenclaim-signtool --privKey="YourPrivateKey" --message="HBETACLAIM0xYourBaseAddressHere"`
 3.  **Claim ZEN:** `npx zenclaim-claimzenaddress --zenAddress="YourZenAddress" --destinationAddress="0xYourBaseAddressHere" --signature="YourMessageSignature" --senderAddressPrivKey="SendersBasePrivateKey"`
 
 
@@ -646,12 +646,12 @@ Below are the basic steps to submit a claim for ZEN transparent addresses using 
 
 1. **Prepare the Destination Address:** Identify the Base network address where you want to receive the ZEN. Ensure it is in the correct format (starting with `0x` and in checksum format).  
 2. **Create the Message to Sign:**  
-   * Construct the message by combining the word "tZENCLAIM" with your Base destination address.  
-   * Example: `tZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC`  
+   * Construct the message by combining the word "HBETACLAIM" with your Base destination address.  
+   * Example: `HBETACLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC`  
 3. **Sign the Message Using zenclaim-signtool:**  
    * Use the `zenclaim-signtool` to sign the message created in the previous step.  
    * Provide your ZEN private key and the message to sign as arguments or options.  
-   * Command Line Example: `npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="tZENCLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" --network="testnet"`  
+   * Command Line Example: `npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="HBETACLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" --network="testnet"`  
    * This step will provide you with a signature.  
 4. **Submit the Claim Using zenclaim-claimzenaddress:**  
    * Use the `zenclaim-claimzenaddress` command to submit the claim.  
@@ -697,7 +697,7 @@ Submitting a claim for a multisig address requires coordination with the holders
       npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --network="testnet" --buildmessage
       ```
 
-   * The tool will return the exact message that must be signed by each key holder. This message will be in the format `tZENCLAIM{multisig_address_decoded}{destination_address}`.  
+   * The tool will return the exact message that must be signed by each key holder. This message will be in the format `HBETACLAIM{multisig_address_decoded}{destination_address}`.  
 4. **Interact with Key Holders:**  
    * Share the message generated in the previous step with each of the three key holders.  
    * Instruct each key holder to sign the message using their respective private key and any appropriate tool (e.g., `zenclaim-signtool` or another signing method like the Sphere application).  
