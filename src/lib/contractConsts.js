@@ -1,7 +1,7 @@
 // production:
-export const ZEND_BACKUP_VAULT_CONTRACT_ADDRESS = "0x87Fee5F83B50843D13968D263085D7CDc242eD39";
+export const ZEND_BACKUP_VAULT_CONTRACT_ADDRESS = "0x1Ee188bDf19eBF04B73Ab6FFcec2a864cd4774F2";
 /* NEED ADDRESS for ZENBackupVault when deployed on base mainnet */
-export const ZENCLAIM_MESSAGE_PREFIX = "HBETACLAIM";
+export const ZENCLAIM_MESSAGE_PREFIX = "ZENCLAIM";
 
 // testnet: base sepolia. (explorer - sepolia.basescan.org) chain id 84532
 export const ZEND_BACKUP_VAULT_CONTRACT_ADDRESS_TESTNET = '0x8503cDA4330AeeeF480C3ef029645db2Fe6B0E60';

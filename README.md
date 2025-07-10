@@ -99,7 +99,7 @@ Example Usage:
 As a CLI:
 
 ```bash
-npx zenclaim-seedtool --mnemonicPhrase="your seed phrase here" --network="testnet"
+npx zenclaim-seedtool --mnemonicPhrase="your seed phrase here" --network="mainnet"
 ```
 
 As a module:
@@ -109,7 +109,7 @@ import { deriveAddresses } from 'zenclaim-seedtool';
 
 const options = {
   mnemonicPhrase: "your usually 12 or 24 seed phrase here",
-  network: "testnet"
+  network: "mainnet"
 };
 
 deriveAddresses(options).then(result => {
@@ -154,7 +154,7 @@ Returns an object with an address and signature or an object with an error messa
 As a CLI
 
 ```bash
-npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="your_message_here" --network="testnet"
+npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="your_message_here" --network="mainnet"
 ```
 
 As a module:
@@ -165,7 +165,7 @@ import { signMessage } from 'zenclaim-signtool';
 const options = { 
   privKey: "your_private_key_here", 
   message: "your_message_here",
-  network: "testnet"
+  network: "mainnet"
 }
 
 signMessage(options).then(result => {
@@ -188,7 +188,7 @@ Drop the dashes when creating the options object for module use.
  --privKey="" (mandatory, WIF (Wallet Import Format) or raw format private key)
  --message="" (mandatory) 
  --compressed=true||false (optional, default true) 
- --network="mainnet||testnet" (optional, default mainnet)
+ --network="mainnet||testnet" (optional, default "mainnet")
  --stringify (optional JSON.stringify() output, default object {signature, address})
  --help  display this help
  --verbose  display additional values to help debug
@@ -206,7 +206,7 @@ Returns either true or false on success or an object with an error message.
 As a CLI:
 
 ```bash
-npx zenclaim-verifymessage --message="your_signed_message_here" --zenAddress="your_znaddress_here" --signature="signature_here" --network="testnet"
+npx zenclaim-verifymessage --message="your_signed_message_here" --zenAddress="your_znaddress_here" --signature="signature_here" --network="mainnet"
 ```
 
 As a Module:
@@ -218,7 +218,7 @@ const options = {
   message: "message_here", 
   zenAddress: "zen_address_here", 
   signature: "signature_here",
-  network: "testnet"
+  network: "mainnet"
 };
 
 verifyMessage(options).then(result => {
@@ -258,7 +258,7 @@ Returns an object with the x and y coordinates or an object with an error messag
 As a CLI:
 
 ```bash
-npx zenclaim-recoverpubkey --message="your_signed_message_here" --zenAddress="source_address_here" --signature="signature_here" --network="testnet"
+npx zenclaim-recoverpubkey --message="your_signed_message_here" --zenAddress="source_address_here" --signature="signature_here" --network="mainnet"
 ```
 
 As a module:
@@ -270,7 +270,7 @@ const options = {
   message: "your_signed_message_here",
   zenAddress: "source_address_here",
   signature: "signature_here",
-  network: "testnet"
+  network: "mainnet"
 };
 
 recoverPubKey(options).then(result => {
@@ -314,7 +314,7 @@ Returns the transaction hash on success or an object with an error message.
 As a CLI:
 
 ```bash
-npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key" --network="testnet"
+npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key" --network="mainnet"
 ```
 
 As a module:
@@ -327,7 +327,7 @@ const options = {
   destinationAddress: "base_destination_address",
   signature: "signature_from signed_message",
   senderAddressPrivKey: "base_senders_private_key",
-  network: "testnet"
+  network: "mainnet"
 };
 
 claimZenAddress(options).then(result => {
@@ -434,7 +434,7 @@ Deterministically generate a P2PKH ZEN address from a Base ETH address.
 As a CLI:
 
 ```bash
-npx zenclaim-deriveclaimdirectaddress --baseEthAddress="<base_eth_address>" --network="testnet" 
+npx zenclaim-deriveclaimdirectaddress --baseEthAddress="<base_eth_address>" --network="mainnet" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -446,7 +446,7 @@ import { deriveClaimDirectAddress } from 'zenclaim-deriveclaimdirectaddress';
 
 const options = {
   baseEthAddress: "<base_eth_address>",
-  network: "testnet"
+  network: "mainnet"
 };
 
 deriveClaimDirectAddress(options).then(result => {
@@ -482,7 +482,7 @@ The balance would be unspendable on Horizen 1 as no private key corresponding wi
 As a CLI:
 
 ```bash
-npx zenclaim-claimdirect --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="testnet" 
+npx zenclaim-claimdirect --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="mainnet" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -495,7 +495,7 @@ import { claimDirect } from 'zenclaim-claimdirect';
 const options = {
   baseEthAddress: "<base_eth_address>",
   senderAddressPrivKey: "<sender_private_key>",
-  network: "testnet"
+  network: "mainnet"
 };
 
 claimDirect(options).then(result => {
@@ -533,7 +533,7 @@ Deterministically generate a P2SH ZEN multisig address and redeem script from a 
 As a CLI:
 
 ```bash
-npx zenclaim-deriveclaimdirectmultisig --zenAddressPubKey="<zen_public_key>" --baseEthAddress="<base_eth_address>" --network="testnet" 
+npx zenclaim-deriveclaimdirectmultisig --zenAddressPubKey="<zen_public_key>" --baseEthAddress="<base_eth_address>" --network="mainnet" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -546,7 +546,7 @@ import { deriveClaimDirectMultisig } from 'zenclaim-deriveclaimdirectmultisig';
 const options = {
   zenAddressPubKey: "<zen_public_key>",
   baseEthAddress: "<base_eth_address>",
-  network: "testnet"
+  network: "mainnet"
 };
 
 deriveClaimDirectMultisig(options).then(result => {
@@ -585,7 +585,7 @@ As a CLI:
 
 ```bash
 npx zenclaim-claimdirectmultisigaddress
- --redeemScript="<redeem_script>" --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="testnet" 
+ --redeemScript="<redeem_script>" --baseEthAddress="<base_eth_address>" --senderAddressPrivKey="<sender_private_key>" --network="mainnet" 
 ```
 
 Note: adjust the quotes for the operating system you are using.
@@ -599,7 +599,7 @@ const options = {
   redeemScript: "<redeem_script>",
   baseEthAddress: "<base_eth_address>",
   senderAddressPrivKey: "<sender_private_key>",
-  network: "testnet"
+  network: "mainnet"
 };
 
 claimDirectMultisig(options).then(result => {
@@ -651,14 +651,14 @@ Below are the basic steps to submit a claim for ZEN transparent addresses using 
 3. **Sign the Message Using zenclaim-signtool:**  
    * Use the `zenclaim-signtool` to sign the message created in the previous step.  
    * Provide your ZEN private key and the message to sign as arguments or options.  
-   * Command Line Example: `npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="HBETACLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" --network="testnet"`  
+   * Command Line Example: `npx zenclaim-signtool --privKey="your_zen_private_key_here" --message="HBETACLAIM0x0Fd343F9a263906bD6AfebfDD4011579979E8aeC" --network="mainnet"`  
    * This step will provide you with a signature.  
 4. **Submit the Claim Using zenclaim-claimzenaddress:**  
    * Use the `zenclaim-claimzenaddress` command to submit the claim.  
    * Provide the source ZEN address, the destination Base address, the signature obtained from the previous step, and the sender's private key for the Base network.  
    * The sender's private key should be associated with an address that has sufficient funds to cover gas fees.  
    * Command Line Example (all on one line):   
-     * `npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key" --network="testnet"`  
+     * `npx zenclaim-claimzenaddress --zenAddress="source_address_here" --destinationAddress="base_address_here" --signature="from_signed_message" --senderAddressPrivKey="base_senders_private_key" --network="mainnet"`  
    * This tool will validate the claim and send a transaction to the smart contract on Base.  
    * The transaction hash is returned when successful.  
 5. **Verify the Transaction:** After submitting the claim, verify the transaction using the transaction hash returned in the previous step on the Base network using a block explorer (https://sepolia.basescan.org/)[https://sepolia.basescan.org/]. Check that the ZEN has been transferred to your destination Base address.
@@ -679,9 +679,9 @@ In this case:
 This example is for a 3 of 5 multisig. Only submit the required number of signatures.
 
 ### Quick Start Example (Multisig Address)
-1. **Build Message:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --destinationAddress="YourBaseAddress" --network="testnet" --buildmessage`
+1. **Build Message:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --destinationAddress="YourBaseAddress" --network="mainnet" --buildmessage`
 2. **Sign Message:** Each required key holder signs the message returned from the previous step using their private key (e.g., with `npx zenclaim-signtool`).
-3. **Claim ZEN:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --redeemScript="YourRedeemScript" --destinationAddress="YourBaseAddress" --senderAddressPrivKey="SendersBasePrivateKey" --signatures="[\"Signature1\",\"Signature2\",\"Signature3\"]" --network="testnet"`
+3. **Claim ZEN:** `npx zenclaim-claimmultisigaddress --zenMultisigAddress="YourMultisigAddress" --redeemScript="YourRedeemScript" --destinationAddress="YourBaseAddress" --senderAddressPrivKey="SendersBasePrivateKey" --signatures="[\"Signature1\",\"Signature2\",\"Signature3\"]" --network="mainnet"`
 
 
 Submitting a claim for a multisig address requires coordination with the holders of the private keys. The following steps detail the process for a multisig address requiring three signatures using the `zenclaim-claimmultisigaddress` tool.
@@ -694,7 +694,7 @@ Submitting a claim for a multisig address requires coordination with the holders
    * Use the `zenclaim-claimmultisigaddress` tool with the `--buildmessage` option to create the message each key holder must sign. This step requires the multisig address and the destination address.  
    * Command Line Example:
       ```bash
-      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --network="testnet" --buildmessage
+      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --destinationAddress="base_address_here" --network="mainnet" --buildmessage
       ```
 
    * The tool will return the exact message that must be signed by each key holder. This message will be in the format `HBETACLAIM{multisig_address_decoded}{destination_address}`.  
@@ -709,7 +709,7 @@ Submitting a claim for a multisig address requires coordination with the holders
    * Command Line Example (all on one line):
 
       ```bash
-      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --destinationAddress="base_address_here" --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"signature3\"]" --network="testnet"
+      npx zenclaim-claimmultisigaddress --zenMultisigAddress="multisig_address_here" --redeemScript="your_redeem_script_here" --destinationAddress="base_address_here" --senderAddressPrivKey="base_senders_private_key" --signatures="[\"signature1\",\"signature2\",\"signature3\"]" --network="mainnet"
       ```
 
    * Note: Adjust the quotes for the operating system you are using (the backslash escape character may not be needed).  In module use, signatures must be an array.  

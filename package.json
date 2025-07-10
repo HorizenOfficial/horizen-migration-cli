@@ -1,6 +1,6 @@
 {
   "name": "zenclaim-cli",
-  "version": "1.0.0-HBETACLAIM",
+  "version": "1.0.0-ZENCLAIM",
   "description": "command line tools for claiming zen on Horizen 2.0",
   "type": "module",
   "bin": {
